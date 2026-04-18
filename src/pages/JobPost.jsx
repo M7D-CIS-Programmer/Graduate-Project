@@ -1,0 +1,400 @@
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import {
+    Briefcase,
+    MapPin,
+    DollarSign,
+    Clock,
+    CheckCircle2,
+    ChevronRight,
+    ChevronLeft,
+    Building2,
+    FileText,
+    Plus,
+    LayoutDashboard
+} from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
+import './JobPost.css';
+import { api } from '../api/api';
+import { useAuth } from '../context/AuthContext';
+import { useCreateJob } from '../hooks/useJobs';
+import { useQuery } from '@tanstack/react-query';
+
+export default function JobPost() {
+    const { t, dir } = useLanguage();
+    const navigate = useNavigate();
+    const { user } = useAuth();
+    const createJobMutation = useCreateJob();
+    const { data: categories = [] } = useQuery({
+        queryKey: ['categories'],
+        queryFn: api.getCategories
+    });
+    
+    const [step, setStep] = useState(1);
+    const [isSubmitted, setIsSubmitted] = useState(false);
+    const [formData, setFormData] = useState({
+        title: '',
+        company: '', 
+        category: '',
+        type: 'Full-time',
+        location: '',
+        salary: '',
+        isNegotiable: false,
+        description: '',
+        responsibilities: '',
+        requirements: '',
+        benefits: ''
+    });
+<<<<<<< HEAD:frontend/src/pages/JobPost.jsx
+=======
+
+    const categories = ['Engineering', 'Design', 'Marketing', 'Management', 'Other'];
+>>>>>>> 8905e2557c6f8eee2d2c02b1bfe69f0d5638ceb3:src/pages/JobPost.jsx
+    const jordanCities = ['Amman', 'Irbid', 'Zarqa', 'Balqa', 'Madaba', 'Karak', 'Tafilah', 'Ma\'an', 'Aqaba', 'Mafraq', 'Jerash', 'Ajloun'];
+
+    const handleInputChange = (e) => {
+        const { name, value, type, checked } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: type === 'checkbox' ? checked : value
+        }));
+    };
+
+    const handleNext = () => {
+        setStep(prev => prev + 1);
+        window.scrollTo(0, 0);
+    };
+
+    const handlePrev = () => {
+        setStep(prev => prev - 1);
+        window.scrollTo(0, 0);
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        
+        if (step < 3) {
+            handleNext();
+            return;
+        }
+
+<<<<<<< HEAD:frontend/src/pages/JobPost.jsx
+        try {
+            // Find category ID by name
+            const categoryObj = categories.find(c => c.name === formData.category || c.id.toString() === formData.category);
+            
+            // Map frontend data to backend model
+            const jobData = {
+                userId: user?.id || 1,
+                title: formData.title,
+                description: formData.description,
+                type: formData.type,
+                workMode: 'On-site',
+                responsibilities: formData.responsibilities,
+                requirements: formData.requirements,
+                categoryId: categoryObj?.id || 1,
+                isSalaryNegotiable: formData.isNegotiable,
+                salaryMin: 2000, 
+                salaryMax: 4000,
+                features: formData.benefits,
+                status: 'Active'
+            };
+
+            await createJobMutation.mutateAsync(jobData);
+=======
+        // Simulate API call
+        setTimeout(() => {
+>>>>>>> 8905e2557c6f8eee2d2c02b1bfe69f0d5638ceb3:src/pages/JobPost.jsx
+            setIsSubmitted(true);
+            window.scrollTo(0, 0);
+        } catch (err) {
+            console.error('Failed to post job:', err);
+            alert(t('actionFailed') || 'Failed to post job. Please try again.');
+        }
+    };
+
+    if (isSubmitted) {
+        return (
+            <div className={`job-post-container ${dir}`}>
+                <div className="job-post-card success-card glass">
+                    <div className="success-icon">
+                        <CheckCircle2 size={48} />
+                    </div>
+                    <h2>{t('jobPostedSuccess')}</h2>
+                    <p>{t('jobPostedSubtitle')}</p>
+
+                    <div className="success-actions">
+                        <button
+                            className="btn-primary"
+                            onClick={() => navigate('/dashboard/employer')}
+                        >
+                            <LayoutDashboard size={20} />
+                            {t('goToDashboard')}
+                        </button>
+                        <button
+                            className="btn-primary"
+                            style={{ background: 'rgba(255,255,255,0.05)', boxShadow: 'none' }}
+                            onClick={() => {
+                                setIsSubmitted(false);
+                                setStep(1);
+                                setFormData({
+                                    title: '',
+                                    company: '',
+                                    category: '',
+                                    type: 'Full-time',
+                                    location: '',
+                                    salary: '',
+                                    isNegotiable: false,
+                                    description: '',
+                                    responsibilities: '',
+                                    requirements: '',
+                                    benefits: ''
+                                });
+                            }}
+                        >
+                            <Plus size={20} />
+                            {t('createAnother')}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <div className={`job-post-container ${dir}`}>
+            <div className="job-post-header">
+                <h1>{t('postJobHeader')}</h1>
+                <p>{t('postJobSubtitle')}</p>
+            </div>
+
+            {/* Stepper */}
+            <div className="post-stepper">
+                <div className={`step ${step >= 1 ? 'active' : ''} ${step > 1 ? 'completed' : ''}`}>
+                    <div className="step-number">{step > 1 ? <CheckCircle2 size={20} /> : '1'}</div>
+                    <span className="step-label">{t('step1')}</span>
+                </div>
+                <div className={`step ${step >= 2 ? 'active' : ''} ${step > 2 ? 'completed' : ''}`}>
+                    <div className="step-number">{step > 2 ? <CheckCircle2 size={20} /> : '2'}</div>
+                    <span className="step-label">{t('step2')}</span>
+                </div>
+                <div className={`step ${step >= 3 ? 'active' : ''}`}>
+                    <div className="step-number">3</div>
+                    <span className="step-label">{t('step3')}</span>
+                </div>
+            </div>
+
+            <div className="job-post-card glass">
+                <form onSubmit={handleSubmit}>
+                    {step === 1 && (
+                        <div className="form-grid">
+                            <div className="form-group full-width">
+                                <label>{t('jobTitle')}</label>
+                                <input
+                                    type="text"
+                                    name="title"
+                                    value={formData.title}
+                                    onChange={handleInputChange}
+                                    placeholder={t('jobTitlePlaceholder')}
+                                    required
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label>{t('companyName')}</label>
+                                <input
+                                    type="text"
+                                    name="company"
+                                    value={formData.company}
+                                    onChange={handleInputChange}
+                                    placeholder={t('companyPlaceholder')}
+                                    required
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label>{t('category')}</label>
+                                <select
+                                    name="category"
+                                    value={formData.category}
+                                    onChange={handleInputChange}
+                                    required
+                                >
+                                    <option value="">{t('selectCategory')}</option>
+                                    {categories.map(cat => (
+                                        <option key={cat.id} value={cat.id}>{cat.name}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="form-group">
+                                <label>{t('jobType')}</label>
+                                <select
+                                    name="type"
+                                    value={formData.type}
+                                    onChange={handleInputChange}
+                                >
+                                    <option value="Full-time">{t('fullTime')}</option>
+                                    <option value="Part-time">{t('partTime')}</option>
+                                    <option value="Contract">{t('contract')}</option>
+                                    <option value="Remote">{t('remote')}</option>
+                                </select>
+                            </div>
+                            <div className="form-group">
+                                <label>{t('locationPlaceholder')}</label>
+                                <select
+                                    name="location"
+                                    value={formData.location}
+                                    onChange={handleInputChange}
+                                    required
+                                >
+                                    <option value="">{t('selectLocation') || 'Select Location'}</option>
+                                    {jordanCities.map(city => (
+                                        <option key={city} value={city}>{t(city.toLowerCase().replace("'", ''))}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="form-group">
+                                <label>{t('salaryRange')}</label>
+                                <input
+                                    type="text"
+                                    name="salary"
+                                    value={formData.salary}
+                                    onChange={handleInputChange}
+                                    placeholder="e.g. $2,000 - $3,500"
+                                />
+                            </div>
+                            <div className="form-group checkbox-group">
+                                <input
+                                    type="checkbox"
+                                    name="isNegotiable"
+                                    id="negotiable"
+                                    checked={formData.isNegotiable}
+                                    onChange={handleInputChange}
+                                />
+                                <label htmlFor="negotiable">{t('salaryNegotiable')}</label>
+                            </div>
+                        </div>
+                    )}
+
+                    {step === 2 && (
+                        <div className="form-grid">
+                            <div className="form-group full-width">
+                                <label>{t('jobDescription')}</label>
+                                <textarea
+                                    name="description"
+                                    value={formData.description}
+                                    onChange={handleInputChange}
+                                    placeholder={t('jobDescriptionPlaceholder')}
+                                    required
+                                />
+                            </div>
+                            <div className="form-group full-width">
+                                <label>{t('responsibilities')}</label>
+                                <textarea
+                                    name="responsibilities"
+                                    value={formData.responsibilities}
+                                    onChange={handleInputChange}
+                                    placeholder={t('responsibilitiesPlaceholder')}
+                                />
+                            </div>
+                            <div className="form-group full-width">
+                                <label>{t('requirements')}</label>
+                                <textarea
+                                    name="requirements"
+                                    value={formData.requirements}
+                                    onChange={handleInputChange}
+                                    placeholder={t('requirementsPlaceholder')}
+                                />
+                            </div>
+                            <div className="form-group full-width">
+                                <label>{t('benefits')}</label>
+                                <textarea
+                                    name="benefits"
+                                    value={formData.benefits}
+                                    onChange={handleInputChange}
+                                    placeholder={t('benefitsPlaceholder')}
+                                />
+                            </div>
+                        </div>
+                    )}
+
+                    {step === 3 && (
+                        <div className="review-area">
+                            <div className="review-section">
+                                <h3>{t('step1')}</h3>
+                                <div className="review-grid">
+                                    <div className="review-item">
+                                        <label>{t('jobTitle')}</label>
+                                        <span>{formData.title}</span>
+                                    </div>
+                                    <div className="review-item">
+                                        <label>{t('companyName')}</label>
+                                        <span>{formData.company}</span>
+                                    </div>
+                                    <div className="review-item">
+                                        <label>{t('category')}</label>
+                                        <span>{categories.find(c => c.id.toString() === formData.category)?.name || formData.category}</span>
+                                    </div>
+                                    <div className="review-item">
+                                        <label>{t('jobType')}</label>
+                                        <span>{formData.type}</span>
+                                    </div>
+                                    <div className="review-item">
+                                        <label>{t('locationPlaceholder')}</label>
+                                        <span>{formData.location}</span>
+                                    </div>
+                                    <div className="review-item">
+                                        <label>{t('salaryRange')}</label>
+                                        <span>{formData.salary} {formData.isNegotiable ? `(${t('salaryNegotiable')})` : ''}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="review-section">
+                                <h3>{t('step2')}</h3>
+                                <div className="review-grid" style={{ display: 'block' }}>
+                                    <div className="review-item" style={{ marginBottom: '1.5rem' }}>
+                                        <label>{t('jobDescription')}</label>
+                                        <p style={{ fontSize: '0.9rem', whiteSpace: 'pre-wrap' }}>{formData.description}</p>
+                                    </div>
+                                    <div className="review-item" style={{ marginBottom: '1.5rem' }}>
+                                        <label>{t('responsibilities')}</label>
+                                        <p style={{ fontSize: '0.9rem', whiteSpace: 'pre-wrap' }}>{formData.responsibilities}</p>
+                                    </div>
+                                    <div className="review-item" style={{ marginBottom: '1.5rem' }}>
+                                        <label>{t('requirements')}</label>
+                                        <p style={{ fontSize: '0.9rem', whiteSpace: 'pre-wrap' }}>{formData.requirements}</p>
+                                    </div>
+                                    <div className="review-item">
+                                        <label>{t('benefits')}</label>
+                                        <p style={{ fontSize: '0.9rem', whiteSpace: 'pre-wrap' }}>{formData.benefits}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    <div className="form-actions">
+                        {step > 1 ? (
+                            <button type="button" className="btn-primary" style={{ background: 'rgba(255,255,255,0.05)', boxShadow: 'none' }} onClick={handlePrev}>
+                                <ChevronLeft size={20} /> {t('back')}
+                            </button>
+                        ) : (
+                            <div></div>
+                        )}
+
+                        {step < 3 && (
+                            <button type="button" className="btn-primary" onClick={handleNext}>
+                                {t('nextStep') || "Next"} <ChevronRight size={20} />
+                            </button>
+                        )}
+                        {step === 3 && (
+                            <button type="submit" className="btn-primary">
+                                <CheckCircle2 size={20} /> {t('publishJob')}
+                            </button>
+                        )}
+                    </div>
+                </form>
+            </div>
+        </div>
+    );
+}
+
