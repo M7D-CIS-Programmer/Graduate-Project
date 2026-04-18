@@ -1,0 +1,108 @@
+using aabu_project.Data;
+using aabu_project.Models;
+using aabu_project.Dtos;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using SQLitePCL;
+
+[ApiController]
+[Route("api/[controller]")]
+public class ApplicationJobsController : ControllerBase
+{
+    private readonly MyDbContext _context;
+
+    public ApplicationJobsController(MyDbContext context)
+    {
+        _context = context;
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Get()
+    {
+        return Ok(await _context.ApplicationJobs
+            .Include(a => a.Job)
+            .ThenInclude(j => j.User)
+            .Include(a => a.User)
+            .ToListAsync());
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Apply(ApplicationJobCreateDto dto)
+    {
+        var app = new ApplicationJob
+        {
+            JobId = dto.JobId,
+            UserId = dto.UserId,
+            Note = dto.Note,
+            Cv = dto.Cv,
+            Date = DateTime.Now,
+            CandidateStatus = "Applied"
+        };
+
+        _context.ApplicationJobs.Add(app);
+        
+        // Notify Employer
+        var job = await _context.Jobs.FindAsync(dto.JobId);
+        if (job != null)
+        {
+            var seeker = await _context.Users.FindAsync(dto.UserId);
+            var notification = new Notification
+            {
+                UserId = job.UserId,
+                Title = "New Job Application",
+                Message = $"{seeker?.Name ?? "A candidate"} applied for your job: {job.Title}",
+                Type = "Application",
+                IsRead = false
+            };
+            _context.Notifications.Add(notification);
+        }
+
+        await _context.SaveChangesAsync();
+        return Ok(app);
+    }
+
+    [HttpPut("{id}/status")]
+    public async Task<IActionResult> UpdateStatus(int id, [FromBody] ApplicationStatusUpdateDto dto)
+    {
+        var app = await _context.ApplicationJobs
+            .Include(a => a.Job)
+            .FirstOrDefaultAsync(a => a.Id == id);
+
+        if (app == null)
+            return NotFound();
+
+        var oldStatus = app.CandidateStatus;
+        app.CandidateStatus = dto.Status;
+        
+        // Notify Job Seeker if status actually changed
+        if (oldStatus != dto.Status)
+        {
+            var notification = new Notification
+            {
+                UserId = app.UserId,
+                Title = "Application Status Update",
+                Message = $"Your application for '{app.Job.Title}' has been updated to: {dto.Status}",
+                Type = "StatusUpdate",
+                IsRead = false
+            };
+            _context.Notifications.Add(notification);
+        }
+
+        await _context.SaveChangesAsync();
+        return Ok(app);
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var app = await _context.ApplicationJobs.FindAsync(id);
+
+        if (app == null)
+            return NotFound();
+
+        _context.ApplicationJobs.Remove(app);
+        await _context.SaveChangesAsync();
+
+        return Ok();
+    }
+}
