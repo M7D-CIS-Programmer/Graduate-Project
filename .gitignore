@@ -1,0 +1,11 @@
+# .NET build output
+bin/
+obj/
+*.dll
+*.pdb
+*.exe
+
+# Frontend
+frontend/.env
+frontend/node_modules/
+frontend/dist/

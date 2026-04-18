@@ -1,0 +1,6 @@
+@aabu_project_HostAddress = http://localhost:5232
+
+GET {{aabu_project_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
