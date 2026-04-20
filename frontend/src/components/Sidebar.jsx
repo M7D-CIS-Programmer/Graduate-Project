@@ -49,11 +49,7 @@ const Sidebar = ({ isOpen }) => {
             ];
         }
 
-<<<<<<< HEAD:frontend/src/components/Sidebar.jsx
         if (role === 'employer' || role === 'company') {
-=======
-        if (user.role === 'Company') {
->>>>>>> 8905e2557c6f8eee2d2c02b1bfe69f0d5638ceb3:src/components/Sidebar.jsx
             return [
                 { name: t('dashboard'), icon: <LayoutDashboard size={20} />, path: '/dashboard/employer' },
                 { name: t('myJobs'), icon: <Briefcase size={20} />, path: '/dashboard/employer/jobs' },
@@ -79,11 +75,7 @@ const Sidebar = ({ isOpen }) => {
 
     const navItems = [
         ...getRoleItems(),
-<<<<<<< HEAD:frontend/src/components/Sidebar.jsx
         ...(['employer', 'company', 'admin'].includes(userRole) ? [] : baseItems),
-=======
-        ...(['Company', 'Admin'].includes(user?.role) ? [] : baseItems),
->>>>>>> 8905e2557c6f8eee2d2c02b1bfe69f0d5638ceb3:src/components/Sidebar.jsx
         { name: t('notifications'), icon: <Bell size={20} />, path: '/notifications' },
         { name: t('profile'), icon: <UserIcon size={20} />, path: '/profile' },
         { name: t('settings'), icon: <Settings size={20} />, path: '/settings' }
@@ -95,13 +87,8 @@ const Sidebar = ({ isOpen }) => {
                 <div className="sidebar-header">
                     <p className="sidebar-label">
                         {user
-<<<<<<< HEAD:frontend/src/components/Sidebar.jsx
                             ? (['employer', 'company'].includes(userRole) ? t('company')
                                 : userRole === 'admin' ? 'Admin'
-=======
-                            ? (user.role === 'Company' ? t('company')
-                                : user.role === 'Admin' ? 'Admin'
->>>>>>> 8905e2557c6f8eee2d2c02b1bfe69f0d5638ceb3:src/components/Sidebar.jsx
                                     : t('jobSeeker'))
                             : t('menu')}
                     </p>

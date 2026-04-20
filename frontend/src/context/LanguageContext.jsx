@@ -145,10 +145,7 @@ export const LanguageProvider = ({ children }) => {
             marketingManager: "Marketing Manager",
             myApplications: "My Applications",
             applicationsSubtitle: "Track the status of jobs you have applied for.",
-<<<<<<< HEAD:frontend/src/context/LanguageContext.jsx
             noJobsFound: "No jobs found. Start by posting your first job!",
-=======
->>>>>>> 8905e2557c6f8eee2d2c02b1bfe69f0d5638ceb3:src/context/LanguageContext.jsx
             applied: "Applied",
             myJobs: "My Jobs",
             postedDate: "Posted Date",
@@ -170,15 +167,12 @@ export const LanguageProvider = ({ children }) => {
             alreadyApplied: "Already Applied",
             appliedSuccess: "Application submitted successfully!",
             appliedSuccessMsg: "You successfully applied for {role} at {company}",
-<<<<<<< HEAD:frontend/src/context/LanguageContext.jsx
             applicationStatusUpdateMsg: "Your application for '{jobTitle}' has been updated to: {status}",
             employerViewedResumeMsg: "{company} viewed your resume",
             applicationReceivedMsg: "Your application for {jobTitle} has been received",
             applicationReceived: "Application Received",
             applicationStatusUpdate: "Application Status Update",
             employerViewedProfileMsg: "An employer viewed your profile",
-=======
->>>>>>> 8905e2557c6f8eee2d2c02b1bfe69f0d5638ceb3:src/context/LanguageContext.jsx
             signInToApply: "Please sign in to apply",
             applyFor: "Apply for",
             justNow: "Just now",
@@ -524,10 +518,7 @@ export const LanguageProvider = ({ children }) => {
             marketingManager: "مدير تسويق",
             myApplications: "طلباتي",
             applicationsSubtitle: "تتبع حالة الوظائف التي تقدمت لها.",
-<<<<<<< HEAD:frontend/src/context/LanguageContext.jsx
             noJobsFound: "لم يتم العثور على وظائف، ابدأ بنشر وظيفتك الأولى!",
-=======
->>>>>>> 8905e2557c6f8eee2d2c02b1bfe69f0d5638ceb3:src/context/LanguageContext.jsx
             applied: "تم التقديم",
             myJobs: "وظائفي المنشورة",
             postedDate: "تاريخ النشر",
@@ -549,15 +540,12 @@ export const LanguageProvider = ({ children }) => {
             alreadyApplied: "تم التقديم مسبقاً",
             appliedSuccess: "تم تقديم الطلب بنجاح!",
             appliedSuccessMsg: "لقد تقدمت بنجاح لوظيفة {role} في {company}",
-<<<<<<< HEAD:frontend/src/context/LanguageContext.jsx
             applicationStatusUpdateMsg: "تم تحديث حالة طلبك لوظيفة '{jobTitle}' إلى: {status}",
             employerViewedResumeMsg: "قام {company} بمشاهدة سيرتك الذاتية",
             applicationReceivedMsg: "تم استلام طلبك لوظيفة {jobTitle}",
             applicationReceived: "تم استلام الطلب",
             applicationStatusUpdate: "تحديث حالة الطلب",
             employerViewedProfileMsg: "قام صاحب عمل بمشاهدة ملفك الشخصي",
-=======
->>>>>>> 8905e2557c6f8eee2d2c02b1bfe69f0d5638ceb3:src/context/LanguageContext.jsx
             signInToApply: "الرجاء تسجيل الدخول للتقديم",
             applyFor: "التقديم على وظيفة",
             justNow: "الآن",
