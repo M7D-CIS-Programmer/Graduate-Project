@@ -53,7 +53,6 @@ const AdminDashboard = () => {
         { label: t('activeJobs'), value: rawJobs.length.toString(), icon: <Briefcase />, color: '#f59e0b', trend: '+18%' },
     ];
 
-<<<<<<< HEAD:frontend/src/pages/Dashboard/AdminDashboard.jsx
     const recentUsers = rawUsers.slice(0, 4).map(u => ({
         id: u.id,
         name: u.name,
@@ -61,14 +60,6 @@ const AdminDashboard = () => {
         date: t('justNow') || 'Recently',
         status: u.status === 'Active' ? t('active') : u.status || t('active')
     }));
-=======
-    const recentUsers = [
-        { id: 1, name: 'Sarah salem', role: t('jobSeeker'), date: '2 mins ago', status: 'Active' },
-        { id: 2, name: 'Google Inc.', role: t('employer'), date: '15 mins ago', status: 'Pending' },
-        { id: 3, name: 'Marwan mohamed', role: t('jobSeeker'), date: '1 hour ago', status: 'Active' },
-        { id: 4, name: 'Tech Solutions', role: t('employer'), date: '3 hours ago', status: 'Active' },
-    ];
->>>>>>> 8905e2557c6f8eee2d2c02b1bfe69f0d5638ceb3:src/pages/Dashboard/AdminDashboard.jsx
 
     const chartData = {
         labels: [t('jan'), t('feb'), t('mar'), t('apr'), t('may'), t('jun')],

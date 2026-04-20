@@ -13,7 +13,6 @@ const Companies = () => {
     const [selectedSector, setSelectedSector] = useState('all');
     const { data: users = [], isLoading, error } = useUsers();
 
-<<<<<<< HEAD:frontend/src/pages/Companies/Companies.jsx
     const companies = users.filter(u => u.role === 'Employer').map(u => ({
         id: u.id,
         name: u.name,
@@ -24,70 +23,6 @@ const Companies = () => {
         jobsCount: 0,
         description: u.description || 'Leading company in the region.'
     }));
-=======
-    const companies = [
-        {
-            id: 1,
-            name: 'TechVision',
-            logo: 'https://api.dicebear.com/7.x/initials/svg?seed=TV&backgroundColor=6366f1',
-            sector: t('tech'),
-            location: 'Irbid, Jordan',
-            employees: '500-1000',
-            jobsCount: 12,
-            description: 'Leading the way in AI and machine learning solutions for the modern world.'
-        },
-        {
-            id: 2,
-            name: 'CreativePulse',
-            logo: 'https://api.dicebear.com/7.x/initials/svg?seed=CP&backgroundColor=ec4899',
-            sector: t('tech'),
-            location: 'Amman, Jordan',
-            employees: '100-250',
-            jobsCount: 5,
-            description: 'A boutique design agency specializing in brand identity and digital experiences.'
-        },
-        {
-            id: 3,
-            name: 'DataFlow',
-            logo: 'https://api.dicebear.com/7.x/initials/svg?seed=DF&backgroundColor=10b981',
-            sector: t('tech'),
-            location: 'Mafraq, Jordan',
-            employees: '250-500',
-            jobsCount: 8,
-            description: 'Scalable data infrastructure and analytics for global enterprises.'
-        },
-        {
-            id: 4,
-            name: 'GlobalFinance',
-            logo: 'https://api.dicebear.com/7.x/initials/svg?seed=GF&backgroundColor=f59e0b',
-            sector: t('finance'),
-            location: 'Aqaba, Jordan',
-            employees: '5000+',
-            jobsCount: 45,
-            description: 'Empowering individuals and businesses with innovative financial services.'
-        },
-        {
-            id: 5,
-            name: 'HealthPlus',
-            logo: 'https://api.dicebear.com/7.x/initials/svg?seed=HP&backgroundColor=3b82f6',
-            sector: t('healthcare'),
-            location: 'Amman, Jordan',
-            employees: '1000-2000',
-            jobsCount: 18,
-            description: 'Modern healthcare management and patient-centric digital solutions.'
-        },
-        {
-            id: 6,
-            name: 'EduSmart',
-            logo: 'https://api.dicebear.com/7.x/initials/svg?seed=ES&backgroundColor=8b5cf6',
-            sector: t('education_sector'),
-            location: 'Amman, Jordan',
-            employees: '50-100',
-            jobsCount: 3,
-            description: 'Revolutionizing online learning with interactive and personalized curricula.'
-        }
-    ];
->>>>>>> 8905e2557c6f8eee2d2c02b1bfe69f0d5638ceb3:src/pages/Companies/Companies.jsx
 
     const filteredCompanies = companies.filter(company => {
         const matchesSearch = (company.name || '').toLowerCase().includes(searchTerm.toLowerCase());

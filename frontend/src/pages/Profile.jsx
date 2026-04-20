@@ -24,11 +24,7 @@ import './User.css';
 const Profile = () => {
     const { id } = useParams();
     const { t } = useLanguage();
-<<<<<<< HEAD:frontend/src/pages/Profile.jsx
     const { user: currentUser, updateUser } = useAuth();
-=======
-    const { user, updateUser } = useAuth();
->>>>>>> 8905e2557c6f8eee2d2c02b1bfe69f0d5638ceb3:src/pages/Profile.jsx
     const { addToast } = useToast();
     const fileInputRef = useRef(null);
 
@@ -103,7 +99,6 @@ const Profile = () => {
         }
     };
 
-<<<<<<< HEAD:frontend/src/pages/Profile.jsx
     const handleSave = async () => {
         try {
             await updateUser({
@@ -121,16 +116,6 @@ const Profile = () => {
         } catch (error) {
             addToast(t('actionFailed') || 'Failed to update profile. Please try again.', 'error');
         }
-=======
-    const handleSave = () => {
-        updateUser({
-            name: formData.name,
-            email: formData.email,
-            photo: formData.photo,
-            phone: formData.phone
-        });
-        addToast('Profile updated successfully!', 'success');
->>>>>>> 8905e2557c6f8eee2d2c02b1bfe69f0d5638ceb3:src/pages/Profile.jsx
     };
 
     return (
@@ -198,33 +183,12 @@ const Profile = () => {
                                 <MapPin size={16} /> {t('locationPlaceholder')}
                             </label>
                             <select
-<<<<<<< HEAD:frontend/src/pages/Profile.jsx
                                 value={formData.location}
                                 onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                             >
                                 <option value="">{t('selectLocation') || 'Select Location'}</option>
                                 {['Amman', 'Irbid', 'Zarqa', 'Balqa', 'Madaba', 'Karak', 'Tafilah', 'Ma\'an', 'Aqaba', 'Mafraq', 'Jerash', 'Ajloun'].map(city => (
                                     <option key={city} value={city}>{t(city.toLowerCase().replace("'", ''))}</option>
-=======
-                                style={{
-                                    width: '100%',
-                                    background: 'rgba(255, 255, 255, 0.05)',
-                                    border: '1px solid var(--border-color)',
-                                    borderRadius: '12px',
-                                    padding: '0.85rem 1rem',
-                                    color: 'white',
-                                    outline: 'none',
-                                    cursor: 'pointer',
-                                    fontFamily: 'inherit',
-                                    fontSize: '0.95rem'
-                                }}
-                                value={formData.location}
-                                onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                            >
-                                <option value="" style={{ color: '#0f172a' }}>{t('selectLocation') || 'Select Location'}</option>
-                                {['Amman', 'Irbid', 'Zarqa', 'Balqa', 'Madaba', 'Karak', 'Tafilah', 'Ma\'an', 'Aqaba', 'Mafraq', 'Jerash', 'Ajloun'].map(city => (
-                                    <option key={city} value={city} style={{ color: '#0f172a' }}>{t(city.toLowerCase().replace("'", ''))}</option>
->>>>>>> 8905e2557c6f8eee2d2c02b1bfe69f0d5638ceb3:src/pages/Profile.jsx
                                 ))}
                             </select>
                         </div>

@@ -325,7 +325,7 @@
     justify-content: flex-end;
     gap: 1rem;
     margin-top: 2rem;
-<<<<<<< HEAD:frontend/src/pages/Jobs/Jobs.css
+
 }
 
 /* Candidate Action Buttons */
@@ -370,6 +370,5 @@
 .btn-candidate-action.danger:hover {
     background: rgba(239, 68, 68, 0.1);
     border-color: #ef4444;
-=======
->>>>>>> 8905e2557c6f8eee2d2c02b1bfe69f0d5638ceb3:src/pages/Jobs/Jobs.css
+
 }

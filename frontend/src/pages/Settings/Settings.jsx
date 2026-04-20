@@ -154,11 +154,7 @@ const Settings = () => {
                                 {t('deleteAccount')}
                             </h3>
                             <p style={{ fontSize: '0.85rem', color: 'rgba(239, 68, 68, 0.7)', marginBottom: '1.5rem' }}>
-<<<<<<< HEAD:frontend/src/pages/Settings/Settings.jsx
                                 {t('deleteAccountWarning')}
-=======
-                                Once you delete your account, there is no going back. Please be certain.
->>>>>>> 8905e2557c6f8eee2d2c02b1bfe69f0d5638ceb3:src/pages/Settings/Settings.jsx
                             </p>
                             <Button variant="secondary" style={{ width: '100%', borderColor: '#ef4444', color: '#ef4444' }}>
                                 {t('deleteAccount')}

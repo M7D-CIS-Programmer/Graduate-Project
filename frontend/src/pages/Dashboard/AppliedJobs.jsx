@@ -1,5 +1,4 @@
 import React from 'react';
-<<<<<<< HEAD:frontend/src/pages/Dashboard/AppliedJobs.jsx
 import Spinner from '../../components/ui/Spinner';
 import { useLanguage } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
@@ -8,19 +7,11 @@ import { useNavigate } from 'react-router-dom';
 import { useApplications } from '../../hooks/useApplications';
 import './Dashboard.css';
 import '../User.css';
-=======
-import { useLanguage } from '../../context/LanguageContext';
-import { useAuth } from '../../context/AuthContext';
-import { Briefcase, Clock, CheckCircle, XCircle, Eye } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import './Dashboard.css';
->>>>>>> 8905e2557c6f8eee2d2c02b1bfe69f0d5638ceb3:src/pages/Dashboard/AppliedJobs.jsx
 
 const AppliedJobs = () => {
     const { t, dir } = useLanguage();
     const { user } = useAuth();
     const navigate = useNavigate();
-<<<<<<< HEAD:frontend/src/pages/Dashboard/AppliedJobs.jsx
     const { data: allApplications = [], isLoading } = useApplications();
     const applications = user?.id ? allApplications.filter(app => app.userId === user.id) : allApplications;
 
@@ -67,49 +58,6 @@ const AppliedJobs = () => {
 
     return (
         <div className={`user-page-container ${dir}`}>
-=======
-
-    // Mock data for applied jobs
-    const appliedJobs = user?.appliedJobs?.length > 0 ? user.appliedJobs : [
-        { id: 1, title: 'seniorReactDev', company: 'TechVision', status: 'reviewing', date: '2023-10-25', location: 'Remote', type: 'Full-time' },
-        { id: 2, title: 'uiuxDesigner', company: 'CreativePulse', status: 'interviewScheduled', date: '2023-10-20', location: 'Irbid', type: 'Contract' },
-        { id: 3, title: 'marketingManager', company: 'DataFlow', status: 'rejected', date: '2023-10-15', location: 'Amman', type: 'Full-time' },
-        { id: 4, title: 'engineering', company: 'InnovateTech', status: 'applied', date: '2023-10-28', location: 'Remote', type: 'Full-time' }
-    ];
-
-    const getStatusIcon = (status) => {
-        switch (status.toLowerCase()) {
-            case 'interview scheduled':
-            case 'interviewscheduled':
-            case 'hired':
-                return <CheckCircle size={16} />;
-            case 'rejected':
-                return <XCircle size={16} />;
-            case 'reviewing':
-                return <Clock size={16} />;
-            default:
-                return <Briefcase size={16} />;
-        }
-    };
-
-    const getStatusBadgeClass = (status) => {
-        switch (status.toLowerCase()) {
-            case 'interview scheduled':
-            case 'interviewscheduled':
-            case 'hired':
-                return 'status-badge success';
-            case 'rejected':
-                return 'status-badge danger';
-            case 'reviewing':
-                return 'status-badge warning';
-            default:
-                return 'status-badge primary';
-        }
-    };
-
-    return (
-        <div className={`dashboard-container ${dir}`}>
->>>>>>> 8905e2557c6f8eee2d2c02b1bfe69f0d5638ceb3:src/pages/Dashboard/AppliedJobs.jsx
             <div className="dashboard-header">
                 <div>
                     <h1 className="dashboard-title">{t('myApplications')}</h1>
@@ -117,7 +65,6 @@ const AppliedJobs = () => {
                 </div>
             </div>
 
-<<<<<<< HEAD:frontend/src/pages/Dashboard/AppliedJobs.jsx
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 {applications.length > 0 ? (
                     applications.map(app => (
@@ -184,73 +131,10 @@ const AppliedJobs = () => {
                         <p style={{ color: 'var(--text-muted)', marginTop: '0.5rem' }}>{t('exploreCompanies')}</p>
                     </div>
                 )}
-=======
-            <div className="dashboard-grid full-width" style={{ gridTemplateColumns: 'minmax(0, 1fr)' }}>
-                <section className="dashboard-section table-section">
-                    <div className="table-responsive">
-                        <table className="admin-table">
-                            <thead>
-                                <tr>
-                                    <th>{t('jobTitle')}</th>
-                                    <th>{t('company')}</th>
-                                    <th>{t('postedDate')}</th>
-                                    <th>{t('status')}</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {appliedJobs.map(job => (
-                                    <tr key={job.id}>
-                                        <td>
-                                            <div className="user-info-cell">
-                                                <div className="user-avatar-small" style={{ backgroundColor: 'rgba(99, 102, 241, 0.1)', color: '#6366f1' }}>
-                                                    <Briefcase size={16} />
-                                                </div>
-                                                <div>
-                                                    <p className="user-name-cell">{t(job.title) || job.title}</p>
-                                                    <span className="user-email-cell">{job.type || 'Full-time'} • {job.location || 'Remote'}</span>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td>{job.company}</td>
-                                        <td>{job.date || job.time || t('justNow')}</td>
-                                        <td>
-                                            <span
-                                                className={getStatusBadgeClass(job.status)}
-                                                style={{
-                                                    display: 'inline-flex',
-                                                    alignItems: 'center',
-                                                    gap: '0.35rem',
-                                                    padding: '0.25rem 0.75rem',
-                                                    borderRadius: '9999px',
-                                                    fontSize: '0.75rem',
-                                                    fontWeight: '600'
-                                                }}
-                                            >
-                                                {getStatusIcon(job.status)}
-                                                {t(job.status) || job.status}
-                                            </span>
-                                        </td>
-                                    </tr>
-                                ))}
-                                {appliedJobs.length === 0 && (
-                                    <tr>
-                                        <td colSpan="5" style={{ textAlign: 'center', padding: '2rem' }}>
-                                            {t('noSavedJobs')}
-                                        </td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-                </section>
->>>>>>> 8905e2557c6f8eee2d2c02b1bfe69f0d5638ceb3:src/pages/Dashboard/AppliedJobs.jsx
             </div>
         </div>
     );
 };
 
-<<<<<<< HEAD:frontend/src/pages/Dashboard/AppliedJobs.jsx
 
-=======
->>>>>>> 8905e2557c6f8eee2d2c02b1bfe69f0d5638ceb3:src/pages/Dashboard/AppliedJobs.jsx
 export default AppliedJobs;

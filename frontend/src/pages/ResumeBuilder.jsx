@@ -159,7 +159,6 @@ const ResumeBuilder = () => {
                                         value={formData.personal.location}
                                         onChange={(e) => setFormData({ ...formData, personal: { ...formData.personal, location: e.target.value } })}
                                     >
-<<<<<<< HEAD:frontend/src/pages/ResumeBuilder.jsx
                                         <option 
                                             value="" 
                                             style={{ 
@@ -180,11 +179,6 @@ const ResumeBuilder = () => {
                                             >
                                                 {t(city.toLowerCase().replace("'", ''))}
                                             </option>
-=======
-                                        <option value="" style={{ color: '#0f172a' }}>{t('selectLocation') || 'Select Location'}</option>
-                                        {['Amman', 'Irbid', 'Zarqa', 'Balqa', 'Madaba', 'Karak', 'Tafilah', 'Ma\'an', 'Aqaba', 'Mafraq', 'Jerash', 'Ajloun'].map(city => (
-                                            <option key={city} value={city} style={{ color: '#0f172a' }}>{t(city.toLowerCase().replace("'", ''))}</option>
->>>>>>> 8905e2557c6f8eee2d2c02b1bfe69f0d5638ceb3:src/pages/ResumeBuilder.jsx
                                         ))}
                                     </select>
                                 </div>

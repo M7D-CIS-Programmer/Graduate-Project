@@ -64,15 +64,9 @@
     bottom: -35px;
     left: 50%;
     transform: translateX(-50%) translateY(10px);
-<<<<<<< HEAD:frontend/src/components/Navbar.css
     background: #0f172a;
     backdrop-filter: blur(4px);
     color: #f8fafc;
-=======
-    background: var(--bg-dark);
-    backdrop-filter: blur(4px);
-    color: var(--text-main);
->>>>>>> 8905e2557c6f8eee2d2c02b1bfe69f0d5638ceb3:src/components/Navbar.css
     padding: 6px 12px;
     border-radius: 6px;
     font-size: 0.8rem;
@@ -100,11 +94,7 @@
     transform: translateX(-50%);
     border-width: 0 6px 6px 6px;
     border-style: solid;
-<<<<<<< HEAD:frontend/src/components/Navbar.css
     border-color: transparent transparent #0f172a transparent;
-=======
-    border-color: transparent transparent var(--bg-dark) transparent;
->>>>>>> 8905e2557c6f8eee2d2c02b1bfe69f0d5638ceb3:src/components/Navbar.css
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.3s ease, visibility 0.3s ease;
@@ -288,72 +278,7 @@
 .user-profile {
     display: flex;
     align-items: center;
-<<<<<<< HEAD:frontend/src/components/Navbar.css
     gap: 0.75rem;
-=======
-}
-
-.dropdown-chevron {
-    color: var(--text-muted);
-    transition: var(--transition);
-    margin-left: 0.5rem;
-}
-
-[dir="rtl"] .dropdown-chevron {
-    margin-left: 0;
-    margin-right: 0.5rem;
-}
-
-.dropdown-chevron.open {
-    transform: rotate(180deg);
-}
-
-.user-dropdown {
-    position: absolute;
-    top: calc(100% + 1rem);
-    right: 0;
-    width: 220px;
-    border-radius: 16px;
-    padding: 0.75rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
-    border: 1px solid var(--border-color);
-    background: var(--glass-bg);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    animation: dropdownSlideDown 0.3s ease-out;
-    z-index: 100;
-}
-
-[dir="rtl"] .user-dropdown {
-    right: auto;
-    left: 0;
-}
-
-@keyframes dropdownSlideDown {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.dropdown-item {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 0.75rem 1rem;
-    border-radius: 10px;
-    color: var(--text-main);
-    font-size: 0.9rem;
-    transition: var(--transition);
->>>>>>> 8905e2557c6f8eee2d2c02b1bfe69f0d5638ceb3:src/components/Navbar.css
     cursor: pointer;
 }
 
@@ -362,15 +287,11 @@
     top: -6px;
     right: -6px;
     background: #ef4444;
-<<<<<<< HEAD:frontend/src/components/Navbar.css
     color: white;
     font-size: 0.65rem;
     font-weight: 700;
     min-width: 18px;
     height: 18px;
-=======
-    border: 1.5px solid var(--bg-card);
->>>>>>> 8905e2557c6f8eee2d2c02b1bfe69f0d5638ceb3:src/components/Navbar.css
     border-radius: 50%;
     display: flex;
     align-items: center;

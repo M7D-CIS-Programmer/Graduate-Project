@@ -1,8 +1,5 @@
 import React, { useState, useEffect } from 'react';
-<<<<<<< HEAD:frontend/src/pages/EmployerHome.jsx
 import Spinner from '../components/ui/Spinner';
-=======
->>>>>>> 8905e2557c6f8eee2d2c02b1bfe69f0d5638ceb3:src/pages/EmployerHome.jsx
 import { useLanguage } from '../context/LanguageContext';
 import { Search, MapPin, Briefcase, Building, Users, TrendingUp, ChevronRight } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -10,17 +7,13 @@ import heroImg1 from '../assets/heroImg1.jpg';
 import heroImg2 from '../assets/heroImg2.jpg';
 import heroImg3 from '../assets/heroImg3.jpg';
 import './Home.css';
-<<<<<<< HEAD:frontend/src/pages/EmployerHome.jsx
 import { useJobs } from '../hooks/useJobs';
-=======
->>>>>>> 8905e2557c6f8eee2d2c02b1bfe69f0d5638ceb3:src/pages/EmployerHome.jsx
 
 const EmployerHome = () => {
     const { t, dir } = useLanguage();
     const navigate = useNavigate();
     const [currentImage, setCurrentImage] = useState(0);
     const [searchQuery, setSearchQuery] = useState('');
-<<<<<<< HEAD:frontend/src/pages/EmployerHome.jsx
     const candidates = [
         { name: 'Ahmad Al-Hassan', location: 'Dubai, UAE' },
         { name: 'Sara Malik', location: 'Abu Dhabi, UAE' },
@@ -28,8 +21,6 @@ const EmployerHome = () => {
     ];
     const { data: jobs = [], isLoading } = useJobs();
     const jobsCount = jobs.length;
-=======
->>>>>>> 8905e2557c6f8eee2d2c02b1bfe69f0d5638ceb3:src/pages/EmployerHome.jsx
 
     const bgImages = [
         heroImg1,
@@ -42,11 +33,7 @@ const EmployerHome = () => {
             setCurrentImage((prev) => (prev + 1) % bgImages.length);
         }, 4000);
         return () => clearInterval(timer);
-<<<<<<< HEAD:frontend/src/pages/EmployerHome.jsx
     }, []);
-=======
-    }, [bgImages.length]);
->>>>>>> 8905e2557c6f8eee2d2c02b1bfe69f0d5638ceb3:src/pages/EmployerHome.jsx
 
     const categories = [
         { title: 'Tech', count: '1,240', icon: <Briefcase /> },
@@ -64,11 +51,7 @@ const EmployerHome = () => {
         }
     };
 
-<<<<<<< HEAD:frontend/src/pages/EmployerHome.jsx
     if (isLoading) return <Spinner />;
-
-=======
->>>>>>> 8905e2557c6f8eee2d2c02b1bfe69f0d5638ceb3:src/pages/EmployerHome.jsx
     return (
         <div className="home-container">
             {/* Hero Section */}
@@ -112,11 +95,7 @@ const EmployerHome = () => {
                                 <Users />
                             </div>
                             <div>
-<<<<<<< HEAD:frontend/src/pages/EmployerHome.jsx
                                 <h3 className="stat-value">{candidates.length}+</h3>
-=======
-                                <h3 className="stat-value">45k+</h3>
->>>>>>> 8905e2557c6f8eee2d2c02b1bfe69f0d5638ceb3:src/pages/EmployerHome.jsx
                                 <p className="stat-label">{t('activeCandidates')}</p>
                             </div>
                         </div>
@@ -125,11 +104,7 @@ const EmployerHome = () => {
                                 <Briefcase />
                             </div>
                             <div>
-<<<<<<< HEAD:frontend/src/pages/EmployerHome.jsx
                                 <h3 className="stat-value">{jobsCount}+</h3>
-=======
-                                <h3 className="stat-value">25k+</h3>
->>>>>>> 8905e2557c6f8eee2d2c02b1bfe69f0d5638ceb3:src/pages/EmployerHome.jsx
                                 <p className="stat-label">{t('activeJobs')}</p>
                             </div>
                         </div>
@@ -138,11 +113,7 @@ const EmployerHome = () => {
                                 <Building />
                             </div>
                             <div>
-<<<<<<< HEAD:frontend/src/pages/EmployerHome.jsx
                                 <h3 className="stat-value">10+</h3>
-=======
-                                <h3 className="stat-value">10k+</h3>
->>>>>>> 8905e2557c6f8eee2d2c02b1bfe69f0d5638ceb3:src/pages/EmployerHome.jsx
                                 <p className="stat-label">{t('activeCompanies')}</p>
                             </div>
                         </div>
@@ -183,35 +154,18 @@ const EmployerHome = () => {
                     </Link>
                 </div>
                 <div className="jobs-grid">
-<<<<<<< HEAD:frontend/src/pages/EmployerHome.jsx
                     {candidates.map((candidate, i) => (
-=======
-                    {[
-                        { titleKey: 'seniorReactDev', location: 'Amman', typeKey: 'fullTime', remoteKey: 'remote', salary: '$120k - $160k' },
-                        { titleKey: 'uiuxDesigner', location: 'Irbid', typeKey: 'partTime', remoteKey: 'remote', salary: '$80k - $100k' },
-                        { titleKey: 'marketingManager', location: 'Zarqa', typeKey: 'contract', remoteKey: 'remote', salary: '$90k - $130k' },
-                    ].map((candidate, i) => (
->>>>>>> 8905e2557c6f8eee2d2c02b1bfe69f0d5638ceb3:src/pages/EmployerHome.jsx
                         <div key={i} className="card">
                             <div className="job-card-header">
                                 <div className="company-logo-placeholder">
                                     <Users size={24} />
                                 </div>
-<<<<<<< HEAD:frontend/src/pages/EmployerHome.jsx
                                 <span className="job-type-badge">{t('fullTime')}</span>
                             </div>
                             <h3 className="job-title">{candidate.name}</h3>
                             <p className="job-company">{candidate.location || 'Remote'} • {t('remote')}</p>
                             <div className="job-card-footer">
                                 <span className="job-salary">$100k - $150k</span>
-=======
-                                <span className="job-type-badge">{t(candidate.typeKey)}</span>
-                            </div>
-                            <h3 className="job-title">{t(candidate.titleKey)}</h3>
-                            <p className="job-company">{candidate.location} • {t(candidate.remoteKey)}</p>
-                            <div className="job-card-footer">
-                                <span className="job-salary">{candidate.salary}</span>
->>>>>>> 8905e2557c6f8eee2d2c02b1bfe69f0d5638ceb3:src/pages/EmployerHome.jsx
                                 <Link to="/profile" className="details-btn">{t('details')}</Link>
                             </div>
                         </div>

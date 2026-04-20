@@ -366,7 +366,6 @@ export const LanguageProvider = ({ children }) => {
             mafraq: "Mafraq",
             jerash: "Jerash",
             ajloun: "Ajloun",
-<<<<<<< HEAD:frontend/src/context/LanguageContext.jsx
             selectLocation: "Select Location",
             // Dashboard Months
             jan: "Jan", feb: "Feb", mar: "Mar", apr: "Apr", may: "May", jun: "Jun",
@@ -387,9 +386,6 @@ export const LanguageProvider = ({ children }) => {
             switchToArabic: "Switch to Arabic",
             switchToEnglish: "Switch to English",
             deleteAccountWarning: "Once you delete your account, there is no going back. Please be certain."
-=======
-            selectLocation: "Select Location"
->>>>>>> 8905e2557c6f8eee2d2c02b1bfe69f0d5638ceb3:src/context/LanguageContext.jsx
         },
         ar: {
             search: "ابحث...",
@@ -741,7 +737,6 @@ export const LanguageProvider = ({ children }) => {
             mafraq: "المفرق",
             jerash: "جرش",
             ajloun: "عجلون",
-<<<<<<< HEAD:frontend/src/context/LanguageContext.jsx
             selectLocation: "اختر الموقع",
             // Dashboard Months
             jan: "يناير", feb: "فبراير", mar: "مارس", apr: "أبريل", may: "مايو", jun: "يونيو",
@@ -762,9 +757,6 @@ export const LanguageProvider = ({ children }) => {
             switchToArabic: "التحويل للعربية",
             switchToEnglish: "التحويل للإنجليزية",
             deleteAccountWarning: "بمجرد حذف حسابك، لن تتمكن من التراجع. يرجى التأكد."
-=======
-            selectLocation: "اختر الموقع"
->>>>>>> 8905e2557c6f8eee2d2c02b1bfe69f0d5638ceb3:src/context/LanguageContext.jsx
         }
     };
 

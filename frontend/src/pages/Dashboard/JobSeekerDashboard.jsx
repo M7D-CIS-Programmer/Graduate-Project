@@ -59,15 +59,9 @@ const JobSeekerDashboard = () => {
     
     const recentActivity = [
         ...dynamicAppliedActivity,
-<<<<<<< HEAD:frontend/src/pages/Dashboard/JobSeekerDashboard.jsx
         { id: 1, title: t('applicationSent'), company: 'TechVision', status: t('appliedJobs'), time: t('twoHoursAgo'), icon: <Briefcase />, color: '#6366f1' },
         { id: 2, title: t('interviewScheduled'), company: 'CreativePulse', status: t('upcoming'), time: t('oneDayAgo'), icon: <Clock />, color: '#f59e0b' },
         { id: 3, title: t('resumeViewed'), company: 'DataFlow', status: t('applicationViewed'), time: t('twoDaysAgo'), icon: <Star />, color: '#10b981' },
-=======
-        { id: 1, title: 'Application Sent', company: 'TechVision', status: t('appliedJobs'), time: '2 hours ago', icon: <Briefcase />, color: '#6366f1' },
-        { id: 2, title: 'Interview Scheduled', company: 'CreativePulse', status: 'Upcoming', time: '1 day ago', icon: <Clock />, color: '#f59e0b' },
-        { id: 3, title: 'Resume Viewed', company: 'DataFlow', status: 'Viewed', time: '2 days ago', icon: <Star />, color: '#10b981' },
->>>>>>> 8905e2557c6f8eee2d2c02b1bfe69f0d5638ceb3:src/pages/Dashboard/JobSeekerDashboard.jsx
     ];
 
     return (

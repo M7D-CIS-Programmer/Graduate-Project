@@ -1,10 +1,7 @@
 import React from 'react';
 import { useLanguage } from '../../context/LanguageContext';
 import { useToast } from '../../context/ToastContext';
-<<<<<<< HEAD:frontend/src/pages/Dashboard/EmployerDashboard.jsx
 import { useTheme } from '../../context/ThemeContext';
-=======
->>>>>>> 8905e2557c6f8eee2d2c02b1bfe69f0d5638ceb3:src/pages/Dashboard/EmployerDashboard.jsx
 import { Link, useNavigate } from 'react-router-dom';
 import {
     FileText,
@@ -53,11 +50,7 @@ const EmployerDashboard = () => {
     const [applications, setApplications] = React.useState(() => {
         try {
             return JSON.parse(localStorage.getItem('allApplications') || '[]');
-<<<<<<< HEAD:frontend/src/pages/Dashboard/EmployerDashboard.jsx
         } catch (e) { return []; }
-=======
-        } catch(e) { return []; }
->>>>>>> 8905e2557c6f8eee2d2c02b1bfe69f0d5638ceb3:src/pages/Dashboard/EmployerDashboard.jsx
     });
 
     const dynamicApplicants = applications.map((app, index) => ({
@@ -78,22 +71,13 @@ const EmployerDashboard = () => {
         if (actionType === 'accept' || actionType === 'reject') {
             if (!applicant.originalId) {
                 addToast(
-<<<<<<< HEAD:frontend/src/pages/Dashboard/EmployerDashboard.jsx
                     t(actionType === 'accept' ? 'candidateAccepted' : 'candidateRejected') ||
                     `Applicant ${actionType === 'accept' ? 'Accepted' : 'Rejected'}`,
-=======
-                    t(actionType === 'accept' ? 'candidateAccepted' : 'candidateRejected') || 
-                    `Applicant ${actionType === 'accept' ? 'Accepted' : 'Rejected'}`, 
->>>>>>> 8905e2557c6f8eee2d2c02b1bfe69f0d5638ceb3:src/pages/Dashboard/EmployerDashboard.jsx
                     'success'
                 );
                 return;
             }
-<<<<<<< HEAD:frontend/src/pages/Dashboard/EmployerDashboard.jsx
 
-=======
-            
->>>>>>> 8905e2557c6f8eee2d2c02b1bfe69f0d5638ceb3:src/pages/Dashboard/EmployerDashboard.jsx
             const updatedStatus = actionType === 'accept' ? 'Hired' : 'Rejected';
             const updatedApps = applications.map(app => {
                 if (app.id === applicant.originalId) {
@@ -101,23 +85,12 @@ const EmployerDashboard = () => {
                 }
                 return app;
             });
-<<<<<<< HEAD:frontend/src/pages/Dashboard/EmployerDashboard.jsx
-
             localStorage.setItem('allApplications', JSON.stringify(updatedApps));
             setApplications(updatedApps);
 
             addToast(
                 t(actionType === 'accept' ? 'candidateAccepted' : 'candidateRejected') ||
                 `Applicant ${actionType === 'accept' ? 'Accepted' : 'Rejected'}`,
-=======
-            
-            localStorage.setItem('allApplications', JSON.stringify(updatedApps));
-            setApplications(updatedApps);
-            
-            addToast(
-                t(actionType === 'accept' ? 'candidateAccepted' : 'candidateRejected') || 
-                `Applicant ${actionType === 'accept' ? 'Accepted' : 'Rejected'}`, 
->>>>>>> 8905e2557c6f8eee2d2c02b1bfe69f0d5638ceb3:src/pages/Dashboard/EmployerDashboard.jsx
                 'success'
             );
         }
@@ -125,15 +98,9 @@ const EmployerDashboard = () => {
 
     const recentApplicants = [
         ...dynamicApplicants,
-<<<<<<< HEAD:frontend/src/pages/Dashboard/EmployerDashboard.jsx
         { id: 1, name: 'Ali Hassan', role: t('seniorReactDev'), time: t('oneHourAgo') || '1 hour ago', status: t('reviewing') },
         { id: 2, name: 'Ahmed Ali', role: t('uiDesigner'), time: '3 hours ago', status: t('pendingApproval') || 'New' },
         { id: 3, name: 'Muna Mohamed', role: t('backendDeveloper'), time: '5 hours ago', status: t('shortlisted') },
-=======
-        { id: 1, name: 'Ali Hassan', role: t('seniorReactDev'), time: '1 hour ago', status: 'Reviewing' },
-        { id: 2, name: 'Ahmed Ali', role: 'UI Designer', time: '3 hours ago', status: 'New' },
-        { id: 3, name: 'Muna Mohamed', role: 'Backend Developer', time: '5 hours ago', status: 'Shortlisted' },
->>>>>>> 8905e2557c6f8eee2d2c02b1bfe69f0d5638ceb3:src/pages/Dashboard/EmployerDashboard.jsx
     ];
 
     return (

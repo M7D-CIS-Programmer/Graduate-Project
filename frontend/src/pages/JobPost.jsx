@@ -45,11 +45,7 @@ export default function JobPost() {
         requirements: '',
         benefits: ''
     });
-<<<<<<< HEAD:frontend/src/pages/JobPost.jsx
-=======
 
-    const categories = ['Engineering', 'Design', 'Marketing', 'Management', 'Other'];
->>>>>>> 8905e2557c6f8eee2d2c02b1bfe69f0d5638ceb3:src/pages/JobPost.jsx
     const jordanCities = ['Amman', 'Irbid', 'Zarqa', 'Balqa', 'Madaba', 'Karak', 'Tafilah', 'Ma\'an', 'Aqaba', 'Mafraq', 'Jerash', 'Ajloun'];
 
     const handleInputChange = (e) => {
@@ -78,7 +74,6 @@ export default function JobPost() {
             return;
         }
 
-<<<<<<< HEAD:frontend/src/pages/JobPost.jsx
         try {
             // Find category ID by name
             const categoryObj = categories.find(c => c.name === formData.category || c.id.toString() === formData.category);
@@ -101,10 +96,6 @@ export default function JobPost() {
             };
 
             await createJobMutation.mutateAsync(jobData);
-=======
-        // Simulate API call
-        setTimeout(() => {
->>>>>>> 8905e2557c6f8eee2d2c02b1bfe69f0d5638ceb3:src/pages/JobPost.jsx
             setIsSubmitted(true);
             window.scrollTo(0, 0);
         } catch (err) {
