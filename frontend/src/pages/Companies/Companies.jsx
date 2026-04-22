@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Spinner from '../../components/ui/Spinner';
 import { Search, MapPin, Users, Briefcase, Filter, ExternalLink } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
@@ -9,6 +10,7 @@ import { useUsers } from '../../hooks/useUsers';
 
 const Companies = () => {
     const { t, dir } = useLanguage();
+    const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedSector, setSelectedSector] = useState('all');
     const { data: users = [], isLoading, error } = useUsers();
@@ -107,7 +109,11 @@ const Companies = () => {
                         </div>
 
                         <div className="company-card-actions">
-                            <Button variant="secondary" className="btn-full">
+                            <Button 
+                                variant="secondary" 
+                                className="btn-full"
+                                onClick={() => navigate(`/companies/${company.id}`)}
+                            >
                                 {t('viewProfile')}
                                 <ExternalLink size={16} />
                             </Button>

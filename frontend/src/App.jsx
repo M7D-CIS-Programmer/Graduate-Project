@@ -122,6 +122,7 @@ function App() {
 
                   {/* Other Routes */}
                   <Route path="/companies" element={<Companies />} />
+                  <Route path="/companies/:id" element={<Profile />} />
                   <Route path="/candidates" element={<Candidates />} />
                   <Route path="/settings" element={<Settings />} />
                   <Route path="/about" element={<AboutUs />} />
