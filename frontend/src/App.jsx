@@ -32,6 +32,8 @@ import Companies from './pages/Companies/Companies';
 import Candidates from './pages/Candidates';
 import Settings from './pages/Settings/Settings';
 import ResumeView from './pages/Dashboard/ResumeView';
+import AboutUs from './pages/AboutUs';
+import ContactUs from './pages/ContactUs';
 import Spinner from './components/ui/Spinner';
 
 const ConditionalHome = () => {
@@ -122,6 +124,8 @@ function App() {
                   <Route path="/companies" element={<Companies />} />
                   <Route path="/candidates" element={<Candidates />} />
                   <Route path="/settings" element={<Settings />} />
+                  <Route path="/about" element={<AboutUs />} />
+                  <Route path="/contact" element={<ContactUs />} />
 
                   {/* Fallback */}
                   <Route path="*" element={
