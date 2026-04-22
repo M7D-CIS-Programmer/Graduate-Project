@@ -28,7 +28,18 @@ export const api = {
     register:            (userData)    => post(`${BASE_URL}/Users`, userData),
 
     // Jobs
-    getJobs:             ()           => get(`${BASE_URL}/Jobs`),
+    getJobs: (filters = {}) => {
+        const params = new URLSearchParams();
+        if (filters.type) params.append('type', filters.type);
+        if (filters.workMode) params.append('workMode', filters.workMode);
+        if (filters.categoryId) params.append('categoryId', filters.categoryId);
+        if (filters.minSalary) params.append('minSalary', filters.minSalary);
+        if (filters.maxSalary) params.append('maxSalary', filters.maxSalary);
+        if (filters.q) params.append('q', filters.q);
+        
+        const queryString = params.toString();
+        return get(`${BASE_URL}/Jobs${queryString ? `?${queryString}` : ''}`);
+    },
     getJobsByUser:       (userId)     => get(`${BASE_URL}/Jobs/user/${userId}`),
     getJob:              (id)         => get(`${BASE_URL}/Jobs/${id}`),
     createJob:           (job)        => post(`${BASE_URL}/Jobs`, job),
@@ -63,6 +74,10 @@ export const api = {
 
     // Notifications
     getNotificationsByUserId: (userId) => get(`${BASE_URL}/Notifications?userId=${userId}`),
+    markNotificationAsRead:   (id)     => put(`${BASE_URL}/Notifications/${id}/read`),
+    markAllNotificationsAsRead: (userId) => put(`${BASE_URL}/Notifications/read-all/${userId}`),
+    clearAllNotifications:    (userId) => del(`${BASE_URL}/Notifications/clear-all/${userId}`),
+    deleteNotification:       (id)     => del(`${BASE_URL}/Notifications/${id}`),
 
     // Search
     search: (query, role, userId) => get(`${BASE_URL}/Search?q=${query}&role=${role || ''}&userId=${userId || ''}`),

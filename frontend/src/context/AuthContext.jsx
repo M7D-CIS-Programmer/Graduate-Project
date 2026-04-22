@@ -40,7 +40,10 @@ export const AuthProvider = ({ children }) => {
       location: userData.location,
       phone: userData.phone,
       createdAt: userData.createdAt,
-      dashboardPath: userData.dashboardPath
+      dashboardPath: userData.dashboardPath,
+      savedJobs: userData.savedJobs || [],
+      appliedJobs: userData.appliedJobs || [],
+      notifications: userData.notifications || []
     }));
     
     // Store token separately for API calls
@@ -76,7 +79,10 @@ export const AuthProvider = ({ children }) => {
         location: updatedUser.location,
         phone: updatedUser.phone,
         createdAt: updatedUser.createdAt,
-        dashboardPath: updatedUser.dashboardPath
+        dashboardPath: updatedUser.dashboardPath,
+        savedJobs: updatedUser.savedJobs || [],
+        appliedJobs: updatedUser.appliedJobs || [],
+        notifications: updatedUser.notifications || []
       };
       localStorage.setItem('user', JSON.stringify(userToStore));
       

@@ -42,10 +42,16 @@ public class UsersController : ControllerBase
             .FirstOrDefaultAsync(u => u.Email == dto.Email);
 
         if (user == null)
+        {
+            Console.WriteLine($"[Login Debug] User not found: {dto.Email}");
             return Unauthorized(new { message = "Invalid email or password" });
+        }
 
         // Verify password
-        if (!_authService.VerifyPassword(dto.Password, user.Pass))
+        bool isValid = _authService.VerifyPassword(dto.Password, user.Pass);
+        Console.WriteLine($"[Login Debug] User found: {user.Email}, Password valid: {isValid}");
+
+        if (!isValid)
             return Unauthorized(new { message = "Invalid email or password" });
 
         // Generate JWT token

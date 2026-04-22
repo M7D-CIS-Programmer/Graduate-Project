@@ -144,10 +144,18 @@ namespace aabu_project.Services
         {
             try
             {
-                return BCrypt.Net.BCrypt.Verify(password, hash);
+                // Check if it's a BCrypt hash (starts with $2a$, $2b$, or $2y$)
+                if (hash.StartsWith("$2a$") || hash.StartsWith("$2b$") || hash.StartsWith("$2y$"))
+                {
+                    return BCrypt.Net.BCrypt.Verify(password, hash);
+                }
+                
+                // Fallback for seeded plain-text passwords in development
+                return password == hash;
             }
             catch
             {
+                // If verification fails or format is wrong, return false
                 return false;
             }
         }

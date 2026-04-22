@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 namespace aabu_project.Models;
 
 public class Notification
@@ -10,6 +10,7 @@ public class Notification
     public string? Type { get; set; }
     public bool IsRead { get; set; }
     public string? Receiver { get; set; }
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     public User User { get; set; } = null!;
 }

@@ -48,15 +48,64 @@ public class JobsController : ControllerBase
     };
 
     [HttpGet]
-    public async Task<IActionResult> GetJobs()
+    public async Task<IActionResult> GetJobs(
+        [FromQuery] string? type, 
+        [FromQuery] string? workMode,
+        [FromQuery] int? categoryId,
+        [FromQuery] decimal? minSalary,
+        [FromQuery] decimal? maxSalary,
+        [FromQuery] string? q)
     {
-        var jobs = await _context.Jobs
+        var query = _context.Jobs
             .Include(j => j.User)
                 .ThenInclude(u => u.Roles)
             .Include(j => j.Category)
                 .ThenInclude(c => c.Jobs)
             .Include(j => j.Applications)
-            .ToListAsync();
+            .AsQueryable();
+
+        // Filter by Search Query
+        if (!string.IsNullOrEmpty(q))
+        {
+            var search = q.ToLower();
+            query = query.Where(j => 
+                j.Title.ToLower().Contains(search) || 
+                j.Description.ToLower().Contains(search) ||
+                (j.Company != null && j.Company.ToLower().Contains(search)));
+        }
+
+        // Filter by Job Type (Full Time, Part Time, etc.)
+        if (!string.IsNullOrEmpty(type))
+        {
+            var types = type.Split(',', StringSplitOptions.RemoveEmptyEntries);
+            query = query.Where(j => types.Contains(j.Type));
+        }
+
+        // Filter by Work Mode (Remote, On-site, Hybrid)
+        if (!string.IsNullOrEmpty(workMode))
+        {
+            var modes = workMode.Split(',', StringSplitOptions.RemoveEmptyEntries);
+            query = query.Where(j => modes.Contains(j.WorkMode));
+        }
+
+        // Filter by Category
+        if (categoryId.HasValue && categoryId.Value > 0)
+        {
+            query = query.Where(j => j.CategoryId == categoryId.Value);
+        }
+
+        // Filter by Salary Range
+        if (minSalary.HasValue)
+        {
+            query = query.Where(j => (j.SalaryMin ?? 0) >= minSalary.Value);
+        }
+
+        if (maxSalary.HasValue)
+        {
+            query = query.Where(j => (j.SalaryMax ?? 0) <= maxSalary.Value);
+        }
+
+        var jobs = await query.ToListAsync();
         return Ok(jobs.Select(ToResponseDto));
     }
 

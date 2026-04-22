@@ -36,12 +36,43 @@ public class NotificationsController(MyDbContext context) : ControllerBase
         return Ok(notif);
     }
 
+    [HttpPut("{id}/read")]
+    public async Task<IActionResult> MarkAsRead(int id)
+    {
+        var item = await Context.Notifications.FindAsync(id);
+        if (item == null) return NotFound();
+        item.IsRead = true;
+        await Context.SaveChangesAsync();
+        return Ok();
+    }
+
+    [HttpPut("read-all/{userId}")]
+    public async Task<IActionResult> MarkAllAsRead(int userId)
+    {
+        var items = await Context.Notifications.Where(n => n.UserId == userId && !n.IsRead).ToListAsync();
+        foreach (var item in items)
+        {
+            item.IsRead = true;
+        }
+        await Context.SaveChangesAsync();
+        return Ok();
+    }
+
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
         var item = await Context.Notifications.FindAsync(id);
         if (item == null) return NotFound();
         Context.Notifications.Remove(item);
+        await Context.SaveChangesAsync();
+        return Ok();
+    }
+
+    [HttpDelete("clear-all/{userId}")]
+    public async Task<IActionResult> ClearAll(int userId)
+    {
+        var items = await Context.Notifications.Where(n => n.UserId == userId).ToListAsync();
+        Context.Notifications.RemoveRange(items);
         await Context.SaveChangesAsync();
         return Ok();
     }
