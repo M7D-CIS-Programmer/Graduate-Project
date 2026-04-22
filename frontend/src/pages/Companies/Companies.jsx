@@ -17,16 +17,18 @@ const Companies = () => {
         id: u.id,
         name: u.name,
         logo: `https://api.dicebear.com/7.x/initials/svg?seed=${u.name}&backgroundColor=6366f1`,
-        sector: t('tech'),
+        sector: u.industry || t('tech'),
         location: u.location || 'Remote',
         employees: '100-250',
-        jobsCount: 0,
+        jobsCount: u.activeJobsCount || 0,
         description: u.description || 'Leading company in the region.'
     }));
 
     const filteredCompanies = companies.filter(company => {
         const matchesSearch = (company.name || '').toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesSector = selectedSector === 'all' || company.sector === (selectedSector === 'tech' ? t('tech') : selectedSector === 'finance' ? t('finance') : selectedSector === 'healthcare' ? t('healthcare') : t('education_sector'));
+        const matchesSector = selectedSector === 'all' || 
+            company.sector.toLowerCase() === selectedSector.toLowerCase() ||
+            (selectedSector === 'tech' && company.sector === t('tech'));
         return matchesSearch && matchesSector;
     });
 
