@@ -28,17 +28,25 @@ const Home = () => {
     }, []);
 
     const [categories, setCategories] = useState([]);
+    const [jobs, setJobs] = useState([]);
+    const [isLoadingJobs, setIsLoadingJobs] = useState(true);
 
     useEffect(() => {
-        const fetchCategories = async () => {
+        const fetchData = async () => {
             try {
-                const data = await api.getCategories();
-                setCategories(data.slice(0, 4)); // Show only top 4 for "Popular"
+                const [catData, jobData] = await Promise.all([
+                    api.getCategories(),
+                    api.getJobs()
+                ]);
+                setCategories(catData.slice(0, 4));
+                setJobs(jobData.slice(0, 3)); // Show top 3 jobs as "Featured"
             } catch (error) {
-                console.error('Error fetching categories:', error);
+                console.error('Error fetching home data:', error);
+            } finally {
+                setIsLoadingJobs(false);
             }
         };
-        fetchCategories();
+        fetchData();
     }, []);
 
     const getCategoryIcon = (name) => {
@@ -160,22 +168,37 @@ const Home = () => {
                     </Link>
                 </div>
                 <div className="jobs-grid">
-                    {[1, 2, 3].map((item, i) => (
-                        <div key={i} className="card">
-                            <div className="job-card-header">
-                                <div className="company-logo-placeholder">
-                                    <Building size={24} />
+                    {isLoadingJobs ? (
+                        [1, 2, 3].map((i) => (
+                            <div key={i} className="card skeleton-card" style={{ height: '200px', opacity: 0.5 }}>
+                                <div className="skeleton-line" style={{ width: '60%', height: '20px', background: 'var(--border-color)', margin: '10px 0' }} />
+                                <div className="skeleton-line" style={{ width: '40%', height: '15px', background: 'var(--border-color)' }} />
+                            </div>
+                        ))
+                    ) : jobs.length > 0 ? (
+                        jobs.map((job) => (
+                            <div key={job.id} className="card job-card-dynamic">
+                                <div className="job-card-header">
+                                    <div className="company-logo-placeholder">
+                                        <Building size={24} />
+                                    </div>
+                                    <span className="job-type-badge">{t(job.type?.toLowerCase()) || job.type}</span>
                                 </div>
-                                <span className="job-type-badge">{t('fullTime')}</span>
+                                <h3 className="job-title">{job.title}</h3>
+                                <p className="job-company">{job.company || t('unknownCompany')} • {job.location || t('remote')}</p>
+                                <div className="job-card-footer">
+                                    <span className="job-salary">
+                                        {job.salaryMin && job.salaryMax 
+                                            ? `$${(job.salaryMin / 1000).toFixed(0)}k - $${(job.salaryMax / 1000).toFixed(0)}k`
+                                            : t('salaryNegotiable')}
+                                    </span>
+                                    <Link to={`/jobs/${job.id}`} className="details-btn">{t('details')}</Link>
+                                </div>
                             </div>
-                            <h3 className="job-title">{t('seniorReactDev')}</h3>
-                            <p className="job-company">TechVision • {t('remote')}</p>
-                            <div className="job-card-footer">
-                                <span className="job-salary">$120k - $160k</span>
-                                <Link to="/jobs/1" className="details-btn">{t('details')}</Link>
-                            </div>
-                        </div>
-                    ))}
+                        ))
+                    ) : (
+                        <div className="no-results" style={{ gridColumn: '1 / -1' }}>{t('noJobsFound')}</div>
+                    )}
                 </div>
             </section>
         </div>
