@@ -56,6 +56,18 @@ public class ApplicationJobsController : ControllerBase
                 Receiver = "Employer"
             };
             _context.Notifications.Add(notification);
+
+            // Notify Seeker (Confirmation)
+            var seekerNotification = new Notification
+            {
+                UserId = dto.UserId,
+                Title = "Application Sent",
+                Message = $"Your application for '{job.Title}' has been sent successfully.",
+                Type = "Info",
+                IsRead = false,
+                Receiver = "Job Seeker"
+            };
+            _context.Notifications.Add(seekerNotification);
         }
 
         await _context.SaveChangesAsync();
