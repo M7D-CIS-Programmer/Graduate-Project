@@ -10,7 +10,7 @@ public class Notification
     public string? Type { get; set; }
     public bool IsRead { get; set; }
     public string? Receiver { get; set; }
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.Now;
 
     public User User { get; set; } = null!;
 }

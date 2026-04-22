@@ -49,7 +49,7 @@ public class JobResponseDto
     public string? Status { get; set; }
     public string? Location { get; set; }
     public string? Company { get; set; }
-    public DateTime PostedDate { get; set; }
+    public DateTimeOffset PostedDate { get; set; }
 
     public int ApplicantsCount { get; set; }
     public UserDto User { get; set; } = null!;

@@ -20,7 +20,7 @@ public class Job
     public string? Status { get; set; }
     public string? Location { get; set; }
     public string? Company { get; set; }
-    public DateTime PostedDate { get; set; } = DateTime.UtcNow;
+    public DateTimeOffset PostedDate { get; set; } = DateTimeOffset.Now;
 
 
     // Navigation
