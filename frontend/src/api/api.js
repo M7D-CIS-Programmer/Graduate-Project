@@ -63,4 +63,7 @@ export const api = {
 
     // Notifications
     getNotificationsByUserId: (userId) => get(`${BASE_URL}/Notifications?userId=${userId}`),
+
+    // Search
+    search: (query, role, userId) => get(`${BASE_URL}/Search?q=${query}&role=${role || ''}&userId=${userId || ''}`),
 };

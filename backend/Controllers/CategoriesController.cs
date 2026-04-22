@@ -11,7 +11,14 @@ public class CategoriesController(MyDbContext context) : ControllerBase
     private readonly MyDbContext Context = context;
  
     [HttpGet]
-    public async Task<IActionResult> GetAll() => Ok(await Context.Categories.ToListAsync());
+    public async Task<IActionResult> GetAll() => Ok(await Context.Categories
+        .Select(c => new CategoryResponseDto
+        {
+            Id = c.Id,
+            Name = c.Name,
+            JobCount = c.Jobs.Count
+        })
+        .ToListAsync());
 
     [HttpPost]
     public async Task<IActionResult> Create(CategoryCreateDto dto)

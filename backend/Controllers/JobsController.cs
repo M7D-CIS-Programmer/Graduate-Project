@@ -43,7 +43,7 @@ public class JobsController : ControllerBase
             job.User.Jobs?.Count(j => j.Status == "Active") ?? 0,
             job.User.Industry
         ) : null!,
-        Category = job.Category != null ? new CategoryResponseDto { Id = job.Category.Id, Name = job.Category.Name } : null!,
+        Category = job.Category != null ? new CategoryResponseDto { Id = job.Category.Id, Name = job.Category.Name, JobCount = job.Category.Jobs?.Count ?? 0 } : null!,
         ApplicantsCount = job.Applications?.Count ?? 0
     };
 
@@ -54,6 +54,7 @@ public class JobsController : ControllerBase
             .Include(j => j.User)
                 .ThenInclude(u => u.Roles)
             .Include(j => j.Category)
+                .ThenInclude(c => c.Jobs)
             .Include(j => j.Applications)
             .ToListAsync();
         return Ok(jobs.Select(ToResponseDto));
@@ -66,6 +67,7 @@ public class JobsController : ControllerBase
             .Include(j => j.User)
                 .ThenInclude(u => u.Roles)
             .Include(j => j.Category)
+                .ThenInclude(c => c.Jobs)
             .Include(j => j.Applications)
             .Where(j => j.UserId == userId)
             .ToListAsync();
@@ -79,6 +81,7 @@ public class JobsController : ControllerBase
             .Include(j => j.User)
                 .ThenInclude(u => u.Roles)
             .Include(j => j.Category)
+                .ThenInclude(c => c.Jobs)
             .Include(j => j.Applications)
             .FirstOrDefaultAsync(j => j.Id == id);
 

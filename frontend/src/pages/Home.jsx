@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import heroImg1 from '../assets/heroImg1.jpg';
 import heroImg2 from '../assets/heroImg2.jpg';
 import heroImg3 from '../assets/heroImg3.jpg';
+import { api } from '../api/api';
 import './Home.css';
 
 const Home = () => {
@@ -26,12 +27,28 @@ const Home = () => {
         return () => clearInterval(timer);
     }, []);
 
-    const categories = [
-        { title: 'Tech', count: '1,240', icon: <Briefcase /> },
-        { title: 'Design', count: '850', icon: <Users /> },
-        { title: 'Management', count: '420', icon: <TrendingUp /> },
-        { title: 'Marketing', count: '310', icon: <Building /> }
-    ];
+    const [categories, setCategories] = useState([]);
+
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const data = await api.getCategories();
+                setCategories(data.slice(0, 4)); // Show only top 4 for "Popular"
+            } catch (error) {
+                console.error('Error fetching categories:', error);
+            }
+        };
+        fetchCategories();
+    }, []);
+
+    const getCategoryIcon = (name) => {
+        const n = name.toLowerCase();
+        if (n.includes('tech') || n.includes('engineering')) return <Briefcase />;
+        if (n.includes('design')) return <Users />;
+        if (n.includes('market')) return <Building />;
+        if (n.includes('manage') || n.includes('finance')) return <TrendingUp />;
+        return <Briefcase />;
+    };
 
     const handleSearch = (e) => {
         e.preventDefault();
@@ -118,14 +135,13 @@ const Home = () => {
                         <h2 className="featured-title">{t('popularCategories')}</h2>
                         <p style={{ color: 'var(--text-muted)' }}>{t('categoriesSubtitle')}</p>
                     </div>
-                    <button className="view-all-btn">{t('viewAll')}</button>
                 </div>
                 <div className="categories-grid">
                     {categories.map((cat, i) => (
                         <div key={i} className="card categories-card">
-                            <div className="cat-icon-box">{cat.icon}</div>
-                            <h3>{t(cat.title.toLowerCase())}</h3>
-                            <p>{cat.count} {t('activeJobs')}</p>
+                            <div className="cat-icon-box">{getCategoryIcon(cat.name)}</div>
+                            <h3>{t(cat.name.toLowerCase()) || cat.name}</h3>
+                            <p>{cat.jobCount} {t('activeJobs')}</p>
                         </div>
                     ))}
                 </div>
