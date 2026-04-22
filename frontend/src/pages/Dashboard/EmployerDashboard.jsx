@@ -67,7 +67,7 @@ const EmployerDashboard = () => {
 
     const handleAction = async (actionType, applicant) => {
         if (actionType === 'view') {
-            navigate(`/profile/${applicant.userId}`);
+            navigate(`/candidate/${applicant.userId}`);
             return;
         }
 

@@ -55,7 +55,7 @@ const Applicants = () => {
         } else if (action === 'viewResume') {
             navigate(`/resume/${app.userId}`);
         } else if (action === 'viewProfile') {
-            navigate(`/profile/${app.userId}`);
+            navigate(`/candidate/${app.userId}`);
         }
     };
 
