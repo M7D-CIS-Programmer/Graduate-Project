@@ -50,6 +50,7 @@ public class JobResponseDto
     public string? Location { get; set; }
     public string? Company { get; set; }
     public DateTimeOffset PostedDate { get; set; }
+    public int ViewsCount { get; set; }
 
     public int ApplicantsCount { get; set; }
     public UserDto User { get; set; } = null!;

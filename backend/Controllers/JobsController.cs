@@ -44,7 +44,8 @@ public class JobsController : ControllerBase
             job.User.Industry
         ) : null!,
         Category = job.Category != null ? new CategoryResponseDto { Id = job.Category.Id, Name = job.Category.Name, JobCount = job.Category.Jobs?.Count ?? 0 } : null!,
-        ApplicantsCount = job.Applications?.Count ?? 0
+        ApplicantsCount = job.Applications?.Count ?? 0,
+        ViewsCount = job.ViewsCount
     };
 
     [HttpGet]
@@ -136,6 +137,10 @@ public class JobsController : ControllerBase
 
         if (job == null)
             return NotFound();
+
+        // Increment Views
+        job.ViewsCount++;
+        await _context.SaveChangesAsync();
 
         return Ok(ToResponseDto(job));
     }
