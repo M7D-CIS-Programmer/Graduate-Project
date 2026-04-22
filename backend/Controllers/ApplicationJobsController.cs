@@ -52,7 +52,8 @@ public class ApplicationJobsController : ControllerBase
                 Title = "New Job Application",
                 Message = $"{seeker?.Name ?? "A candidate"} applied for your job: {job.Title}",
                 Type = "Application",
-                IsRead = false
+                IsRead = false,
+                Receiver = "Employer"
             };
             _context.Notifications.Add(notification);
         }
@@ -83,7 +84,8 @@ public class ApplicationJobsController : ControllerBase
                 Title = "Application Status Update",
                 Message = $"Your application for '{app.Job.Title}' has been updated to: {dto.Status}",
                 Type = "StatusUpdate",
-                IsRead = false
+                IsRead = false,
+                Receiver = "Job Seeker"
             };
             _context.Notifications.Add(notification);
         }
