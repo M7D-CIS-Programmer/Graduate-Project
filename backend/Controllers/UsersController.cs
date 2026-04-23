@@ -139,13 +139,7 @@ public class UsersController : ControllerBase
             normalizedRole = "Job Seeker";
         }
 
-        var role = await _context.Roles.FirstOrDefaultAsync(r => 
-            r.RoleName == normalizedRole || 
-            (normalizedRole == "Job Seeker" && r.RoleName == "JobSeeker") ||
-            (normalizedRole == "Employer" && r.RoleName == "Employer"));
 
-        if (role == null) 
-            return BadRequest(new { message = $"Role '{dto.RoleName}' not found" });
 
         // Hash password
         var hashedPassword = _authService.HashPassword(dto.Pass);
@@ -159,7 +153,7 @@ public class UsersController : ControllerBase
             Phone = dto.Phone,
             Status = "Active",
             Industry = dto.Industry,
-            Roles = new List<Role> { role }
+            Roles = new List<Role> { new Role { RoleName = normalizedRole } }
         };
 
         _context.Users.Add(user);

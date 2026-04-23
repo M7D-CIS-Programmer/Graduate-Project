@@ -42,8 +42,8 @@ namespace aabu_project.Services
             {
                 Name = dto.Name,
                 Email = dto.Email,
-                Pass = HashPassword(dto.Password)
-                
+                Pass = HashPassword(dto.Password),
+                Roles = new List<Role> { new Role { RoleName = "Job Seeker" } }
             };
 
             _context.Users.Add(user);
