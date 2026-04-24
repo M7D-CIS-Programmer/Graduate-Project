@@ -34,26 +34,7 @@
     color: var(--primary);
 }
 
-.about-stats {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 2rem;
-    padding: 3rem;
-    margin-bottom: 4rem;
-    text-align: center;
-    border-radius: 20px;
-}
 
-.stat-item h3 {
-    font-size: 2.5rem;
-    color: var(--primary);
-    margin-bottom: 0.5rem;
-}
-
-.stat-item p {
-    color: var(--text-muted);
-    font-weight: 500;
-}
 
 .about-values {
     margin-bottom: 4rem;
@@ -128,9 +109,7 @@
         font-size: 2.5rem;
     }
     
-    .about-stats {
-        grid-template-columns: repeat(2, 1fr);
-    }
+
     
     .mission-content {
         padding: 2rem;
