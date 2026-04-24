@@ -12,7 +12,8 @@ import {
     Bookmark,
     Bell,
     User as UserIcon,
-    FileEdit
+    FileEdit,
+    Mail
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -76,8 +77,13 @@ const Sidebar = ({ isOpen }) => {
     const navItems = [
         ...getRoleItems(),
         ...(['employer', 'company', 'admin'].includes(userRole) ? [] : baseItems),
-        { name: t('notifications'), icon: <Bell size={20} />, path: '/notifications' },
-        { name: t('profile'), icon: <UserIcon size={20} />, path: '/profile' },
+        ...(user ? [
+            { name: t('notifications'), icon: <Bell size={20} />, path: '/notifications' },
+            { name: t('profile'), icon: <UserIcon size={20} />, path: '/profile' }
+        ] : [
+            { name: t('aboutUs'), icon: <FileText size={20} />, path: '/about' },
+            { name: t('contactUs'), icon: <Mail size={20} />, path: '/contact' }
+        ]),
         { name: t('settings'), icon: <Settings size={20} />, path: '/settings' }
     ];
 

@@ -8,6 +8,7 @@ import Button from '../../components/ui/Button';
 import Spinner from '../../components/ui/Spinner';
 import { useJob } from '../../hooks/useJobs';
 import { useApplyForJob } from '../../hooks/useApplications';
+import { formatTimeAgo } from '../../utils/dateUtils';
 
 const JobDetails = () => {
     const { id } = useParams();
@@ -174,10 +175,10 @@ const JobDetails = () => {
                         </div>
 
                         <div className="job-tags">
-                            <span className="tag"><Briefcase size={16} /> {t(job.type) || job.type}</span>
-                            <span className="tag"><MapPin size={16} /> {job.workMode || t('remote')}</span>
+                            <span className="tag"><Briefcase size={16} /> {t(job.type.toLowerCase().replace(' ', '')) || job.type}</span>
+                            <span className="tag"><MapPin size={16} /> {t(job.workMode.toLowerCase()) || job.workMode}</span>
                             <span className="tag"><DollarSign size={16} /> ${job.salaryMin?.toLocaleString()} - ${job.salaryMax?.toLocaleString()}</span>
-                            <span className="tag"><Clock size={16} /> {t('justNow')}</span>
+                            <span className="tag"><Clock size={16} /> {formatTimeAgo(job.postedDate, t, dir === 'rtl' ? 'ar' : 'en')}</span>
                         </div>
 
                         <div className="job-description-section">

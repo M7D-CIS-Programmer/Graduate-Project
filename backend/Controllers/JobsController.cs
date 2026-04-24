@@ -43,19 +43,75 @@ public class JobsController : ControllerBase
             job.User.Jobs?.Count(j => j.Status == "Active") ?? 0,
             job.User.Industry
         ) : null!,
-        Category = job.Category != null ? new CategoryResponseDto { Id = job.Category.Id, Name = job.Category.Name } : null!,
-        ApplicantsCount = job.Applications?.Count ?? 0
+        Category = job.Category != null ? new CategoryResponseDto { Id = job.Category.Id, Name = job.Category.Name, JobCount = job.Category.Jobs?.Count ?? 0 } : null!,
+        ApplicantsCount = job.Applications?.Count ?? 0,
+        ViewsCount = job.ViewsCount
     };
 
     [HttpGet]
-    public async Task<IActionResult> GetJobs()
+    public async Task<IActionResult> GetJobs(
+        [FromQuery] string? type, 
+        [FromQuery] string? workMode,
+        [FromQuery] int? categoryId,
+        [FromQuery] decimal? minSalary,
+        [FromQuery] decimal? maxSalary,
+        [FromQuery] string? q)
     {
-        var jobs = await _context.Jobs
+        var query = _context.Jobs
             .Include(j => j.User)
                 .ThenInclude(u => u.Roles)
             .Include(j => j.Category)
+                .ThenInclude(c => c.Jobs)
             .Include(j => j.Applications)
-            .ToListAsync();
+            .AsQueryable();
+
+        // Filter by Search Query
+        if (!string.IsNullOrEmpty(q))
+        {
+            var normalized = aabu_project.Utilities.SearchUtility.Normalize(q);
+            var equivalent = aabu_project.Utilities.SearchUtility.GetEquivalent(normalized);
+            var terms = new List<string> { normalized };
+            if (equivalent != normalized) terms.Add(equivalent);
+
+            query = query.Where(j => terms.Any(t => 
+                (j.SearchKey != null && j.SearchKey.Contains(t)) ||
+                j.Title.Contains(t) || 
+                j.Description.Contains(t) ||
+                (j.Company != null && j.Company.Contains(t))));
+        }
+
+        // Filter by Job Type (Full Time, Part Time, etc.)
+        if (!string.IsNullOrEmpty(type))
+        {
+            var types = type.Split(',', StringSplitOptions.RemoveEmptyEntries);
+            query = query.Where(j => types.Contains(j.Type));
+        }
+
+        // Filter by Work Mode (Remote, On-site, Hybrid)
+        if (!string.IsNullOrEmpty(workMode))
+        {
+            var modes = workMode.Split(',', StringSplitOptions.RemoveEmptyEntries);
+            query = query.Where(j => modes.Contains(j.WorkMode));
+        }
+
+        // Filter by Category
+        if (categoryId.HasValue && categoryId.Value > 0)
+        {
+            query = query.Where(j => j.CategoryId == categoryId.Value);
+        }
+
+        // Filter by Salary Range
+        if (minSalary.HasValue)
+        {
+            query = query.Where(j => (j.SalaryMin ?? 0) >= minSalary.Value);
+        }
+
+        if (maxSalary.HasValue)
+        {
+            query = query.Where(j => (j.SalaryMax ?? 0) <= maxSalary.Value);
+        }
+
+        var jobs = await query.ToListAsync();
         return Ok(jobs.Select(ToResponseDto));
     }
 
@@ -66,6 +122,7 @@ public class JobsController : ControllerBase
             .Include(j => j.User)
                 .ThenInclude(u => u.Roles)
             .Include(j => j.Category)
+                .ThenInclude(c => c.Jobs)
             .Include(j => j.Applications)
             .Where(j => j.UserId == userId)
             .ToListAsync();
@@ -79,11 +136,16 @@ public class JobsController : ControllerBase
             .Include(j => j.User)
                 .ThenInclude(u => u.Roles)
             .Include(j => j.Category)
+                .ThenInclude(c => c.Jobs)
             .Include(j => j.Applications)
             .FirstOrDefaultAsync(j => j.Id == id);
 
         if (job == null)
             return NotFound();
+
+        // Increment Views
+        job.ViewsCount++;
+        await _context.SaveChangesAsync();
 
         return Ok(ToResponseDto(job));
     }
@@ -107,7 +169,8 @@ public class JobsController : ControllerBase
             Features = dto.Features,
             Status = dto.Status,
             Location = dto.Location,
-            Company = dto.Company
+            Company = dto.Company,
+            SearchKey = aabu_project.Utilities.SearchUtility.GenerateSearchKey(dto.Title, dto.Description, dto.Company, dto.Location)
         };
         _context.Jobs.Add(job);
         await _context.SaveChangesAsync();
@@ -131,6 +194,7 @@ public class JobsController : ControllerBase
         job.Responsibilities = updated.Responsibilities;
         job.Location = updated.Location;
         job.Company = updated.Company;
+        job.SearchKey = aabu_project.Utilities.SearchUtility.GenerateSearchKey(updated.Title, updated.Description, updated.Company, updated.Location);
 
         await _context.SaveChangesAsync();
 

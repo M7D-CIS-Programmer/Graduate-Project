@@ -12,6 +12,7 @@ import {
 import { useLanguage } from '../../context/LanguageContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useJobs } from '../../hooks/useJobs';
+import { useCategories } from '../../hooks/useCategories';
 import './Jobs.css';
 
 
@@ -19,28 +20,42 @@ import './Jobs.css';
 const JobListings = () => {
     const { t, dir } = useLanguage();
     const navigate = useNavigate();
-    const { data: jobs = [], isLoading, error } = useJobs();
+    const location = useLocation();
+    const queryParams = new URLSearchParams(location.search);
+    const initialSearch = queryParams.get('q') || '';
+
+    const [searchQuery, setSearchQuery] = React.useState(initialSearch);
+    const [selectedTypes, setSelectedTypes] = React.useState([]);
+    const [selectedWorkModes, setSelectedWorkModes] = React.useState([]);
+    const [selectedSalaries, setSelectedSalaries] = React.useState([]);
+    const [selectedCategory, setSelectedCategory] = React.useState('');
+
+    const { data: categories = [] } = useCategories();
+
+    const { data: jobs = [], isLoading, error } = useJobs({
+        type: selectedTypes.join(','),
+        workMode: selectedWorkModes.join(','),
+        q: searchQuery,
+        categoryId: selectedCategory
+    });
 
     const jobTypeOptions = [
         { label: t('fullTime'), value: 'Full Time' },
         { label: t('partTime'), value: 'Part Time' },
         { label: t('contract'), value: 'Contract' },
-        { label: t('remote'),   value: 'Remote' },
+    ];
+
+    const workModeOptions = [
+        { label: t('remote'), value: 'Remote' },
+        { label: t('onSite'), value: 'On-site' },
+        { label: t('hybrid'), value: 'Hybrid' },
     ];
 
     const salaryRanges = [
-        { label: '$50k - $80k',   min: 50000,  max: 80000  },
-        { label: '$80k - $120k',  min: 80000,  max: 120000 },
-        { label: '$120k+',        min: 120000, max: Infinity },
+        { label: '$50k - $80k', min: 50000, max: 80000 },
+        { label: '$80k - $120k', min: 80000, max: 120000 },
+        { label: '$120k+', min: 120000, max: Infinity },
     ];
-
-    const location = useLocation();
-    const queryParams = new URLSearchParams(location.search);
-    const initialSearch = queryParams.get('q') || '';
-    const [searchQuery, setSearchQuery] = React.useState(initialSearch);
-
-    const [selectedTypes, setSelectedTypes] = React.useState([]);
-    const [selectedSalaries, setSelectedSalaries] = React.useState([]);
 
     React.useEffect(() => {
         setSearchQuery(queryParams.get('q') || '');
@@ -49,25 +64,14 @@ const JobListings = () => {
     const toggleType = (value) =>
         setSelectedTypes(prev => prev.includes(value) ? prev.filter(v => v !== value) : [...prev, value]);
 
+    const toggleWorkMode = (value) =>
+        setSelectedWorkModes(prev => prev.includes(value) ? prev.filter(v => v !== value) : [...prev, value]);
+
     const toggleSalary = (label) =>
         setSelectedSalaries(prev => prev.includes(label) ? prev.filter(l => l !== label) : [...prev, label]);
 
+    // Salary filtering is still client-side for now as it's complex to pass ranges to API without better DTO
     const filteredJobs = jobs.filter(job => {
-        // Search
-        if (searchQuery) {
-            const q = searchQuery.toLowerCase();
-            const matchesSearch =
-                job.title?.toLowerCase().includes(q) ||
-                job.description?.toLowerCase().includes(q) ||
-                job.user?.name?.toLowerCase().includes(q) ||
-                job.workMode?.toLowerCase().includes(q);
-            if (!matchesSearch) return false;
-        }
-
-        // Type filter — compare against raw DB values
-        if (selectedTypes.length > 0 && !selectedTypes.includes(job.type)) return false;
-
-        // Salary filter
         if (selectedSalaries.length > 0) {
             const matchesSalary = selectedSalaries.some(label => {
                 const range = salaryRanges.find(r => r.label === label);
@@ -77,9 +81,8 @@ const JobListings = () => {
             });
             if (!matchesSalary) return false;
         }
-
         return true;
-    });
+    }).sort((a, b) => new Date(b.postedDate) - new Date(a.postedDate));
 
     const handleSearch = (e) => {
         e.preventDefault();
@@ -107,6 +110,29 @@ const JobListings = () => {
                     </div>
 
                     <div className="filter-section">
+                        <h3 className="filter-title">{t('category') || 'Category'}</h3>
+                        <select
+                            className="filter-select"
+                            value={selectedCategory}
+                            onChange={(e) => setSelectedCategory(e.target.value)}
+                            style={{
+                                width: '100%',
+                                padding: '0.75rem',
+                                borderRadius: '8px',
+                                background: 'var(--bg-card)',
+                                border: '1px solid var(--border-color)',
+                                color: 'var(--text-main)',
+                                marginBottom: '1rem'
+                            }}
+                        >
+                            <option value="">{t('allCategories') || 'All Categories'}</option>
+                            {categories.map(cat => (
+                                <option key={cat.id} value={cat.id}>{cat.name}</option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div className="filter-section">
                         <h3 className="filter-title">{t('jobType')}</h3>
                         <div className="filter-options">
                             {jobTypeOptions.map(opt => (
@@ -115,6 +141,22 @@ const JobListings = () => {
                                         type="checkbox"
                                         checked={selectedTypes.includes(opt.value)}
                                         onChange={() => toggleType(opt.value)}
+                                    />
+                                    <span>{opt.label}</span>
+                                </label>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="filter-section">
+                        <h3 className="filter-title">{t('workMode')}</h3>
+                        <div className="filter-options">
+                            {workModeOptions.map(opt => (
+                                <label key={opt.value} className="filter-checkbox">
+                                    <input
+                                        type="checkbox"
+                                        checked={selectedWorkModes.includes(opt.value)}
+                                        onChange={() => toggleWorkMode(opt.value)}
                                     />
                                     <span>{opt.label}</span>
                                 </label>
@@ -156,7 +198,7 @@ const JobListings = () => {
                                 placeholder={t('jobTitlePlaceholder')}
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                style={{ background: 'none', border: 'none', color: 'white', outline: 'none', width: '100%', paddingLeft: '10px' }}
+                                style={{ background: 'none', border: 'none', color: 'var(--text-color)', outline: 'none', width: '100%', paddingLeft: '10px' }}
                             />
                         </div>
                         <button type="submit" className="btn-primary" style={{ height: '44px' }}>{t('searchJobs')}</button>

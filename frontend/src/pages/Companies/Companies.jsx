@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Spinner from '../../components/ui/Spinner';
 import { Search, MapPin, Users, Briefcase, Filter, ExternalLink } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
@@ -9,6 +10,7 @@ import { useUsers } from '../../hooks/useUsers';
 
 const Companies = () => {
     const { t, dir } = useLanguage();
+    const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedSector, setSelectedSector] = useState('all');
     const { data: users = [], isLoading, error } = useUsers();
@@ -17,18 +19,20 @@ const Companies = () => {
         id: u.id,
         name: u.name,
         logo: `https://api.dicebear.com/7.x/initials/svg?seed=${u.name}&backgroundColor=6366f1`,
-        sector: t('tech'),
+        sector: u.industry || t('tech'),
         location: u.location || 'Remote',
         employees: '100-250',
-        jobsCount: 0,
+        jobsCount: u.activeJobsCount || 0,
         description: u.description || 'Leading company in the region.'
     }));
 
     const filteredCompanies = companies.filter(company => {
         const matchesSearch = (company.name || '').toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesSector = selectedSector === 'all' || company.sector === (selectedSector === 'tech' ? t('tech') : selectedSector === 'finance' ? t('finance') : selectedSector === 'healthcare' ? t('healthcare') : t('education_sector'));
+        const matchesSector = selectedSector === 'all' ||
+            company.sector.toLowerCase() === selectedSector.toLowerCase() ||
+            (selectedSector === 'tech' && company.sector === t('tech'));
         return matchesSearch && matchesSector;
-    });
+    }).sort((a, b) => b.id - a.id);
 
     if (isLoading) return <Spinner />;
 
@@ -58,18 +62,7 @@ const Companies = () => {
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
                 </div>
-                <div className="filter-group">
-                    <Filter size={20} className="filter-icon" />
-                    <select
-                        value={selectedSector}
-                        onChange={(e) => setSelectedSector(e.target.value)}
-                        className="sector-select"
-                    >
-                        {sectors.map(sector => (
-                            <option key={sector.id} value={sector.id}>{sector.label}</option>
-                        ))}
-                    </select>
-                </div>
+
             </div>
 
             <div className="companies-grid">
@@ -105,7 +98,11 @@ const Companies = () => {
                         </div>
 
                         <div className="company-card-actions">
-                            <Button variant="secondary" className="btn-full">
+                            <Button
+                                variant="secondary"
+                                className="btn-full"
+                                onClick={() => navigate(`/companies/${company.id}`)}
+                            >
                                 {t('viewProfile')}
                                 <ExternalLink size={16} />
                             </Button>

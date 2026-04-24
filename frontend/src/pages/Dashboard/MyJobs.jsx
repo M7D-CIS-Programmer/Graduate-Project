@@ -14,9 +14,10 @@ import {
     ExternalLink
 } from 'lucide-react';
 import './Dashboard.css';
+import { formatFriendlyDate } from '../../utils/dateUtils';
 
 const MyJobs = () => {
-    const { t, dir } = useLanguage();
+    const { t, dir, language } = useLanguage();
     const { user } = useAuth();
     const [searchTerm, setSearchTerm] = useState('');
     const { data: jobs = [], isLoading } = useMyJobs(user?.id);
@@ -54,7 +55,7 @@ const MyJobs = () => {
                             <th style={{ padding: '1rem', color: 'var(--text-muted)', fontWeight: '500' }}>{t('jobTitle')}</th>
                             <th style={{ padding: '1rem', color: 'var(--text-muted)', fontWeight: '500' }}>{t('postedDate')}</th>
                             <th style={{ padding: '1rem', color: 'var(--text-muted)', fontWeight: '500' }}>{t('status')}</th>
-                            <th style={{ padding: '1rem', color: 'var(--text-muted)', fontWeight: '500' }}>{t('appliedJobs')}</th>
+                            <th style={{ padding: '1rem', color: 'var(--text-muted)', fontWeight: '500' }}>{t('totalApplicants')}</th>
                             <th style={{ padding: '1rem', color: 'var(--text-muted)', fontWeight: '500' }}>{t('views')}</th>
                             <th style={{ padding: '1rem', color: 'var(--text-muted)', fontWeight: '500', textAlign: 'center' }}>{t('actions')}</th>
                         </tr>
@@ -80,7 +81,7 @@ const MyJobs = () => {
                                     <td style={{ padding: '1.25rem 1rem' }}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', color: 'var(--text-muted)' }}>
                                             <Calendar size={14} />
-                                            {job.postedDate || new Date().toLocaleDateString()}
+                                            {formatFriendlyDate(job.postedDate, language)}
                                         </div>
                                     </td>
                                     <td style={{ padding: '1.25rem 1rem' }}>

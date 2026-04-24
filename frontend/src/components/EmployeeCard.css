@@ -1,0 +1,137 @@
+/* EmployeeCard Component */
+.employee-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 28px 24px;
+    background: var(--card-bg, #ffffff);
+    border: 1px solid var(--border-color, #e5e7eb);
+    border-radius: 20px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    text-align: center;
+    width: 100%;
+}
+
+.employee-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+}
+
+/* Avatar */
+.employee-card__avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: rgba(99, 102, 241, 0.1);
+    color: var(--primary, #6366f1);
+    flex-shrink: 0;
+}
+
+/* Body */
+.employee-card__body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+}
+
+.employee-card__name {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text-primary, #111827);
+    margin: 0;
+    line-height: 1.3;
+}
+
+.employee-card__role {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--primary, #6366f1);
+    background: rgba(99, 102, 241, 0.1);
+    border-radius: 999px;
+    padding: 3px 12px;
+}
+
+/* Meta info (email, location) */
+.employee-card__meta {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 8px;
+    width: 100%;
+}
+
+.employee-card__meta-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    color: var(--text-muted, #6b7280);
+}
+
+.employee-card__meta-icon {
+    flex-shrink: 0;
+    color: var(--primary, #6366f1);
+    opacity: 0.7;
+}
+
+.employee-card__meta-text {
+    font-size: 0.82rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 180px;
+}
+
+/* View Profile Button */
+.employee-card__btn {
+    display: block;
+    width: 100%;
+    margin-top: 4px;
+    padding: 10px 0;
+    background: var(--primary, #6366f1);
+    color: #ffffff;
+    border-radius: 12px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+    transition: background 0.2s ease, opacity 0.2s ease;
+}
+
+.employee-card__btn:hover {
+    opacity: 0.88;
+}
+
+/* Dark theme */
+[data-theme='dark'] .employee-card {
+    background: var(--card-bg, #1e1e2e);
+    border-color: var(--border-color, #2d2d3f);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+}
+
+[data-theme='dark'] .employee-card:hover {
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+}
+
+[data-theme='dark'] .employee-card__name {
+    color: var(--text-primary, #f9fafb);
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .employee-card {
+        padding: 20px 16px;
+    }
+
+    .employee-card__meta-text {
+        max-width: 140px;
+    }
+}

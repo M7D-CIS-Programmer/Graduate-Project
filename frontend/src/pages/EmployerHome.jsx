@@ -8,17 +8,31 @@ import heroImg2 from '../assets/heroImg2.jpg';
 import heroImg3 from '../assets/heroImg3.jpg';
 import './Home.css';
 import { useJobs } from '../hooks/useJobs';
+import { api } from '../api/api';
+import EmployeeCard from '../components/EmployeeCard';
 
 const EmployerHome = () => {
     const { t, dir } = useLanguage();
     const navigate = useNavigate();
     const [currentImage, setCurrentImage] = useState(0);
     const [searchQuery, setSearchQuery] = useState('');
-    const candidates = [
-        { name: 'Ahmad Al-Hassan', location: 'Dubai, UAE' },
-        { name: 'Sara Malik', location: 'Abu Dhabi, UAE' },
-        { name: 'Omar Khalid', location: 'Sharjah, UAE' },
-    ];
+    const [candidates, setCandidates] = useState([]);
+    const [categories, setCategories] = useState([]);
+
+    useEffect(() => {
+        Promise.all([
+            api.getUsers(),
+            api.getCategories()
+        ]).then(([users, catData]) => {
+            const seekers = users
+                .filter((u) => u.role?.toLowerCase() === 'job seeker')
+                .slice(0, 3);
+            setCandidates(seekers);
+            setCategories(catData.slice(0, 4));
+        }).catch((error) => {
+            console.error('Error fetching dashboard data:', error);
+        });
+    }, []);
     const { data: jobs = [], isLoading } = useJobs();
     const jobsCount = jobs.length;
 
@@ -35,12 +49,14 @@ const EmployerHome = () => {
         return () => clearInterval(timer);
     }, []);
 
-    const categories = [
-        { title: 'Tech', count: '1,240', icon: <Briefcase /> },
-        { title: 'Design', count: '850', icon: <Users /> },
-        { title: 'Management', count: '420', icon: <TrendingUp /> },
-        { title: 'Marketing', count: '310', icon: <Building /> }
-    ];
+    const getCategoryIcon = (name) => {
+        const n = name.toLowerCase();
+        if (n.includes('tech') || n.includes('engineering')) return <Briefcase />;
+        if (n.includes('design')) return <Users />;
+        if (n.includes('market')) return <Building />;
+        if (n.includes('manage') || n.includes('finance')) return <TrendingUp />;
+        return <Briefcase />;
+    };
 
     const handleSearch = (e) => {
         e.preventDefault();
@@ -128,16 +144,21 @@ const EmployerHome = () => {
                         <h2 className="featured-title">{t('popularCategories')}</h2>
                         <p style={{ color: 'var(--text-muted)' }}>{t('categoriesSubtitle')}</p>
                     </div>
-                    <button className="view-all-btn">{t('viewAll')}</button>
                 </div>
                 <div className="categories-grid">
-                    {categories.map((cat, i) => (
-                        <div key={i} className="card categories-card">
-                            <div className="cat-icon-box">{cat.icon}</div>
-                            <h3>{t(cat.title.toLowerCase())}</h3>
-                            <p>{cat.count} {t('activeCandidates')}</p>
-                        </div>
-                    ))}
+                    {categories.length > 0 ? (
+                        categories.map((cat, i) => (
+                            <div key={cat.id || i} className="card categories-card">
+                                <div className="cat-icon-box">{getCategoryIcon(cat.name)}</div>
+                                <h3>{t(cat.name.toLowerCase()) || cat.name}</h3>
+                                <p>{cat.jobCount || 0} {t('activeJobs')}</p>
+                            </div>
+                        ))
+                    ) : (
+                        [1, 2, 3, 4].map(i => (
+                            <div key={i} className="card categories-card skeleton" style={{ height: '160px', opacity: 0.3 }} />
+                        ))
+                    )}
                 </div>
             </section>
 
@@ -146,30 +167,25 @@ const EmployerHome = () => {
                 <div className="featured-header">
                     <div>
                         <h2 className="featured-title">{t('featuredTalent')}</h2>
-                        <p style={{ color: 'var(--text-muted)' }}>{t('handPickedJobs')}</p>
+                        <p style={{ color: 'var(--text-muted)' }}>{t('handPickedTalent')}</p>
                     </div>
-                    <Link to="/candidates" className="view-all-btn" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        {t('viewAll')}
-                        <ChevronRight size={16} className={dir === 'rtl' ? 'rotate-180' : ''} />
-                    </Link>
                 </div>
+
                 <div className="jobs-grid">
-                    {candidates.map((candidate, i) => (
-                        <div key={i} className="card">
-                            <div className="job-card-header">
-                                <div className="company-logo-placeholder">
-                                    <Users size={24} />
-                                </div>
-                                <span className="job-type-badge">{t('fullTime')}</span>
-                            </div>
-                            <h3 className="job-title">{candidate.name}</h3>
-                            <p className="job-company">{candidate.location || 'Remote'} • {t('remote')}</p>
-                            <div className="job-card-footer">
-                                <span className="job-salary">$100k - $150k</span>
-                                <Link to="/profile" className="details-btn">{t('details')}</Link>
-                            </div>
-                        </div>
-                    ))}
+                    {candidates.length > 0 ? (
+                        candidates.map((candidate) => (
+                            <EmployeeCard
+                                key={candidate.id}
+                                id={candidate.id}
+                                name={candidate.name}
+                                email={candidate.email}
+                                location={candidate.location}
+                                role={candidate.industry || t('jobSeeker')}
+                            />
+                        ))
+                    ) : (
+                        <div className="no-results" style={{ gridColumn: '1 / -1' }}>{t('noCandidatesFound') || 'No talent found at the moment.'}</div>
+                    )}
                 </div>
             </section>
         </div>

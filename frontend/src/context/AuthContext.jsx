@@ -6,10 +6,10 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
     try {
-        const saved = localStorage.getItem('user');
+        const saved = sessionStorage.getItem('user');
         return saved ? JSON.parse(saved) : null;
     } catch (e) {
-        console.error('Failed to parse user from localStorage', e);
+        console.error('Failed to parse user from sessionStorage', e);
         return null;
     }
   });
@@ -32,7 +32,7 @@ export const AuthProvider = ({ children }) => {
     setUser(userToStore);
     
     // Store user data (without sensitive token)
-    localStorage.setItem('user', JSON.stringify({
+    sessionStorage.setItem('user', JSON.stringify({
       id: userData.id,
       name: userData.name,
       email: userData.email,
@@ -40,19 +40,22 @@ export const AuthProvider = ({ children }) => {
       location: userData.location,
       phone: userData.phone,
       createdAt: userData.createdAt,
-      dashboardPath: userData.dashboardPath
+      dashboardPath: userData.dashboardPath,
+      savedJobs: userData.savedJobs || [],
+      appliedJobs: userData.appliedJobs || [],
+      notifications: userData.notifications || []
     }));
     
     // Store token separately for API calls
     if (userData.token) {
-      localStorage.setItem('token', userData.token);
+      sessionStorage.setItem('token', userData.token);
     }
   };
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
+    sessionStorage.removeItem('user');
+    sessionStorage.removeItem('token');
   };
 
   const updateUser = async (newData) => {
@@ -76,9 +79,12 @@ export const AuthProvider = ({ children }) => {
         location: updatedUser.location,
         phone: updatedUser.phone,
         createdAt: updatedUser.createdAt,
-        dashboardPath: updatedUser.dashboardPath
+        dashboardPath: updatedUser.dashboardPath,
+        savedJobs: updatedUser.savedJobs || [],
+        appliedJobs: updatedUser.appliedJobs || [],
+        notifications: updatedUser.notifications || []
       };
-      localStorage.setItem('user', JSON.stringify(userToStore));
+      sessionStorage.setItem('user', JSON.stringify(userToStore));
       
       return updatedUser;
     } catch (error) {

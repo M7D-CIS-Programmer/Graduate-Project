@@ -218,7 +218,7 @@ const Profile = () => {
                                 border: '1px solid var(--border-color)',
                                 borderRadius: '12px',
                                 padding: '1rem',
-                                color: '#0e1321',
+                                color: 'var(--text-primary)',
                                 outline: 'none',
                                 fontFamily: 'inherit',
                                 transition: 'var(--transition)'

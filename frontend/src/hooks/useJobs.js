@@ -2,10 +2,10 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '../api/api';
 import { queryKeys } from './queryKeys';
 
-export const useJobs = () =>
+export const useJobs = (filters = {}) =>
     useQuery({
-        queryKey: queryKeys.jobs,
-        queryFn:  api.getJobs,
+        queryKey: ['jobs', filters],
+        queryFn:  () => api.getJobs(filters),
         staleTime: 30_000,
     });
 

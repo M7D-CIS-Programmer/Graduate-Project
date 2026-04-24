@@ -42,10 +42,16 @@ public class UsersController : ControllerBase
             .FirstOrDefaultAsync(u => u.Email == dto.Email);
 
         if (user == null)
+        {
+            Console.WriteLine($"[Login Debug] User not found: {dto.Email}");
             return Unauthorized(new { message = "Invalid email or password" });
+        }
 
         // Verify password
-        if (!_authService.VerifyPassword(dto.Password, user.Pass))
+        bool isValid = _authService.VerifyPassword(dto.Password, user.Pass);
+        Console.WriteLine($"[Login Debug] User found: {user.Email}, Password valid: {isValid}");
+
+        if (!isValid)
             return Unauthorized(new { message = "Invalid email or password" });
 
         // Generate JWT token
@@ -133,13 +139,7 @@ public class UsersController : ControllerBase
             normalizedRole = "Job Seeker";
         }
 
-        var role = await _context.Roles.FirstOrDefaultAsync(r => 
-            r.RoleName == normalizedRole || 
-            (normalizedRole == "Job Seeker" && r.RoleName == "JobSeeker") ||
-            (normalizedRole == "Employer" && r.RoleName == "Employer"));
 
-        if (role == null) 
-            return BadRequest(new { message = $"Role '{dto.RoleName}' not found" });
 
         // Hash password
         var hashedPassword = _authService.HashPassword(dto.Pass);
@@ -153,7 +153,8 @@ public class UsersController : ControllerBase
             Phone = dto.Phone,
             Status = "Active",
             Industry = dto.Industry,
-            Roles = new List<Role> { role }
+            SearchKey = aabu_project.Utilities.SearchUtility.GenerateSearchKey(dto.Name, dto.Industry, dto.Location),
+            Roles = new List<Role> { new Role { RoleName = normalizedRole } }
         };
 
         _context.Users.Add(user);
@@ -196,6 +197,7 @@ public class UsersController : ControllerBase
         user.LinkedIn = dto.LinkedIn;
         user.Github = dto.Github;
         user.Industry = dto.Industry;
+        user.SearchKey = aabu_project.Utilities.SearchUtility.GenerateSearchKey(user.Name, user.Industry, user.Location, user.Description);
 
         await _context.SaveChangesAsync();
         return Ok(ToDto(user));

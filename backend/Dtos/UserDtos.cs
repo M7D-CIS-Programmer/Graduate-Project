@@ -43,7 +43,7 @@ public record UserDto(
     int Id, string Name, string Email,
     string? Location, string? Website, string? Phone,
     string? Description, string? LinkedIn, string? Github, string? Status,
-    string? Role, DateTime CreatedAt, int ActiveJobsCount = 0, string? Industry = null
+    string? Role, DateTimeOffset CreatedAt, int ActiveJobsCount = 0, string? Industry = null
 );
 
 public class LoginDto
@@ -65,7 +65,7 @@ public class AuthResponseDto
     public string? Phone { get; set; }
     public string? Role { get; set; }
     public string Token { get; set; } = null!;
-    public DateTime CreatedAt { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
 }
 
 public class AuthResultDto

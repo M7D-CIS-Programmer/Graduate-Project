@@ -32,6 +32,13 @@ import Companies from './pages/Companies/Companies';
 import Candidates from './pages/Candidates';
 import Settings from './pages/Settings/Settings';
 import ResumeView from './pages/Dashboard/ResumeView';
+import AboutUs from './pages/AboutUs';
+import ContactUs from './pages/ContactUs';
+import CandidateProfile from './pages/CandidateProfile';
+import FAQ from './pages/FAQ';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsOfService from './pages/TermsOfService';
+import Chatbot from './pages/Chatbot';
 import Spinner from './components/ui/Spinner';
 
 const ConditionalHome = () => {
@@ -114,14 +121,22 @@ function App() {
 
                   {/* User Features */}
                   <Route path="/profile/:id?" element={<Profile />} />
+                  <Route path="/candidate/:id" element={<CandidateProfile />} />
                   <Route path="/notifications" element={<Notifications />} />
                   <Route path="/resume-builder" element={<ResumeBuilder />} />
                   <Route path="/resume/:userId" element={<ResumeView />} />
 
                   {/* Other Routes */}
                   <Route path="/companies" element={<Companies />} />
+                  <Route path="/companies/:id" element={<Profile />} />
                   <Route path="/candidates" element={<Candidates />} />
                   <Route path="/settings" element={<Settings />} />
+                  <Route path="/about" element={<AboutUs />} />
+                  <Route path="/contact" element={<ContactUs />} />
+                  <Route path="/faq" element={<FAQ />} />
+                  <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                  <Route path="/terms-of-service" element={<TermsOfService />} />
+                  <Route path="/chatbot" element={<Chatbot />} />
 
                   {/* Fallback */}
                   <Route path="*" element={

@@ -1,10 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { MessageCircle, X, Send, User, Bot, Paperclip, File as FileIcon } from 'lucide-react';
+import { MessageCircle, X, Send, User, Bot, Paperclip, File as FileIcon, Maximize2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import './Chatbot.css';
 
 const Chatbot = ({ isSidebarOpen }) => {
     const { t, dir } = useLanguage();
+    const navigate = useNavigate();
     const [isOpen, setIsOpen] = useState(false);
     const [message, setMessage] = useState('');
     const [selectedFile, setSelectedFile] = useState(null);
@@ -73,9 +75,14 @@ const Chatbot = ({ isSidebarOpen }) => {
                                 </div>
                             </div>
                         </div>
-                        <button className="close-btn" onClick={() => setIsOpen(false)}>
-                            <X size={20} />
-                        </button>
+                        <div className="chatbot-header-actions">
+                            <button className="expand-btn" onClick={() => navigate('/chatbot')} title={t('fullPageChat')}>
+                                <Maximize2 size={18} />
+                            </button>
+                            <button className="close-btn" onClick={() => setIsOpen(false)}>
+                                <X size={20} />
+                            </button>
+                        </div>
                     </div>
 
                     <div className="chatbot-messages" ref={scrollRef}>

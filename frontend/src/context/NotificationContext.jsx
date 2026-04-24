@@ -17,7 +17,7 @@ export const NotificationProvider = ({ children }) => {
         if (!user?.id) return;
 
         try {
-            const notifications = await api.getNotificationsByUserId(user.id);
+            const notifications = await api.getNotificationsByUserId(user.id, user.role);
             const count = notifications.filter(n => !n.isRead).length;
             setUnreadCount(count);
 

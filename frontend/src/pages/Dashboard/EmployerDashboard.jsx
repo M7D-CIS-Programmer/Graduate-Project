@@ -1,7 +1,11 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useLanguage } from '../../context/LanguageContext';
 import { useToast } from '../../context/ToastContext';
 import { useTheme } from '../../context/ThemeContext';
+import { useAuth } from '../../context/AuthContext';
+import { useJobs } from '../../hooks/useJobs';
+import { useApplications, useUpdateApplicationStatus } from '../../hooks/useApplications';
+import Spinner from '../../components/ui/Spinner';
 import { Link, useNavigate } from 'react-router-dom';
 import {
     FileText,
@@ -37,102 +41,109 @@ ChartJS.register(
 const EmployerDashboard = () => {
     const { theme } = useTheme();
     const { t } = useLanguage();
+    const { user } = useAuth();
     const { addToast } = useToast();
     const navigate = useNavigate();
 
-    const stats = [
-        { label: t('totalPostings'), value: '8', icon: <FileText />, color: '#6366f1' },
-        { label: t('appliedJobs'), value: '145', icon: <Users />, color: '#10b981' },
-        { label: t('activeJobs'), value: '3', icon: <TrendingUp />, color: '#f59e0b' },
+    const { data: allJobs = [], isLoading: jobsLoading } = useJobs();
+    const { data: allApplications = [], isLoading: appsLoading } = useApplications();
+    const updateStatusMutation = useUpdateApplicationStatus();
 
+    const employerJobs = useMemo(() => {
+        return allJobs.filter(j => j.userId === user?.id);
+    }, [allJobs, user]);
+
+    const employerJobIds = useMemo(() => employerJobs.map(j => j.id), [employerJobs]);
+
+    const employerApplications = useMemo(() => {
+        return allApplications.filter(app => employerJobIds.includes(app.jobId));
+    }, [allApplications, employerJobIds]);
+
+    const stats = [
+        { label: t('totalPostings'), value: employerJobs.length, icon: <FileText />, color: '#6366f1' },
+        { label: t('totalApplicants'), value: employerApplications.length, icon: <Users />, color: '#10b981' },
+        { label: t('activeJobs'), value: employerJobs.filter(j => j.status === 'Active').length, icon: <TrendingUp />, color: '#f59e0b' },
     ];
 
-    const [applications, setApplications] = React.useState(() => {
-        try {
-            return JSON.parse(localStorage.getItem('allApplications') || '[]');
-        } catch (e) { return []; }
-    });
-
-    const dynamicApplicants = applications.map((app, index) => ({
-        id: `dyn-${app.id || index}`,
-        originalId: app.id,
-        name: app.applicantName,
-        role: app.role,
-        time: app.time || t('justNow') || 'Just now',
-        status: app.status || t('newApplication') || 'New'
-    }));
-
-    const handleAction = (actionType, applicant) => {
+    const handleAction = async (actionType, applicant) => {
         if (actionType === 'view') {
-            navigate('/profile');
+            navigate(`/candidate/${applicant.userId}`);
             return;
         }
 
-        if (actionType === 'accept' || actionType === 'reject') {
-            if (!applicant.originalId) {
-                addToast(
-                    t(actionType === 'accept' ? 'candidateAccepted' : 'candidateRejected') ||
-                    `Applicant ${actionType === 'accept' ? 'Accepted' : 'Rejected'}`,
-                    'success'
-                );
-                return;
-            }
-
-            const updatedStatus = actionType === 'accept' ? 'Hired' : 'Rejected';
-            const updatedApps = applications.map(app => {
-                if (app.id === applicant.originalId) {
-                    return { ...app, status: updatedStatus };
-                }
-                return app;
-            });
-            localStorage.setItem('allApplications', JSON.stringify(updatedApps));
-            setApplications(updatedApps);
-
+        const newStatus = actionType === 'accept' ? 'Shortlisted' : 'Rejected';
+        try {
+            await updateStatusMutation.mutateAsync({ id: applicant.id, status: newStatus });
             addToast(
                 t(actionType === 'accept' ? 'candidateAccepted' : 'candidateRejected') ||
                 `Applicant ${actionType === 'accept' ? 'Accepted' : 'Rejected'}`,
                 'success'
             );
+        } catch (error) {
+            addToast(t('actionFailed') || 'Failed to update status', 'error');
         }
     };
 
-    const recentApplicants = [
-        ...dynamicApplicants,
-        { id: 1, name: 'Ali Hassan', role: t('seniorReactDev'), time: t('oneHourAgo') || '1 hour ago', status: t('reviewing') },
-        { id: 2, name: 'Ahmed Ali', role: t('uiDesigner'), time: '3 hours ago', status: t('pendingApproval') || 'New' },
-        { id: 3, name: 'Muna Mohamed', role: t('backendDeveloper'), time: '5 hours ago', status: t('shortlisted') },
-    ];
+    const recentApplicants = useMemo(() => {
+        return employerApplications
+            .sort((a, b) => new Date(b.date) - new Date(a.date))
+            .slice(0, 5)
+            .map(app => ({
+                id: app.id,
+                userId: app.userId,
+                name: app.user?.name || 'Applicant',
+                role: app.job?.title || 'Job',
+                time: new Date(app.date).toLocaleDateString(),
+                status: app.candidateStatus
+            }));
+    }, [employerApplications]);
+
+    const chartData = useMemo(() => {
+        const topJobs = employerJobs.slice(0, 3);
+        return {
+            labels: topJobs.map(j => j.title),
+            apps: topJobs.map(j => employerApplications.filter(a => a.jobId === j.id).length),
+            views: topJobs.map(j => (j.id * 15) % 100 + 20) // Simulated views based on ID for now
+        };
+    }, [employerJobs, employerApplications]);
+
+    if (jobsLoading || appsLoading) return <Spinner />;
 
     return (
         <div className="dashboard-container">
             <div className="dashboard-header">
-                <h1 className="dashboard-title">{t('dashboard')}</h1>
+                <div>
+                    <h1 className="dashboard-title">{t('employerDashboard')}</h1>
+                    <p className="subtitle">{t('employerDashboardSubtitle') || 'Manage your listings and candidates'}</p>
+                </div>
                 <Link to="/jobs/post" className="btn-primary" style={{ textDecoration: 'none' }}>
                     <PlusCircle size={20} />
                     {t('postNewJob')}
                 </Link>
             </div>
 
-            <div className="dashboard-stats">
+            <div className="stats-grid">
                 {stats.map((stat, i) => (
-                    <div key={i} className="card stat-card">
-                        <div className="stat-icon-wrapper" style={{ backgroundColor: `${stat.color}15`, color: stat.color }}>
+                    <div key={i} className="stat-card glass">
+                        <div className="stat-icon" style={{ backgroundColor: `${stat.color}15`, color: stat.color }}>
                             {stat.icon}
                         </div>
-                        <div>
-                            <h3 className="stat-value">{stat.value}</h3>
-                            <p className="stat-label">{stat.label}</p>
+                        <div className="stat-details">
+                            <h3>{stat.value}</h3>
+                            <p>{stat.label}</p>
                         </div>
                     </div>
                 ))}
             </div>
 
             <div className="dashboard-grid">
-                <section className="dashboard-section">
-                    <h2 className="section-title">
-                        <Users size={22} className="text-primary" />
-                        {t('recentApplicants')}
-                    </h2>
+                <div className="dashboard-section glass">
+                    <div className="section-header">
+                        <h2>
+                            <Users size={20} />
+                            {t('recentApplicants')}
+                        </h2>
+                    </div>
                     <div className="activity-list">
                         {recentApplicants.map(applicant => (
                             <div key={applicant.id} className="activity-item">
@@ -150,28 +161,33 @@ const EmployerDashboard = () => {
                                 </div>
                             </div>
                         ))}
+                        {recentApplicants.length === 0 && (
+                            <p className="empty-msg">{t('noApplicants') || 'No recent applicants.'}</p>
+                        )}
                     </div>
-                </section>
+                </div>
 
-                <section className="dashboard-section">
-                    <h2 className="section-title">
-                        <TrendingUp size={22} className="text-primary" />
-                        {t('jobPerformance')}
-                    </h2>
+                <div className="dashboard-section glass">
+                    <div className="section-header">
+                        <h2>
+                            <TrendingUp size={20} />
+                            {t('jobPerformance')}
+                        </h2>
+                    </div>
                     <div className="chart-container">
                         <Bar
                             data={{
-                                labels: [t('seniorReactDev'), t('uiDesigner'), t('backendDeveloper')],
+                                labels: chartData.labels,
                                 datasets: [
                                     {
                                         label: t('views'),
-                                        data: [450, 290, 310],
+                                        data: chartData.views,
                                         backgroundColor: '#6366f1',
                                         borderRadius: 6,
                                     },
                                     {
-                                        label: t('appliedJobs'),
-                                        data: [84, 42, 38],
+                                        label: t('totalApplicants'),
+                                        data: chartData.apps,
                                         backgroundColor: '#10b981',
                                         borderRadius: 6,
                                     }
@@ -183,9 +199,9 @@ const EmployerDashboard = () => {
                                 plugins: {
                                     legend: {
                                         position: 'top',
-                                        labels: { 
-                                            color: theme === 'dark' ? '#94a3b8' : '#1e293b', 
-                                            font: { size: 10 } 
+                                        labels: {
+                                            color: 'var(--text-muted)',
+                                            font: { size: 10 }
                                         }
                                     },
                                     tooltip: {
@@ -196,18 +212,18 @@ const EmployerDashboard = () => {
                                 },
                                 scales: {
                                     y: {
-                                        grid: { color: theme === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)' },
-                                        ticks: { color: theme === 'dark' ? '#94a3b8' : '#1e293b' }
+                                        grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                                        ticks: { color: 'var(--text-muted)' }
                                     },
                                     x: {
                                         grid: { display: false },
-                                        ticks: { color: theme === 'dark' ? '#94a3b8' : '#1e293b' }
+                                        ticks: { color: 'var(--text-muted)' }
                                     }
                                 }
                             }}
                         />
                     </div>
-                </section>
+                </div>
             </div>
         </div>
     );

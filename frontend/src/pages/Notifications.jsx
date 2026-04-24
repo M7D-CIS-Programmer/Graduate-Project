@@ -15,6 +15,7 @@ import { useAuth } from '../context/AuthContext';
 import { useNotifications } from '../context/NotificationContext';
 import { api } from '../api/api';
 import Button from '../components/ui/Button';
+import { formatTimeAgo } from '../utils/dateUtils';
 import './User.css';
 
 const Notifications = () => {
@@ -23,90 +24,113 @@ const Notifications = () => {
     const { setUnreadCount } = useNotifications();
     const [notifications, setNotifications] = useState([]);
 
-    useEffect(() => {
-        const fetchNotifications = async () => {
-            if (!user?.id) return;
+    const fetchNotifications = async () => {
+        if (!user?.id) return;
+        
+        try {
+            const data = await api.getNotificationsByUserId(user.id, user.role);
             
-            try {
-                const data = await api.getNotificationsByUserId(user.id);
+            // Map backend notifications to UI structure
+            const mappedNotifications = data.map(notif => {
+                let icon = <Bell />;
+                let title = notif.title;
+                let message = notif.message;
                 
-                // Map backend notifications to UI structure
-                const mappedNotifications = data.map(notif => {
-                    let icon = <Bell />;
-                    let title = notif.title;
-                    let message = notif.message;
-                    
-                    // Simple regex mapping for backend English strings
-                    if (message.includes("Your application for '") && message.includes("' has been updated to: ")) {
-                        const match = message.match(/Your application for '(.+)' has been updated to: (.+)/);
-                        if (match) {
-                            title = t('applicationStatusUpdate');
-                            message = t('applicationStatusUpdateMsg', { jobTitle: match[1], status: t(match[2].toLowerCase()) || match[2] });
-                        }
-                    } else if (message.includes("viewed your resume")) {
-                        const match = message.match(/(.+) viewed your resume/);
-                        if (match) {
-                            title = t('resumeViewed');
-                            message = t('employerViewedResumeMsg', { company: match[1] });
-                        }
-                    } else if (message.includes("Your application for ") && message.includes(" has been received")) {
-                        const match = message.match(/Your application for (.+) has been received/);
-                        if (match) {
-                            title = t('applicationReceived');
-                            message = t('applicationReceivedMsg', { jobTitle: match[1] });
-                        }
-                    } else if (message.includes("An employer viewed your profile")) {
-                        title = t('applicationViewed');
-                        message = t('employerViewedProfileMsg');
+                // Simple regex mapping for backend English strings
+                if (message.includes("Your application for '") && message.includes("' has been updated to: ")) {
+                    const match = message.match(/Your application for '(.+)' has been updated to: (.+)/);
+                    if (match) {
+                        title = t('applicationStatusUpdate');
+                        message = t('applicationStatusUpdateMsg', { jobTitle: match[1], status: t(match[2].toLowerCase()) || match[2] });
                     }
-                    
-                    if (notif.type === 'Application') icon = <Users />;
-                    else if (notif.type === 'StatusUpdate') icon = <CheckCircle />;
-                    else if (notif.type === 'ProfileView') icon = <Building2 />;
-                    else if (notif.type === 'ResumeView') icon = <Briefcase />;
-                    
-                    return {
-                        id: notif.id,
-                        title: title,
-                        message: message,
-                        time: t('justNow') || 'Just now',
-                        unread: !notif.isRead,
-                        icon: icon,
-                        type: notif.type?.toLowerCase()
-                    };
-                });
-
-                // Add a sample system notification if list is empty
-                if (mappedNotifications.length === 0) {
-                    mappedNotifications.push({
-                        id: 'welcome',
-                        title: t('systemUpdate'),
-                        message: t('welcomeMessage'),
-                        time: t('justNow'),
-                        unread: false,
-                        icon: <CheckCircle />,
-                        type: 'system'
-                    });
+                } else if (message.includes("viewed your resume")) {
+                    const match = message.match(/(.+) viewed your resume/);
+                    if (match) {
+                        title = t('resumeViewed');
+                        message = t('employerViewedResumeMsg', { company: match[1] });
+                    }
+                } else if (message.includes("Your application for ") && message.includes(" has been received")) {
+                    const match = message.match(/Your application for (.+) has been received/);
+                    if (match) {
+                        title = t('applicationReceived');
+                        message = t('applicationReceivedMsg', { jobTitle: match[1] });
+                    }
+                } else if (message.includes("An employer viewed your profile")) {
+                    title = t('applicationViewed');
+                    message = t('employerViewedProfileMsg');
                 }
+                
+                if (notif.type === 'Application') icon = <Users />;
+                else if (notif.type === 'StatusUpdate') icon = <CheckCircle />;
+                else if (notif.type === 'ProfileView') icon = <Building2 />;
+                else if (notif.type === 'ResumeView') icon = <Briefcase />;
+                
+                return {
+                    id: notif.id,
+                    title: title,
+                    message: message,
+                    time: formatTimeAgo(notif.createdAt, t, dir === 'rtl' ? 'ar' : 'en'),
+                    unread: !notif.isRead,
+                    icon: icon,
+                    type: notif.type?.toLowerCase()
+                };
+            });
 
-                setNotifications(mappedNotifications);
-                setUnreadCount(mappedNotifications.filter(n => n.unread).length);
-            } catch (err) {
-                console.error('Error fetching notifications:', err);
-            }
-        };
+            setNotifications(mappedNotifications);
+            setUnreadCount(mappedNotifications.filter(n => n.unread).length);
+        } catch (err) {
+            console.error('Error fetching notifications:', err);
+        }
+    };
 
+    useEffect(() => {
         fetchNotifications();
     }, [user?.id, t, setUnreadCount]);
 
-    const markAllRead = () => {
-        setNotifications(notifications.map(n => ({ ...n, unread: false })));
-        setUnreadCount(0);
+    const markAsRead = async (id) => {
+        try {
+            await api.markNotificationAsRead(id);
+            setNotifications(prev => prev.map(n => n.id === id ? { ...n, unread: false } : n));
+            setUnreadCount(prev => Math.max(0, prev - 1));
+        } catch (err) {
+            console.error('Failed to mark notification as read:', err);
+        }
     };
 
-    const clearAll = () => {
-        setNotifications([]);
-        setUnreadCount(0);
+    const markAllRead = async () => {
+        if (!user?.id) return;
+        try {
+            await api.markAllNotificationsAsRead(user.id);
+            setNotifications(notifications.map(n => ({ ...n, unread: false })));
+            setUnreadCount(0);
+        } catch (err) {
+            console.error('Failed to mark all as read:', err);
+        }
+    };
+
+    const clearAll = async () => {
+        if (!user?.id) return;
+        try {
+            await api.clearAllNotifications(user.id);
+            setNotifications([]);
+            setUnreadCount(0);
+        } catch (err) {
+            console.error('Failed to clear notifications:', err);
+        }
+    };
+
+    const deleteOne = async (e, id) => {
+        e.stopPropagation();
+        try {
+            await api.deleteNotification(id);
+            setNotifications(prev => {
+                const filtered = prev.filter(n => n.id !== id);
+                setUnreadCount(filtered.filter(n => n.unread).length);
+                return filtered;
+            });
+        } catch (err) {
+            console.error('Failed to delete notification:', err);
+        }
     };
 
     return (
@@ -114,11 +138,11 @@ const Notifications = () => {
             <div className="dashboard-header">
                 <h1 className="dashboard-title">{t('notifications')}</h1>
                 <div style={{ display: 'flex', gap: '1rem' }}>
-                    <Button variant="secondary" onClick={markAllRead}>
+                    <Button variant="secondary" onClick={markAllRead} disabled={notifications.length === 0}>
                         <Check size={18} />
                         {t('markAsRead')}
                     </Button>
-                    <Button variant="secondary" onClick={clearAll} style={{ color: '#ef4444' }}>
+                    <Button variant="secondary" onClick={clearAll} style={{ color: '#ef4444' }} disabled={notifications.length === 0}>
                         <Trash2 size={18} />
                         {t('clearAll')}
                     </Button>
@@ -128,7 +152,12 @@ const Notifications = () => {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 {notifications.length > 0 ? (
                     notifications.map(notif => (
-                        <div key={notif.id} className={`notification-item ${notif.unread ? 'unread' : ''}`}>
+                        <div 
+                            key={notif.id} 
+                            className={`notification-item ${notif.unread ? 'unread' : ''}`}
+                            onClick={() => notif.unread && markAsRead(notif.id)}
+                            style={{ cursor: notif.unread ? 'pointer' : 'default' }}
+                        >
                             <div
                                 className="notification-icon-wrapper"
                                 style={{
@@ -143,7 +172,17 @@ const Notifications = () => {
                                 <p>{notif.message}</p>
                                 <span className="notification-date">{notif.time}</span>
                             </div>
-                            {notif.unread && <div className="notification-unread-dot"></div>}
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                {notif.unread && <div className="notification-unread-dot"></div>}
+                                <button 
+                                    className="delete-notif-btn" 
+                                    onClick={(e) => deleteOne(e, notif.id)}
+                                    title="Delete"
+                                    style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', opacity: 0.5 }}
+                                >
+                                    <Trash2 size={16} />
+                                </button>
+                            </div>
                         </div>
                     ))
                 ) : (

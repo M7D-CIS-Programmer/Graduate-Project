@@ -7,9 +7,10 @@ import { useNavigate } from 'react-router-dom';
 import { useApplications } from '../../hooks/useApplications';
 import './Dashboard.css';
 import '../User.css';
+import { formatFriendlyDate } from '../../utils/dateUtils';
 
 const AppliedJobs = () => {
-    const { t, dir } = useLanguage();
+    const { t, dir, language } = useLanguage();
     const { user } = useAuth();
     const navigate = useNavigate();
     const { data: allApplications = [], isLoading } = useApplications();
@@ -94,7 +95,7 @@ const AppliedJobs = () => {
                                         <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
                                             <span className="notification-date" style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
                                                 <Calendar size={14} />
-                                                {new Date(app.date).toLocaleDateString()}
+                                                {formatFriendlyDate(app.date, language)}
                                             </span>
                                             <span className="notification-date" style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
                                                 <Briefcase size={14} />

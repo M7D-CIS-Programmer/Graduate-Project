@@ -16,9 +16,10 @@ import {
 } from 'lucide-react';
 import './Dashboard.css';
 import { useJobs, useUpdateJobStatus, useDeleteJob } from '../../hooks/useJobs';
+import { formatFriendlyDate } from '../../utils/dateUtils';
 
 const ManageJobs = () => {
-    const { t, dir } = useLanguage();
+    const { t, dir, language } = useLanguage();
     const { addToast } = useToast();
     const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState('');
@@ -160,7 +161,7 @@ const ManageJobs = () => {
                                 <th style={{ padding: '1rem', color: 'var(--text-muted)', fontWeight: '500' }}>{t('jobTitle')}</th>
                                 <th style={{ padding: '1rem', color: 'var(--text-muted)', fontWeight: '500' }}>{t('company')}</th>
                                 <th style={{ padding: '1rem', color: 'var(--text-muted)', fontWeight: '500' }}>{t('postedDate')}</th>
-                                <th style={{ padding: '1rem', color: 'var(--text-muted)', fontWeight: '500', textAlign: 'center' }}>{t('appliedJobs')}</th>
+                                <th style={{ padding: '1rem', color: 'var(--text-muted)', fontWeight: '500', textAlign: 'center' }}>{t('totalApplicants')}</th>
                                 <th style={{ padding: '1rem', color: 'var(--text-muted)', fontWeight: '500' }}>{t('status')}</th>
                                 <th style={{ padding: '1rem', color: 'var(--text-muted)', fontWeight: '500', textAlign: 'center' }}>{t('actions')}</th>
                             </tr>
@@ -185,7 +186,7 @@ const ManageJobs = () => {
                                             <span style={{ color: 'var(--text-primary)' }}>{job.company}</span>
                                         </div>
                                     </td>
-                                    <td style={{ padding: '1rem', color: 'var(--text-muted)' }}>{new Date(job.postedDate).toLocaleDateString()}</td>
+                                    <td style={{ padding: '1rem', color: 'var(--text-muted)' }}>{formatFriendlyDate(job.postedDate, language)}</td>
                                     <td style={{ padding: '1rem', textAlign: 'center' }}>
                                         <span style={{
                                             background: 'rgba(15, 23, 42, 0.5)',

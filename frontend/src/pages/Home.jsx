@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import heroImg1 from '../assets/heroImg1.jpg';
 import heroImg2 from '../assets/heroImg2.jpg';
 import heroImg3 from '../assets/heroImg3.jpg';
+import { api } from '../api/api';
 import './Home.css';
 
 const Home = () => {
@@ -26,12 +27,36 @@ const Home = () => {
         return () => clearInterval(timer);
     }, []);
 
-    const categories = [
-        { title: 'Tech', count: '1,240', icon: <Briefcase /> },
-        { title: 'Design', count: '850', icon: <Users /> },
-        { title: 'Management', count: '420', icon: <TrendingUp /> },
-        { title: 'Marketing', count: '310', icon: <Building /> }
-    ];
+    const [categories, setCategories] = useState([]);
+    const [jobs, setJobs] = useState([]);
+    const [isLoadingJobs, setIsLoadingJobs] = useState(true);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const [catData, jobData] = await Promise.all([
+                    api.getCategories(),
+                    api.getJobs()
+                ]);
+                setCategories(catData.slice(0, 4));
+                setJobs(jobData.slice(0, 3)); // Show top 3 jobs as "Featured"
+            } catch (error) {
+                console.error('Error fetching home data:', error);
+            } finally {
+                setIsLoadingJobs(false);
+            }
+        };
+        fetchData();
+    }, []);
+
+    const getCategoryIcon = (name) => {
+        const n = name.toLowerCase();
+        if (n.includes('tech') || n.includes('engineering')) return <Briefcase />;
+        if (n.includes('design')) return <Users />;
+        if (n.includes('market')) return <Building />;
+        if (n.includes('manage') || n.includes('finance')) return <TrendingUp />;
+        return <Briefcase />;
+    };
 
     const handleSearch = (e) => {
         e.preventDefault();
@@ -118,14 +143,13 @@ const Home = () => {
                         <h2 className="featured-title">{t('popularCategories')}</h2>
                         <p style={{ color: 'var(--text-muted)' }}>{t('categoriesSubtitle')}</p>
                     </div>
-                    <button className="view-all-btn">{t('viewAll')}</button>
                 </div>
                 <div className="categories-grid">
                     {categories.map((cat, i) => (
                         <div key={i} className="card categories-card">
-                            <div className="cat-icon-box">{cat.icon}</div>
-                            <h3>{t(cat.title.toLowerCase())}</h3>
-                            <p>{cat.count} {t('activeJobs')}</p>
+                            <div className="cat-icon-box">{getCategoryIcon(cat.name)}</div>
+                            <h3>{t(cat.name.toLowerCase()) || cat.name}</h3>
+                            <p>{cat.jobCount} {t('activeJobs')}</p>
                         </div>
                     ))}
                 </div>
@@ -138,28 +162,43 @@ const Home = () => {
                         <h2 className="featured-title">{t('featuredJobs')}</h2>
                         <p style={{ color: 'var(--text-muted)' }}>{t('handPickedJobs')}</p>
                     </div>
-                    <Link to="/jobs" className="view-all-btn" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <Link to="/jobs" className="view-all-btn">
                         {t('viewAll')}
                         <ChevronRight size={16} className={dir === 'rtl' ? 'rotate-180' : ''} />
                     </Link>
                 </div>
                 <div className="jobs-grid">
-                    {[1, 2, 3].map((item, i) => (
-                        <div key={i} className="card">
-                            <div className="job-card-header">
-                                <div className="company-logo-placeholder">
-                                    <Building size={24} />
+                    {isLoadingJobs ? (
+                        [1, 2, 3].map((i) => (
+                            <div key={i} className="card skeleton-card" style={{ height: '200px', opacity: 0.5 }}>
+                                <div className="skeleton-line" style={{ width: '60%', height: '20px', background: 'var(--border-color)', margin: '10px 0' }} />
+                                <div className="skeleton-line" style={{ width: '40%', height: '15px', background: 'var(--border-color)' }} />
+                            </div>
+                        ))
+                    ) : jobs.length > 0 ? (
+                        jobs.map((job) => (
+                            <div key={job.id} className="card job-card-dynamic">
+                                <div className="job-card-header">
+                                    <div className="company-logo-placeholder">
+                                        <Building size={24} />
+                                    </div>
+                                    <span className="job-type-badge">{t(job.type?.toLowerCase()) || job.type}</span>
                                 </div>
-                                <span className="job-type-badge">{t('fullTime')}</span>
+                                <h3 className="job-title">{job.title}</h3>
+                                <p className="job-company">{job.company || t('unknownCompany')} • {job.location || t('remote')}</p>
+                                <div className="job-card-footer">
+                                    <span className="job-salary">
+                                        {job.salaryMin && job.salaryMax 
+                                            ? `$${(job.salaryMin / 1000).toFixed(0)}k - $${(job.salaryMax / 1000).toFixed(0)}k`
+                                            : t('salaryNegotiable')}
+                                    </span>
+                                    <Link to={`/jobs/${job.id}`} className="details-btn">{t('details')}</Link>
+                                </div>
                             </div>
-                            <h3 className="job-title">{t('seniorReactDev')}</h3>
-                            <p className="job-company">TechVision • {t('remote')}</p>
-                            <div className="job-card-footer">
-                                <span className="job-salary">$120k - $160k</span>
-                                <Link to="/jobs/1" className="details-btn">{t('details')}</Link>
-                            </div>
-                        </div>
-                    ))}
+                        ))
+                    ) : (
+                        <div className="no-results" style={{ gridColumn: '1 / -1' }}>{t('noJobsFound')}</div>
+                    )}
                 </div>
             </section>
         </div>
