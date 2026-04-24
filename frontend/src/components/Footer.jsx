@@ -40,7 +40,7 @@ const Footer = () => {
                         <ul>
                             <li><Link to="/contact">{t('contactUs')}</Link></li>
                             <li><Link to="/about">{t('aboutUs')}</Link></li>
-                            <li><Link to="/help">FAQ</Link></li>
+                            <li><Link to="/faq">{t('faq')}</Link></li>
                         </ul>
                     </div>
 
