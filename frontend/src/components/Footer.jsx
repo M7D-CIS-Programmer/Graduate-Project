@@ -31,7 +31,7 @@ const Footer = () => {
                         <ul>
                             <li><Link to="/jobs">{t('findJobs')}</Link></li>
                             <li><Link to="/companies">{t('companies')}</Link></li>
-                            <li><Link to="/candidates">{t('candidates')}</Link></li>
+
                         </ul>
                     </div>
 

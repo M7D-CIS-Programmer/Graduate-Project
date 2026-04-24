@@ -621,7 +621,7 @@ export const LanguageProvider = ({ children }) => {
             totalPostings: "إجمالي المنشورات",
             messages: "الرسائل",
             recentApplicants: "المتقدمون الأخيرون",
-            viewProfile: "عرض الملف",
+            viewProfile: "الملف الشخصي ",
             accept: "قبول",
             reject: "رفض",
             jobPerformance: "أداء الوظائف",
