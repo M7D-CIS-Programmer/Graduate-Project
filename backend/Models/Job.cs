@@ -22,6 +22,7 @@ public class Job
     public string? Company { get; set; }
     public DateTimeOffset PostedDate { get; set; } = DateTimeOffset.Now;
     public int ViewsCount { get; set; }
+    public string? SearchKey { get; set; }
 
 
     // Navigation

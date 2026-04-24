@@ -7,6 +7,7 @@ public class SearchResultDto
     public string Description { get; set; } = null!;
     public string Type { get; set; } = null!; // "Job", "Candidate", "Company", "Page"
     public string Link { get; set; } = null!;
+    public string? SearchKey { get; set; }
 }
 
 public class SearchResponseDto

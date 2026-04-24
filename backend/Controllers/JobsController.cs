@@ -68,11 +68,16 @@ public class JobsController : ControllerBase
         // Filter by Search Query
         if (!string.IsNullOrEmpty(q))
         {
-            var search = q.ToLower();
-            query = query.Where(j => 
-                j.Title.ToLower().Contains(search) || 
-                j.Description.ToLower().Contains(search) ||
-                (j.Company != null && j.Company.ToLower().Contains(search)));
+            var normalized = aabu_project.Utilities.SearchUtility.Normalize(q);
+            var equivalent = aabu_project.Utilities.SearchUtility.GetEquivalent(normalized);
+            var terms = new List<string> { normalized };
+            if (equivalent != normalized) terms.Add(equivalent);
+
+            query = query.Where(j => terms.Any(t => 
+                (j.SearchKey != null && j.SearchKey.Contains(t)) ||
+                j.Title.Contains(t) || 
+                j.Description.Contains(t) ||
+                (j.Company != null && j.Company.Contains(t))));
         }
 
         // Filter by Job Type (Full Time, Part Time, etc.)
@@ -164,7 +169,8 @@ public class JobsController : ControllerBase
             Features = dto.Features,
             Status = dto.Status,
             Location = dto.Location,
-            Company = dto.Company
+            Company = dto.Company,
+            SearchKey = aabu_project.Utilities.SearchUtility.GenerateSearchKey(dto.Title, dto.Description, dto.Company, dto.Location)
         };
         _context.Jobs.Add(job);
         await _context.SaveChangesAsync();
@@ -188,6 +194,7 @@ public class JobsController : ControllerBase
         job.Responsibilities = updated.Responsibilities;
         job.Location = updated.Location;
         job.Company = updated.Company;
+        job.SearchKey = aabu_project.Utilities.SearchUtility.GenerateSearchKey(updated.Title, updated.Description, updated.Company, updated.Location);
 
         await _context.SaveChangesAsync();
 

@@ -19,6 +19,7 @@ public class User
     public string? Status { get; set; }
     public string? Industry { get; set; }
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.Now;
+    public string? SearchKey { get; set; }
 
     // Navigation properties
     public ICollection<Resume> Resumes { get; set; } = new List<Resume>();

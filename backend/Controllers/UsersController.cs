@@ -153,6 +153,7 @@ public class UsersController : ControllerBase
             Phone = dto.Phone,
             Status = "Active",
             Industry = dto.Industry,
+            SearchKey = aabu_project.Utilities.SearchUtility.GenerateSearchKey(dto.Name, dto.Industry, dto.Location),
             Roles = new List<Role> { new Role { RoleName = normalizedRole } }
         };
 
@@ -196,6 +197,7 @@ public class UsersController : ControllerBase
         user.LinkedIn = dto.LinkedIn;
         user.Github = dto.Github;
         user.Industry = dto.Industry;
+        user.SearchKey = aabu_project.Utilities.SearchUtility.GenerateSearchKey(user.Name, user.Industry, user.Location, user.Description);
 
         await _context.SaveChangesAsync();
         return Ok(ToDto(user));
