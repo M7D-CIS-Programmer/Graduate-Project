@@ -14,9 +14,10 @@ import {
     ExternalLink
 } from 'lucide-react';
 import './Dashboard.css';
+import { formatFriendlyDate } from '../../utils/dateUtils';
 
 const MyJobs = () => {
-    const { t, dir } = useLanguage();
+    const { t, dir, language } = useLanguage();
     const { user } = useAuth();
     const [searchTerm, setSearchTerm] = useState('');
     const { data: jobs = [], isLoading } = useMyJobs(user?.id);
@@ -80,7 +81,7 @@ const MyJobs = () => {
                                     <td style={{ padding: '1.25rem 1rem' }}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', color: 'var(--text-muted)' }}>
                                             <Calendar size={14} />
-                                            {job.postedDate || new Date().toLocaleDateString()}
+                                            {formatFriendlyDate(job.postedDate, language)}
                                         </div>
                                     </td>
                                     <td style={{ padding: '1.25rem 1rem' }}>

@@ -47,3 +47,23 @@ export const formatTimeAgo = (dateString, t, language = 'en') => {
         day: 'numeric'
     });
 };
+
+/**
+ * Formats an ISO 8601 date string into a user-friendly localized format.
+ * Example: "April 23, 2026, 2:41 AM" or "23 أبريل 2026، 2:41 ص"
+ */
+export const formatFriendlyDate = (dateString, language = 'en') => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    const locale = language === 'ar' ? 'ar-JO' : 'en-US';
+    
+    return date.toLocaleString(locale, {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+    }).replace(',', '،'); // Ensure Arabic comma if needed, though toLocaleString usually handles it.
+};
+

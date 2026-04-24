@@ -17,9 +17,10 @@ import {
     Download
 } from 'lucide-react';
 import './Dashboard.css';
+import { formatFriendlyDate } from '../../utils/dateUtils';
 
 const Applicants = () => {
-    const { t, dir } = useLanguage();
+    const { t, dir, language } = useLanguage();
     const navigate = useNavigate();
     const { addToast } = useToast();
     const [searchTerm, setSearchTerm] = useState('');
@@ -149,7 +150,7 @@ const Applicants = () => {
                                 </td>
                                 <td style={{ padding: '1.25rem 1rem' }}>
                                     <div style={{ fontSize: '0.9rem' }}>{applicant.job?.title || 'General'}</div>
-                                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>{new Date(applicant.date).toLocaleDateString()}</div>
+                                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>{formatFriendlyDate(applicant.date, language)}</div>
                                 </td>
                                 <td style={{ padding: '1.25rem 1rem' }}>
                                     <span style={{
