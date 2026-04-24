@@ -20,6 +20,7 @@ import { useTheme } from '../context/ThemeContext';
 import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
 import './User.css';
+import './ResumeBuilder.css';
 
 const ResumeBuilder = () => {
     const { theme } = useTheme();
@@ -100,7 +101,7 @@ const ResumeBuilder = () => {
     };
 
     return (
-        <div className="user-page-container">
+        <div className={`user-page-container ${dir}`}>
             <div className="dashboard-header">
                 <h1 className="dashboard-title">{t('resumeBuilder')}</h1>
                 <Button onClick={handleDownloadPDF}>
@@ -111,22 +112,14 @@ const ResumeBuilder = () => {
 
             <div className="resume-builder-layout">
                 {/* Form Sections */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+                <div className="form-sections-container">
                     <div className="dashboard-section">
-                        <div style={{ display: 'flex', gap: '2rem', marginBottom: '2.5rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '1rem' }}>
+                        <div className="steps-tabs">
                             {steps.map((step, i) => (
                                 <button
                                     key={i}
                                     onClick={() => setActiveStep(i)}
-                                    style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '0.5rem',
-                                        color: activeStep === i ? 'var(--primary)' : 'var(--text-muted)',
-                                        borderBottom: activeStep === i ? '2px solid var(--primary)' : 'none',
-                                        paddingBottom: '0.5rem',
-                                        fontWeight: activeStep === i ? '600' : '400'
-                                    }}
+                                    className={`step-tab ${activeStep === i ? 'active' : ''}`}
                                 >
                                     {step.icon}
                                     {step.title}
@@ -135,57 +128,37 @@ const ResumeBuilder = () => {
                         </div>
 
                         {activeStep === 0 && (
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+                            <div className="form-grid">
                                 <Input label={t('fullName')} placeholder={t('resumeNamePlaceholder')} value={formData.personal.name} onChange={(e) => setFormData({ ...formData, personal: { ...formData.personal, name: e.target.value } })} icon={User} />
                                 <Input label={t('email')} placeholder={t('resumeEmailPlaceholder')} value={formData.personal.email} onChange={(e) => setFormData({ ...formData, personal: { ...formData.personal, email: e.target.value } })} icon={Mail} />
                                 <Input label={t('phone')} placeholder={t('resumePhonePlaceholder')} value={formData.personal.phone} onChange={(e) => setFormData({ ...formData, personal: { ...formData.personal, phone: e.target.value } })} icon={Phone} />
                                 <div className="input-group">
-                                    <label className="input-label" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                                    <label className="input-label input-label-with-icon">
                                         <MapPin size={16} /> {t('locationPlaceholder')}
                                     </label>
                                     <select
-                                        style={{
-                                            width: '100%',
-                                            background: 'rgba(255, 255, 255, 0.05)',
-                                            border: '1px solid var(--border-color)',
-                                            borderRadius: '12px',
-                                            padding: '0.85rem 1rem',
-                                            color: 'white',
-                                            outline: 'none',
-                                            cursor: 'pointer',
-                                            fontFamily: 'inherit',
-                                            fontSize: '0.95rem'
-                                        }}
+                                        className="custom-select"
                                         value={formData.personal.location}
                                         onChange={(e) => setFormData({ ...formData, personal: { ...formData.personal, location: e.target.value } })}
                                     >
-                                        <option 
-                                            value="" 
-                                            style={{ 
-                                                background: theme === 'dark' ? '#0f172a' : '#4357a7', 
-                                                color: theme === 'dark' ? 'white' : 'black' 
-                                            }}
-                                        >
+                                        <option value="" className="select-option">
                                             {t('selectLocation') || 'Select Location'}
                                         </option>
                                         {['Amman', 'Irbid', 'Zarqa', 'Balqa', 'Madaba', 'Karak', 'Tafilah', 'Ma\'an', 'Aqaba', 'Mafraq', 'Jerash', 'Ajloun'].map(city => (
                                             <option 
                                                 key={city} 
                                                 value={city} 
-                                                style={{ 
-                                                    background: theme === 'dark' ? '#0f172a' : '#4357a7', 
-                                                    color: theme === 'dark' ? 'white' : 'black' 
-                                                }}
+                                                className="select-option"
                                             >
                                                 {t(city.toLowerCase().replace("'", ''))}
                                             </option>
                                         ))}
                                     </select>
                                 </div>
-                                <div style={{ gridColumn: 'span 2' }}>
+                                <div className="span-full">
                                     <label className="input-label" style={{ display: 'block', marginBottom: '0.5rem' }}>{t('aboutMe')}</label>
                                     <textarea
-                                        style={{ width: '100%', minHeight: '100px', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border-color)', borderRadius: '12px', padding: '1rem', color: 'white', outline: 'none' }}
+                                        className="resume-textarea"
                                         placeholder={t('resumeAboutPlaceholder')}
                                         value={formData.personal.about}
                                         onChange={(e) => setFormData({ ...formData, personal: { ...formData.personal, about: e.target.value } })}
@@ -195,13 +168,18 @@ const ResumeBuilder = () => {
                         )}
 
                         {activeStep === 1 && (
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+                            <div className="form-sections-container">
                                 {formData.experience.map((exp, idx) => (
-                                    <div key={exp.id} style={{ position: 'relative', padding: '1.5rem', background: 'rgba(255,255,255,0.02)', borderRadius: '16px', border: '1px solid var(--border-color)' }}>
+                                    <div key={exp.id} className="entry-card">
                                         {formData.experience.length > 1 && (
-                                            <button onClick={() => removeExperience(exp.id)} style={{ position: 'absolute', top: '1rem', right: dir === 'rtl' ? 'auto' : '1rem', left: dir === 'rtl' ? '1rem' : 'auto', color: '#ef4444' }}><Trash2 size={18} /></button>
+                                            <button 
+                                                className="remove-entry-btn"
+                                                onClick={() => removeExperience(exp.id)} 
+                                            >
+                                                <Trash2 size={18} />
+                                            </button>
                                         )}
-                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
+                                        <div className="form-grid">
                                             <Input label={t('jobTitle')} placeholder={t('resumeRolePlaceholder')} value={exp.title} onChange={(e) => {
                                                 const newExp = [...formData.experience];
                                                 newExp[idx].title = e.target.value;
@@ -230,13 +208,18 @@ const ResumeBuilder = () => {
                         )}
 
                         {activeStep === 2 && (
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+                            <div className="form-sections-container">
                                 {formData.education.map((edu, idx) => (
-                                    <div key={edu.id} style={{ position: 'relative', padding: '1.5rem', background: 'rgba(255,255,255,0.02)', borderRadius: '16px', border: '1px solid var(--border-color)' }}>
+                                    <div key={edu.id} className="entry-card">
                                         {formData.education.length > 1 && (
-                                            <button onClick={() => removeEducation(edu.id)} style={{ position: 'absolute', top: '1rem', right: dir === 'rtl' ? 'auto' : '1rem', left: dir === 'rtl' ? '1rem' : 'auto', color: '#ef4444' }}><Trash2 size={18} /></button>
+                                            <button 
+                                                className="remove-entry-btn"
+                                                onClick={() => removeEducation(edu.id)} 
+                                            >
+                                                <Trash2 size={18} />
+                                            </button>
                                         )}
-                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
+                                        <div className="form-grid">
                                             <Input label={t('degree')} placeholder={t('degreePlaceholder')} value={edu.degree} onChange={(e) => {
                                                 const newEdu = [...formData.education];
                                                 newEdu[idx].degree = e.target.value;
@@ -264,8 +247,8 @@ const ResumeBuilder = () => {
                                 ))}
                                 <Button variant="secondary" onClick={addEducation}><Plus size={18} /> {t('addEducation')}</Button>
 
-                                <div className="skills-manager" style={{ marginTop: '2rem' }}>
-                                    <h3 style={{ color: 'white', marginBottom: '1rem' }}>{t('skills')}</h3>
+                                <div className="skills-manager">
+                                    <h3 className="section-title-small">{t('skills')}</h3>
                                     <form onSubmit={addSkill} style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
                                         <div style={{ flex: 1 }}>
                                             <Input
@@ -276,21 +259,16 @@ const ResumeBuilder = () => {
                                         </div>
                                         <Button type="submit" style={{ height: '48px' }}>{t('addSkill')}</Button>
                                     </form>
-                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem' }}>
+                                    <div className="skills-list">
                                         {formData.skills.map((skill) => (
-                                            <span key={skill} className="skill-tag" style={{
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                gap: '0.5rem',
-                                                padding: '0.5rem 1rem',
-                                                background: 'rgba(99, 102, 241, 0.1)',
-                                                border: '1px solid rgba(99, 102, 241, 0.2)',
-                                                borderRadius: '20px',
-                                                color: 'var(--primary)',
-                                                fontSize: '0.9rem'
-                                            }}>
+                                            <span key={skill} className="skill-tag">
                                                 {skill}
-                                                <button onClick={() => removeSkill(skill)} style={{ color: 'var(--text-muted)', cursor: 'pointer' }}><X size={14} /></button>
+                                                <button 
+                                                    className="remove-skill-btn"
+                                                    onClick={() => removeSkill(skill)} 
+                                                >
+                                                    <X size={14} />
+                                                </button>
                                             </span>
                                         ))}
                                     </div>
@@ -301,72 +279,63 @@ const ResumeBuilder = () => {
                 </div>
 
                 {/* Live Preview */}
-                <aside style={{ position: 'sticky', top: 'var(--navbar-height)' }}>
+                <aside className="preview-aside">
                     <div className="dashboard-section" style={{ height: 'fit-content' }}>
                         <h2 className="section-title"><Eye size={20} className="text-primary" /> {t('livePreview')}</h2>
                         <div 
                             ref={resumeRef}
-                            style={{
-                                background: 'white',
-                                color: '#334155',
-                                aspectRatio: '1 / 1.414',
-                                padding: '2rem',
-                                borderRadius: '8px',
-                                fontSize: '0.75rem',
-                                boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
-                                overflowY: 'auto'
-                            }}
+                            className="resume-preview-sheet"
                         >
-                            <header style={{ borderBottom: '2px solid var(--primary)', paddingBottom: '1rem', marginBottom: '1.5rem', textAlign: dir === 'rtl' ? 'right' : 'left' }}>
-                                <h1 style={{ color: 'var(--primary)', fontSize: '1.5rem', marginBottom: '0.25rem' }}>{formData.personal.name || t('yourName')}</h1>
-                                <p>{formData.personal.email || t('emailExample')} | {formData.personal.phone || t('phone')}</p>
-                                <p>{formData.personal.location || t('locationPlaceholder')}</p>
+                            <header className="preview-header" style={{ textAlign: dir === 'rtl' ? 'right' : 'left' }}>
+                                <h1 className="preview-name">{formData.personal.name || t('yourName')}</h1>
+                                <p className="preview-contact">{formData.personal.email || t('emailExample')} | {formData.personal.phone || t('phone')}</p>
+                                <p className="preview-contact">{formData.personal.location || t('locationPlaceholder')}</p>
                             </header>
 
                             {formData.personal.about && (
-                                <section style={{ marginBottom: '1.5rem', textAlign: dir === 'rtl' ? 'right' : 'left' }}>
-                                    <h3 style={{ textTransform: 'uppercase', color: 'var(--primary)', fontSize: '0.8rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>{t('aboutMe')}</h3>
-                                    <p style={{ lineHeight: '1.5' }}>{formData.personal.about}</p>
+                                <section className="preview-section" style={{ textAlign: dir === 'rtl' ? 'right' : 'left' }}>
+                                    <h3 className="preview-section-title">{t('aboutMe')}</h3>
+                                    <p className="preview-about-text">{formData.personal.about}</p>
                                 </section>
                             )}
 
-                            <section style={{ marginBottom: '1.5rem', textAlign: dir === 'rtl' ? 'right' : 'left' }}>
-                                <h3 style={{ textTransform: 'uppercase', color: 'var(--primary)', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            <section className="preview-section" style={{ textAlign: dir === 'rtl' ? 'right' : 'left' }}>
+                                <h3 className="preview-section-title">
                                     <Briefcase size={14} /> {t('experience')}
                                 </h3>
                                 {formData.experience.map(exp => (
-                                    <div key={exp.id} style={{ marginBottom: '1rem' }}>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold' }}>
+                                    <div key={exp.id} className="preview-entry">
+                                        <div className="preview-entry-header">
                                             <span>{exp.title || t('rolePlaceholder')}</span>
                                             <span style={{ color: 'var(--primary)' }}>{exp.start} - {exp.end || t('present')}</span>
                                         </div>
-                                        <p style={{ fontStyle: 'italic', color: '#64748b' }}>{exp.company || t('companyPlaceholder')}</p>
+                                        <p className="preview-entry-subtitle">{exp.company || t('companyPlaceholder')}</p>
                                     </div>
                                 ))}
                             </section>
 
-                            <section style={{ marginBottom: '1.5rem', textAlign: dir === 'rtl' ? 'right' : 'left' }}>
-                                <h3 style={{ textTransform: 'uppercase', color: 'var(--primary)', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            <section className="preview-section" style={{ textAlign: dir === 'rtl' ? 'right' : 'left' }}>
+                                <h3 className="preview-section-title">
                                     <GraduationCap size={14} /> {t('education')}
                                 </h3>
                                 {formData.education.map(edu => (
-                                    <div key={edu.id} style={{ marginBottom: '0.75rem' }}>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold' }}>
+                                    <div key={edu.id} className="preview-entry">
+                                        <div className="preview-entry-header">
                                             <span>{edu.degree || t('degree')}</span>
                                             <span style={{ color: 'var(--primary)' }}>{edu.year}</span>
                                         </div>
-                                        <p style={{ color: '#64748b' }}>{edu.school || t('institution')}</p>
+                                        <p className="preview-entry-subtitle">{edu.school || t('institution')}</p>
                                     </div>
                                 ))}
                             </section>
 
                             <section style={{ textAlign: dir === 'rtl' ? 'right' : 'left' }}>
-                                <h3 style={{ textTransform: 'uppercase', color: 'var(--primary)', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                <h3 className="preview-section-title">
                                     <LangIcon size={14} /> {t('skills')}
                                 </h3>
-                                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                                <div className="preview-skills-list">
                                     {formData.skills.map(skill => (
-                                        <span key={skill} style={{ padding: '4px 8px', background: '#f1f5f9', borderRadius: '4px', border: '1px solid #e2e8f0' }}>{skill}</span>
+                                        <span key={skill} className="preview-skill-item">{skill}</span>
                                     ))}
                                 </div>
                             </section>
