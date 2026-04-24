@@ -501,6 +501,10 @@ export const LanguageProvider = ({ children }) => {
             applicationSent: "Application Sent",
             resumeViewed: "Resume Viewed",
             candidateRejected: "Candidate Rejected",
+            candidateAccepted: "Candidate accepted successfully!",
+            candidateReviewing: "Candidate is now under review.",
+            review: "Review",
+            actionFailed: "Action failed. Please try again.",
             uiDesigner: "UI Designer",
             backendDeveloper: "Backend Developer",
             userProfile: "User Profile",
@@ -1005,6 +1009,11 @@ export const LanguageProvider = ({ children }) => {
             sendMessage: "إرسال الرسالة",
             contactSuccess: "شكراً لك! تم إرسال رسالتك بنجاح.",
             visitUsAmman: "مجمع الملك حسين للأعمال، عمان، الأردن",
+            candidateRejected: "تم رفض المرشح.",
+            candidateAccepted: "تم قبول المرشح بنجاح!",
+            candidateReviewing: "المرشح قيد المراجعة الآن.",
+            review: "مراجعة",
+            actionFailed: "فشلت العملية. يرجى المحاولة مرة أخرى.",
         }
     };
 

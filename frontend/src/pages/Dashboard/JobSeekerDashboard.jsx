@@ -50,9 +50,9 @@ const JobSeekerDashboard = () => {
 
     const stats = [
         { label: t('appliedJobs'), value: userApplications.length, icon: <Briefcase />, color: '#6366f1' },
-        { label: t('interviews'), value: userApplications.filter(a => a.candidateStatus === 'Interview').length, icon: <CheckCircle />, color: '#10b981' },
+        { label: t('interviews'), value: userApplications.filter(a => a.candidateStatus === 'Shortlisted').length, icon: <CheckCircle />, color: '#10b981' },
         { label: t('pending'), value: userApplications.filter(a => a.candidateStatus === 'Applied').length, icon: <Clock />, color: '#f59e0b' },
-        { label: t('saved'), value: user?.savedJobsCount || '0', icon: <Bookmark />, color: '#ec4899' },
+        { label: t('saved'), value: user?.savedJobs?.length || 0, icon: <Bookmark />, color: '#ec4899' },
     ];
 
     const chartData = useMemo(() => {
@@ -97,7 +97,7 @@ const JobSeekerDashboard = () => {
             <div className="dashboard-header">
                 <div>
                     <h1 className="dashboard-title">{t('welcomeBack')}, {user?.name}!</h1>
-                    <p className="subtitle">{t('seekerSubtitle')}</p>
+                    <p className="subtitle">{t('dashboardSubtitle')}</p>
                 </div>
             </div>
 

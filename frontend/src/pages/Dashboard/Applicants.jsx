@@ -7,6 +7,7 @@ import {
     Users,
     Search,
     Filter,
+    Clock,
     MoreVertical,
     Eye,
     CheckCircle,
@@ -41,11 +42,15 @@ const Applicants = () => {
     };
 
     const handleAction = async (action, app) => {
-        if (action === 'accept' || action === 'reject') {
-            const newStatus = action === 'accept' ? 'Accepted' : 'Rejected';
+        if (action === 'accept' || action === 'reject' || action === 'review') {
+            const newStatus = action === 'accept' ? 'Shortlisted' : (action === 'review' ? 'Reviewing' : 'Rejected');
             updateStatus({ id: app.id, status: newStatus }, {
                 onSuccess: () => {
-                    addToast(t(action === 'accept' ? 'candidateAccepted' : 'candidateRejected'), 'success');
+                    let msgKey = '';
+                    if (action === 'accept') msgKey = 'candidateAccepted';
+                    else if (action === 'review') msgKey = 'candidateReviewing';
+                    else msgKey = 'candidateRejected';
+                    addToast(t(msgKey) || `Candidate status updated to ${newStatus}`, 'success');
                 },
                 onError: (err) => {
                     console.error("Action failed:", err);
@@ -66,7 +71,10 @@ const Applicants = () => {
             const matchesSearch = name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 role.toLowerCase().includes(searchTerm.toLowerCase());
             
-            const status = app.candidateStatus || 'New';
+            let status = app.candidateStatus || 'New';
+            if (status === 'Applied') status = 'New';
+            if (status === 'Accepted') status = 'Shortlisted';
+            
             const matchesStatus = statusFilter === 'All' || status === statusFilter;
             
             return matchesSearch && matchesStatus;
@@ -168,6 +176,10 @@ const Applicants = () => {
                                         <button className="btn-candidate-action success" onClick={() => handleAction('accept', applicant)} title={t('accept')}>
                                             <CheckCircle size={16} />
                                             <span>{t('accept') || 'Accept'}</span>
+                                        </button>
+                                        <button className="btn-candidate-action warning" onClick={() => handleAction('review', applicant)} title={t('review')}>
+                                            <Clock size={16} />
+                                            <span>{t('review') || 'Review'}</span>
                                         </button>
                                         <button className="btn-candidate-action danger" onClick={() => handleAction('reject', applicant)} title={t('reject')}>
                                             <XCircle size={16} />
