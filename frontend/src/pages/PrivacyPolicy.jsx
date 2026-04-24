@@ -62,7 +62,7 @@ const PrivacyPolicy = () => {
     ];
 
     return (
-        <div className={`privacy-container ${dir}`}>
+        <div className="privacy-container" dir={dir}>
             <header className="privacy-header">
                 <Shield className="privacy-hero-icon" size={64} />
                 <h1>{t('privacyPolicy')}</h1>

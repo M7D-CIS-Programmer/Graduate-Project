@@ -77,7 +77,7 @@ const TermsOfService = () => {
     ];
 
     return (
-        <div className={`terms-container ${dir}`}>
+        <div className="terms-container" dir={dir}>
             <header className="terms-header">
                 <Scale className="terms-hero-icon" size={64} />
                 <h1>{t('termsOfService')}</h1>

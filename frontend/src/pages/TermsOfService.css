@@ -1,10 +1,15 @@
+/* ── Layout ─────────────────────────────────────────────── */
 .terms-container {
     max-width: 1000px;
     margin: 0 auto;
     padding: 4rem 1.5rem;
 }
 
+/* ── Hero Header ────────────────────────────────────────── */
 .terms-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     text-align: center;
     margin-bottom: 4rem;
 }
@@ -34,11 +39,13 @@
     font-size: 1.2rem;
 }
 
+/* ── Content Grid ───────────────────────────────────────── */
 .terms-content {
     display: grid;
     gap: 2rem;
 }
 
+/* ── Section Card ───────────────────────────────────────── */
 .terms-section {
     padding: 2.5rem;
     border-radius: 24px;
@@ -50,16 +57,24 @@
     transform: translateY(-4px);
 }
 
+/* ── Section Header (icon + title row) ─────────────────── */
 .section-header {
     display: flex;
+    flex-direction: row;
     align-items: center;
     gap: 1rem;
     margin-bottom: 1.5rem;
 }
 
+[dir="rtl"] .section-header {
+    flex-direction: row-reverse;
+}
+
+/* ── Section Icon ───────────────────────────────────────── */
 .section-icon {
     width: 48px;
     height: 48px;
+    flex-shrink: 0;
     border-radius: 12px;
     background: rgba(99, 102, 241, 0.1);
     color: var(--primary);
@@ -68,17 +83,21 @@
     justify-content: center;
 }
 
+/* ── Section Typography ─────────────────────────────────── */
 .terms-section h2 {
     font-size: 1.5rem;
     margin: 0;
+    text-align: start;
 }
 
 .terms-section p {
     color: var(--text-muted);
     line-height: 1.7;
     margin-bottom: 1.5rem;
+    text-align: start;
 }
 
+/* ── List ───────────────────────────────────────────────── */
 .terms-list {
     list-style: none;
     padding: 0;
@@ -88,30 +107,22 @@
 }
 
 .terms-list li {
-    padding-left: 1.5rem;
+    padding-inline-start: 1.5rem;
     position: relative;
     color: var(--text-main);
     font-size: 0.95rem;
+    text-align: start;
 }
 
 .terms-list li::before {
     content: "✓";
     position: absolute;
-    left: 0;
+    inset-inline-start: 0;
     color: var(--primary);
     font-weight: bold;
 }
 
-.rtl .terms-list li {
-    padding-left: 0;
-    padding-right: 1.5rem;
-}
-
-.rtl .terms-list li::before {
-    left: auto;
-    right: 0;
-}
-
+/* ── Contact Footer Card ────────────────────────────────── */
 .terms-contact {
     text-align: center;
     padding: 3rem;
@@ -128,15 +139,16 @@
     color: var(--text-muted);
 }
 
+/* ── Responsive ─────────────────────────────────────────── */
 @media (max-width: 768px) {
     .terms-container {
         padding: 2rem 1rem;
     }
-    
+
     .terms-header h1 {
         font-size: 2.5rem;
     }
-    
+
     .terms-section {
         padding: 1.5rem;
     }
