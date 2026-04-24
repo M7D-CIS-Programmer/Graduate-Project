@@ -162,7 +162,7 @@ const Home = () => {
                         <h2 className="featured-title">{t('featuredJobs')}</h2>
                         <p style={{ color: 'var(--text-muted)' }}>{t('handPickedJobs')}</p>
                     </div>
-                    <Link to="/jobs" className="view-all-btn" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <Link to="/jobs" className="view-all-btn">
                         {t('viewAll')}
                         <ChevronRight size={16} className={dir === 'rtl' ? 'rotate-180' : ''} />
                     </Link>

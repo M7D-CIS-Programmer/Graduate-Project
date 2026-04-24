@@ -161,6 +161,9 @@
     color: var(--primary);
     font-weight: 600;
     transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 4px;
 }
 
 .view-all-btn:hover {

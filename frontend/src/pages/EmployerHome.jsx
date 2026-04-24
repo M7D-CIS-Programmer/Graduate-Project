@@ -8,17 +8,28 @@ import heroImg2 from '../assets/heroImg2.jpg';
 import heroImg3 from '../assets/heroImg3.jpg';
 import './Home.css';
 import { useJobs } from '../hooks/useJobs';
+import { api } from '../api/api';
+import EmployeeCard from '../components/EmployeeCard';
 
 const EmployerHome = () => {
     const { t, dir } = useLanguage();
     const navigate = useNavigate();
     const [currentImage, setCurrentImage] = useState(0);
     const [searchQuery, setSearchQuery] = useState('');
-    const candidates = [
-        { name: 'Ahmad Al-Hassan', location: 'Dubai, UAE' },
-        { name: 'Sara Malik', location: 'Abu Dhabi, UAE' },
-        { name: 'Omar Khalid', location: 'Sharjah, UAE' },
-    ];
+    const [candidates, setCandidates] = useState([]);
+
+    useEffect(() => {
+        api.getUsers()
+            .then((users) => {
+                const seekers = users
+                    .filter((u) => u.role?.toLowerCase() === 'job seeker')
+                    .slice(0, 3);
+                setCandidates(seekers);
+            })
+            .catch((error) => {
+                console.error('Error fetching candidates:', error);
+            });
+    }, []);
     const { data: jobs = [], isLoading } = useJobs();
     const jobsCount = jobs.length;
 
@@ -128,7 +139,6 @@ const EmployerHome = () => {
                         <h2 className="featured-title">{t('popularCategories')}</h2>
                         <p style={{ color: 'var(--text-muted)' }}>{t('categoriesSubtitle')}</p>
                     </div>
-                    <button className="view-all-btn">{t('viewAll')}</button>
                 </div>
                 <div className="categories-grid">
                     {categories.map((cat, i) => (
@@ -146,30 +156,25 @@ const EmployerHome = () => {
                 <div className="featured-header">
                     <div>
                         <h2 className="featured-title">{t('featuredTalent')}</h2>
-                        <p style={{ color: 'var(--text-muted)' }}>{t('handPickedJobs')}</p>
+                        <p style={{ color: 'var(--text-muted)' }}>{t('handPickedTalent')}</p>
                     </div>
-                    <Link to="/candidates" className="view-all-btn" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        {t('viewAll')}
-                        <ChevronRight size={16} className={dir === 'rtl' ? 'rotate-180' : ''} />
-                    </Link>
                 </div>
+
                 <div className="jobs-grid">
-                    {candidates.map((candidate, i) => (
-                        <div key={i} className="card">
-                            <div className="job-card-header">
-                                <div className="company-logo-placeholder">
-                                    <Users size={24} />
-                                </div>
-                                <span className="job-type-badge">{t('fullTime')}</span>
-                            </div>
-                            <h3 className="job-title">{candidate.name}</h3>
-                            <p className="job-company">{candidate.location || 'Remote'} • {t('remote')}</p>
-                            <div className="job-card-footer">
-                                <span className="job-salary">$100k - $150k</span>
-                                <Link to="/profile" className="details-btn">{t('details')}</Link>
-                            </div>
-                        </div>
-                    ))}
+                    {candidates.length > 0 ? (
+                        candidates.map((candidate) => (
+                            <EmployeeCard
+                                key={candidate.id}
+                                id={candidate.id}
+                                name={candidate.name}
+                                email={candidate.email}
+                                location={candidate.location}
+                                role={candidate.industry || t('jobSeeker')}
+                            />
+                        ))
+                    ) : (
+                        <div className="no-results" style={{ gridColumn: '1 / -1' }}>{t('noCandidatesFound') || 'No talent found at the moment.'}</div>
+                    )}
                 </div>
             </section>
         </div>
