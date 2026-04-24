@@ -17,18 +17,21 @@ const EmployerHome = () => {
     const [currentImage, setCurrentImage] = useState(0);
     const [searchQuery, setSearchQuery] = useState('');
     const [candidates, setCandidates] = useState([]);
+    const [categories, setCategories] = useState([]);
 
     useEffect(() => {
-        api.getUsers()
-            .then((users) => {
-                const seekers = users
-                    .filter((u) => u.role?.toLowerCase() === 'job seeker')
-                    .slice(0, 3);
-                setCandidates(seekers);
-            })
-            .catch((error) => {
-                console.error('Error fetching candidates:', error);
-            });
+        Promise.all([
+            api.getUsers(),
+            api.getCategories()
+        ]).then(([users, catData]) => {
+            const seekers = users
+                .filter((u) => u.role?.toLowerCase() === 'job seeker')
+                .slice(0, 3);
+            setCandidates(seekers);
+            setCategories(catData.slice(0, 4));
+        }).catch((error) => {
+            console.error('Error fetching dashboard data:', error);
+        });
     }, []);
     const { data: jobs = [], isLoading } = useJobs();
     const jobsCount = jobs.length;
@@ -46,12 +49,14 @@ const EmployerHome = () => {
         return () => clearInterval(timer);
     }, []);
 
-    const categories = [
-        { title: 'Tech', count: '1,240', icon: <Briefcase /> },
-        { title: 'Design', count: '850', icon: <Users /> },
-        { title: 'Management', count: '420', icon: <TrendingUp /> },
-        { title: 'Marketing', count: '310', icon: <Building /> }
-    ];
+    const getCategoryIcon = (name) => {
+        const n = name.toLowerCase();
+        if (n.includes('tech') || n.includes('engineering')) return <Briefcase />;
+        if (n.includes('design')) return <Users />;
+        if (n.includes('market')) return <Building />;
+        if (n.includes('manage') || n.includes('finance')) return <TrendingUp />;
+        return <Briefcase />;
+    };
 
     const handleSearch = (e) => {
         e.preventDefault();
@@ -141,13 +146,19 @@ const EmployerHome = () => {
                     </div>
                 </div>
                 <div className="categories-grid">
-                    {categories.map((cat, i) => (
-                        <div key={i} className="card categories-card">
-                            <div className="cat-icon-box">{cat.icon}</div>
-                            <h3>{t(cat.title.toLowerCase())}</h3>
-                            <p>{cat.count} {t('activeCandidates')}</p>
-                        </div>
-                    ))}
+                    {categories.length > 0 ? (
+                        categories.map((cat, i) => (
+                            <div key={cat.id || i} className="card categories-card">
+                                <div className="cat-icon-box">{getCategoryIcon(cat.name)}</div>
+                                <h3>{t(cat.name.toLowerCase()) || cat.name}</h3>
+                                <p>{cat.jobCount || 0} {t('activeJobs')}</p>
+                            </div>
+                        ))
+                    ) : (
+                        [1, 2, 3, 4].map(i => (
+                            <div key={i} className="card categories-card skeleton" style={{ height: '160px', opacity: 0.3 }} />
+                        ))
+                    )}
                 </div>
             </section>
 
