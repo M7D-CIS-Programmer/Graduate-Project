@@ -75,8 +75,8 @@ const PrivacyPolicy = () => {
             <div className="privacy-content">
                 {sections.map((section, index) => (
                     <section key={index} className="privacy-section glass">
-                        <div className="section-header">
-                            <div className="section-icon">{section.icon}</div>
+                        <div className="terms-section-header">
+                            <div className="terms-section-icon">{section.icon}</div>
                             <h2>{section.title}</h2>
                         </div>
                         <p>{section.desc}</p>
@@ -91,8 +91,8 @@ const PrivacyPolicy = () => {
                 ))}
 
                 <section className="privacy-section glass">
-                    <div className="section-header">
-                        <div className="section-icon"><FileText size={24} /></div>
+                    <div className="    terms-section-header">
+                        <div className="terms-section-icon"><FileText size={24} /></div>
                         <h2>{t('policyChangesTitle')}</h2>
                     </div>
                     <p>{t('policyChangesDesc')}</p>

@@ -89,8 +89,8 @@ const TermsOfService = () => {
             <div className="terms-content">
                 {sections.map((section, index) => (
                     <section key={index} className="terms-section glass">
-                        <div className="section-header">
-                            <div className="section-icon">{section.icon}</div>
+                        <div className="terms-section-header">
+                            <div className="terms-section-icon">{section.icon}</div>
                             <h2>{section.title}</h2>
                         </div>
                         <p>{section.desc}</p>

@@ -66,7 +66,7 @@
 /* NOTE: .section-header and [dir="rtl"] .section-header are
    shared with TermsOfService.css. Defining them here too
    ensures the rule is always present regardless of load order. */
-.section-header {
+.terms-section-header {
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -74,9 +74,7 @@
     margin-bottom: 1.5rem;
 }
 
-[dir="rtl"] .section-header {
-    flex-direction: row-reverse;
-}
+
 
 /* ── Section Icon ───────────────────────────────────────── */
 .section-icon {
