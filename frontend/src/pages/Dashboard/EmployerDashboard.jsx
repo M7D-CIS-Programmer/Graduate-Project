@@ -44,7 +44,7 @@ const EmployerDashboard = () => {
     const { user } = useAuth();
     const { addToast } = useToast();
     const navigate = useNavigate();
-    
+
     const { data: allJobs = [], isLoading: jobsLoading } = useJobs();
     const { data: allApplications = [], isLoading: appsLoading } = useApplications();
     const updateStatusMutation = useUpdateApplicationStatus();
@@ -61,7 +61,7 @@ const EmployerDashboard = () => {
 
     const stats = [
         { label: t('totalPostings'), value: employerJobs.length, icon: <FileText />, color: '#6366f1' },
-        { label: t('appliedJobs'), value: employerApplications.length, icon: <Users />, color: '#10b981' },
+        { label: t('totalApplicants'), value: employerApplications.length, icon: <Users />, color: '#10b981' },
         { label: t('activeJobs'), value: employerJobs.filter(j => j.status === 'Active').length, icon: <TrendingUp />, color: '#f59e0b' },
     ];
 
@@ -186,7 +186,7 @@ const EmployerDashboard = () => {
                                         borderRadius: 6,
                                     },
                                     {
-                                        label: t('appliedJobs'),
+                                        label: t('totalApplicants'),
                                         data: chartData.apps,
                                         backgroundColor: '#10b981',
                                         borderRadius: 6,
@@ -199,9 +199,9 @@ const EmployerDashboard = () => {
                                 plugins: {
                                     legend: {
                                         position: 'top',
-                                        labels: { 
-                                            color: 'var(--text-muted)', 
-                                            font: { size: 10 } 
+                                        labels: {
+                                            color: 'var(--text-muted)',
+                                            font: { size: 10 }
                                         }
                                     },
                                     tooltip: {

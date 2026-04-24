@@ -161,7 +161,7 @@ const ManageJobs = () => {
                                 <th style={{ padding: '1rem', color: 'var(--text-muted)', fontWeight: '500' }}>{t('jobTitle')}</th>
                                 <th style={{ padding: '1rem', color: 'var(--text-muted)', fontWeight: '500' }}>{t('company')}</th>
                                 <th style={{ padding: '1rem', color: 'var(--text-muted)', fontWeight: '500' }}>{t('postedDate')}</th>
-                                <th style={{ padding: '1rem', color: 'var(--text-muted)', fontWeight: '500', textAlign: 'center' }}>{t('appliedJobs')}</th>
+                                <th style={{ padding: '1rem', color: 'var(--text-muted)', fontWeight: '500', textAlign: 'center' }}>{t('totalApplicants')}</th>
                                 <th style={{ padding: '1rem', color: 'var(--text-muted)', fontWeight: '500' }}>{t('status')}</th>
                                 <th style={{ padding: '1rem', color: 'var(--text-muted)', fontWeight: '500', textAlign: 'center' }}>{t('actions')}</th>
                             </tr>
