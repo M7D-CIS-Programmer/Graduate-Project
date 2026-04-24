@@ -70,6 +70,8 @@
     gap: 0.75rem;
 }
 
+
+
 .chatbot-avatar {
     width: 36px;
     height: 36px;
@@ -83,7 +85,7 @@
 
 .chatbot-header-info h3 {
     font-size: 0.95rem;
-    color: white;
+    color: var(--text-main);
     margin: 0;
 }
 
@@ -102,16 +104,30 @@
     background: #10b981;
 }
 
+.chatbot-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.expand-btn,
 .close-btn {
     color: var(--text-muted);
     background: none;
     border: none;
     cursor: pointer;
     transition: var(--transition);
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
 }
 
+.expand-btn:hover,
 .close-btn:hover {
     color: white;
+    background: rgba(255, 255, 255, 0.05);
 }
 
 .chatbot-messages {
