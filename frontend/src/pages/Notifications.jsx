@@ -28,7 +28,7 @@ const Notifications = () => {
         if (!user?.id) return;
         
         try {
-            const data = await api.getNotificationsByUserId(user.id);
+            const data = await api.getNotificationsByUserId(user.id, user.role);
             
             // Map backend notifications to UI structure
             const mappedNotifications = data.map(notif => {

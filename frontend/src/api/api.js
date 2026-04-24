@@ -73,7 +73,7 @@ export const api = {
     getResumeByUserId: (userId, viewerId) => get(`${BASE_URL}/Resumes/user/${userId}${viewerId ? `?viewerId=${viewerId}` : ''}`),
 
     // Notifications
-    getNotificationsByUserId: (userId) => get(`${BASE_URL}/Notifications?userId=${userId}`),
+    getNotificationsByUserId: (userId, receiver) => get(`${BASE_URL}/Notifications?userId=${userId}${receiver ? `&receiver=${receiver}` : ''}`),
     markNotificationAsRead:   (id)     => put(`${BASE_URL}/Notifications/${id}/read`),
     markAllNotificationsAsRead: (userId) => put(`${BASE_URL}/Notifications/read-all/${userId}`),
     clearAllNotifications:    (userId) => del(`${BASE_URL}/Notifications/clear-all/${userId}`),

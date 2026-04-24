@@ -11,12 +11,16 @@ public class NotificationsController(MyDbContext context) : ControllerBase
     private readonly MyDbContext Context = context;
  
     [HttpGet]
-    public async Task<IActionResult> GetAll([FromQuery] int? userId = null)
+    public async Task<IActionResult> GetAll([FromQuery] int? userId = null, [FromQuery] string? receiver = null)
     {
         IQueryable<Notification> query = Context.Notifications;
         if (userId.HasValue)
         {
             query = query.Where(n => n.UserId == userId.Value);
+        }
+        if (!string.IsNullOrEmpty(receiver))
+        {
+            query = query.Where(n => n.Receiver == receiver);
         }
         return Ok(await query.OrderByDescending(n => n.Id).ToListAsync());
     }
