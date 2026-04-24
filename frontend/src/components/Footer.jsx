@@ -47,8 +47,8 @@ const Footer = () => {
                     <div className="footer-section">
                         <h4>{t('legal')}</h4>
                         <ul>
-                            <li><Link to="/privacy">{t('privacyPolicy')}</Link></li>
-                            <li><Link to="/terms">{t('termsOfService')}</Link></li>
+                            <li><Link to="/privacy-policy">{t('privacyPolicy')}</Link></li>
+                            <li><Link to="/terms-of-service">{t('termsOfService')}</Link></li>
                         </ul>
                     </div>
                 </div>

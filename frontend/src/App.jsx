@@ -36,6 +36,8 @@ import AboutUs from './pages/AboutUs';
 import ContactUs from './pages/ContactUs';
 import CandidateProfile from './pages/CandidateProfile';
 import FAQ from './pages/FAQ';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsOfService from './pages/TermsOfService';
 import Spinner from './components/ui/Spinner';
 
 const ConditionalHome = () => {
@@ -131,6 +133,8 @@ function App() {
                   <Route path="/about" element={<AboutUs />} />
                   <Route path="/contact" element={<ContactUs />} />
                   <Route path="/faq" element={<FAQ />} />
+                  <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                  <Route path="/terms-of-service" element={<TermsOfService />} />
 
                   {/* Fallback */}
                   <Route path="*" element={
