@@ -28,7 +28,7 @@ const Companies = () => {
 
     const filteredCompanies = companies.filter(company => {
         const matchesSearch = (company.name || '').toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesSector = selectedSector === 'all' || 
+        const matchesSector = selectedSector === 'all' ||
             company.sector.toLowerCase() === selectedSector.toLowerCase() ||
             (selectedSector === 'tech' && company.sector === t('tech'));
         return matchesSearch && matchesSector;
@@ -62,18 +62,7 @@ const Companies = () => {
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
                 </div>
-                <div className="filter-group">
-                    <Filter size={20} className="filter-icon" />
-                    <select
-                        value={selectedSector}
-                        onChange={(e) => setSelectedSector(e.target.value)}
-                        className="sector-select"
-                    >
-                        {sectors.map(sector => (
-                            <option key={sector.id} value={sector.id}>{sector.label}</option>
-                        ))}
-                    </select>
-                </div>
+
             </div>
 
             <div className="companies-grid">
@@ -109,8 +98,8 @@ const Companies = () => {
                         </div>
 
                         <div className="company-card-actions">
-                            <Button 
-                                variant="secondary" 
+                            <Button
+                                variant="secondary"
                                 className="btn-full"
                                 onClick={() => navigate(`/companies/${company.id}`)}
                             >

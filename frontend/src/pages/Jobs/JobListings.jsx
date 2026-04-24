@@ -46,15 +46,15 @@ const JobListings = () => {
     ];
 
     const workModeOptions = [
-        { label: t('remote'),   value: 'Remote' },
-        { label: t('onSite'),   value: 'On-site' },
-        { label: t('hybrid'),   value: 'Hybrid' },
+        { label: t('remote'), value: 'Remote' },
+        { label: t('onSite'), value: 'On-site' },
+        { label: t('hybrid'), value: 'Hybrid' },
     ];
 
     const salaryRanges = [
-        { label: '$50k - $80k',   min: 50000,  max: 80000  },
-        { label: '$80k - $120k',  min: 80000,  max: 120000 },
-        { label: '$120k+',        min: 120000, max: Infinity },
+        { label: '$50k - $80k', min: 50000, max: 80000 },
+        { label: '$80k - $120k', min: 80000, max: 120000 },
+        { label: '$120k+', min: 120000, max: Infinity },
     ];
 
     React.useEffect(() => {
@@ -111,9 +111,9 @@ const JobListings = () => {
 
                     <div className="filter-section">
                         <h3 className="filter-title">{t('category') || 'Category'}</h3>
-                        <select 
-                            className="filter-select" 
-                            value={selectedCategory} 
+                        <select
+                            className="filter-select"
+                            value={selectedCategory}
                             onChange={(e) => setSelectedCategory(e.target.value)}
                             style={{
                                 width: '100%',
@@ -198,7 +198,7 @@ const JobListings = () => {
                                 placeholder={t('jobTitlePlaceholder')}
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                style={{ background: 'none', border: 'none', color: 'white', outline: 'none', width: '100%', paddingLeft: '10px' }}
+                                style={{ background: 'none', border: 'none', color: 'var(--text-color)', outline: 'none', width: '100%', paddingLeft: '10px' }}
                             />
                         </div>
                         <button type="submit" className="btn-primary" style={{ height: '44px' }}>{t('searchJobs')}</button>
