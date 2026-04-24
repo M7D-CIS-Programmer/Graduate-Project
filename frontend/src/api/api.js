@@ -81,4 +81,7 @@ export const api = {
 
     // Search
     search: (query, role, userId) => get(`${BASE_URL}/Search?q=${query}&role=${role || ''}&userId=${userId || ''}`),
+
+    // Stats
+    getStats: () => get(`${BASE_URL}/Stats`),
 };

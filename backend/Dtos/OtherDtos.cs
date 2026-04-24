@@ -19,3 +19,10 @@ public class NotificationCreateDto
     public string Message { get; set; } = null!;
     public string? Type { get; set; }
 }
+
+public class StatsDto
+{
+    public int ActiveJobs { get; set; }
+    public int SuccessStories { get; set; }
+    public int VerifiedCompanies { get; set; }
+}

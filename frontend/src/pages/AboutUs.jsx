@@ -1,10 +1,22 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { Users, Target, Shield, Award } from 'lucide-react';
+import { api } from '../api/api';
 import './AboutUs.css';
 
 const AboutUs = () => {
     const { t } = useLanguage();
+    const [stats, setStats] = useState({
+        activeJobs: 0,
+        successStories: 0,
+        verifiedCompanies: 0
+    });
+
+    useEffect(() => {
+        api.getStats()
+            .then(data => setStats(data))
+            .catch(err => console.error('Failed to fetch stats:', err));
+    }, []);
 
     const values = [
         {
@@ -40,21 +52,18 @@ const AboutUs = () => {
 
             <section className="about-stats glass">
                 <div className="stat-item">
-                    <h3>10k+</h3>
+                    <h3>{stats.activeJobs}+</h3>
                     <p>{t('activeJobs')}</p>
                 </div>
                 <div className="stat-item">
-                    <h3>25k+</h3>
+                    <h3>{stats.successStories}+</h3>
                     <p>{t('successStories')}</p>
                 </div>
                 <div className="stat-item">
-                    <h3>5k+</h3>
+                    <h3>{stats.verifiedCompanies}+</h3>
                     <p>{t('verifiedCompanies')}</p>
                 </div>
-                <div className="stat-item">
-                    <h3>50+</h3>
-                    <p>{t('countries')}</p>
-                </div>
+
             </section>
 
             <section className="about-values">
