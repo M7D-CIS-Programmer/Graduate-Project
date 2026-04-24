@@ -16,6 +16,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { useTheme } from '../context/ThemeContext';
 import { formatFriendlyDate } from '../utils/dateUtils';
 import Button from '../components/ui/Button';
+import Modal from '../components/ui/Modal';
 import './Chatbot.css';
 
 const Chatbot = () => {
@@ -34,6 +35,7 @@ const Chatbot = () => {
     });
     const [input, setInput] = useState('');
     const [isTyping, setIsTyping] = useState(false);
+    const [showClearConfirm, setShowClearConfirm] = useState(false);
     const messagesEndRef = useRef(null);
     const inputRef = useRef(null);
 
@@ -103,14 +105,17 @@ const Chatbot = () => {
     };
 
     const clearChat = () => {
-        if (window.confirm(t('confirmClearChat') || "Clear all messages?")) {
-            setMessages([{
-                id: 1,
-                text: t('chatbotWelcome'),
-                sender: 'bot',
-                timestamp: new Date().toISOString()
-            }]);
-        }
+        setShowClearConfirm(true);
+    };
+
+    const handleConfirmClear = () => {
+        setMessages([{
+            id: 1,
+            text: t('chatbotWelcome') || 'Hello! I am your InsightCV assistant. How can I help you today?',
+            sender: 'bot',
+            timestamp: new Date().toISOString()
+        }]);
+        setShowClearConfirm(false);
     };
 
     const suggestedQuestions = [
@@ -210,6 +215,39 @@ const Chatbot = () => {
                 </form>
             </footer>
 
+            {/* Clear Chat Confirmation Modal */}
+            <Modal
+                isOpen={showClearConfirm}
+                onClose={() => setShowClearConfirm(false)}
+                title={t('clearChatHistory') || 'Clear Chat History'}
+                type="danger"
+                footer={
+                    <>
+                        <Button
+                            variant="outline"
+                            onClick={() => setShowClearConfirm(false)}
+                        >
+                            {t('cancel') || 'Cancel'}
+                        </Button>
+                        <Button
+                            variant="danger"
+                            onClick={handleConfirmClear}
+                        >
+                            {t('clear') || 'Clear'}
+                        </Button>
+                    </>
+                }
+            >
+                <div style={{ textAlign: 'center', padding: '1rem 0' }}>
+                    <Trash2 size={48} color="#ef4444" style={{ marginBottom: '1rem', opacity: 0.8 }} />
+                    <p style={{ fontSize: '1.1rem', color: 'var(--text-main)', marginBottom: '0.5rem' }}>
+                        {t('confirmClearChatTitle') || 'Are you sure?'}
+                    </p>
+                    <p style={{ color: 'var(--text-muted)' }}>
+                        {t('confirmClearChatDesc') || 'This will permanently delete all messages in this conversation. This action cannot be undone.'}
+                    </p>
+                </div>
+            </Modal>
 
         </div>
     );
