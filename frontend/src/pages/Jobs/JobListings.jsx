@@ -82,7 +82,7 @@ const JobListings = () => {
             if (!matchesSalary) return false;
         }
         return true;
-    });
+    }).sort((a, b) => new Date(b.postedDate) - new Date(a.postedDate));
 
     const handleSearch = (e) => {
         e.preventDefault();

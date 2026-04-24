@@ -32,7 +32,7 @@ const Companies = () => {
             company.sector.toLowerCase() === selectedSector.toLowerCase() ||
             (selectedSector === 'tech' && company.sector === t('tech'));
         return matchesSearch && matchesSector;
-    });
+    }).sort((a, b) => b.id - a.id);
 
     if (isLoading) return <Spinner />;
 

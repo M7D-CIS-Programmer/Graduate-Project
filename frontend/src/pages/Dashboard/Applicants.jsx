@@ -79,7 +79,7 @@ const Applicants = () => {
             const matchesStatus = statusFilter === 'All' || status === statusFilter;
             
             return matchesSearch && matchesStatus;
-        });
+        }).sort((a, b) => new Date(b.date) - new Date(a.date));
     }, [applications, searchTerm, statusFilter]);
 
     return (
