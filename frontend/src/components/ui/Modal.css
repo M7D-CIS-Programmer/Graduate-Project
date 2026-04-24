@@ -8,7 +8,7 @@
     backdrop-filter: blur(8px);
     display: flex;
     justify-content: center;
-    align-items: flex-start;
+    align-items: center;
     padding: 2rem 1rem;
     overflow-y: auto;
     z-index: 1000;

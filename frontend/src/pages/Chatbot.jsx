@@ -140,7 +140,7 @@ const Chatbot = () => {
                 </div>
                 <div className="header-actions">
                     <button className="header-btn" title={t('clearChat')} onClick={clearChat}>
-                        <RotateCcw size={20} />
+                        <Trash2 size={20} />
                     </button>
                     <button className="header-btn" title={t('close')} onClick={() => window.history.back()}>
                         <X size={20} />
