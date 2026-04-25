@@ -60,6 +60,14 @@
     border: 1px solid var(--glass-border);
 }
 
+.stat-card h3 {
+    color: var(--text-main);
+}
+
+.stat-card p {
+    color: var(--text-main);
+}
+
 .stat-card:hover {
     transform: translateY(-8px);
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
@@ -263,7 +271,22 @@
 }
 
 /* Status variants for buttons */
-.btn-icon.success:hover { color: #10b981; border-color: #10b981; }
-.btn-icon.warning:hover { color: #f59e0b; border-color: #f59e0b; }
-.btn-icon.danger:hover { color: #ef4444; border-color: #ef4444; }
-.btn-icon.primary:hover { color: var(--primary); border-color: var(--primary); }
+.btn-icon.success:hover {
+    color: #10b981;
+    border-color: #10b981;
+}
+
+.btn-icon.warning:hover {
+    color: #f59e0b;
+    border-color: #f59e0b;
+}
+
+.btn-icon.danger:hover {
+    color: #ef4444;
+    border-color: #ef4444;
+}
+
+.btn-icon.primary:hover {
+    color: var(--primary);
+    border-color: var(--primary);
+}
