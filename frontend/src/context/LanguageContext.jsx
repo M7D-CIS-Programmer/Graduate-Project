@@ -7,10 +7,10 @@ export const LanguageProvider = ({ children }) => {
     const dir = language === 'ar' ? 'rtl' : 'ltr';
 
     useEffect(() => {
-    localStorage.setItem('lang', language);
-    document.documentElement.dir = dir;
-    document.documentElement.lang = language;
-}, [language, dir]);
+        localStorage.setItem('lang', language);
+        document.documentElement.dir = dir;
+        document.documentElement.lang = language;
+    }, [language, dir]);
 
     const toggleLanguage = () => {
         setLanguage((prev) => (prev === 'en' ? 'ar' : 'en'));
@@ -201,7 +201,7 @@ export const LanguageProvider = ({ children }) => {
             interviews: "Interviews",
             pending: "Pending",
             recentActivity: "Recent Activity",
-            
+
             fullPageChat: "Full Page Chat",
             typing: "Typing...",
             online: "Online",
@@ -221,7 +221,7 @@ export const LanguageProvider = ({ children }) => {
             cancel: "Cancel",
             clear: "Clear",
             chatError: "Sorry, I'm having trouble connecting right now.",
-            
+
             uploadFile: "Upload File",
             chatbotPlaceholder: "Ask me anything...",
             recentApplications: "Recent Applications",
@@ -296,8 +296,8 @@ export const LanguageProvider = ({ children }) => {
             unknownCompany: "Unknown Company",
             salaryNegotiable: "Salary Negotiable",
             // 
-        
-            
+
+            employerDashboardSubtitle: "Welcome to your employer dashboard",
             matchingSubtitle: "Start exploring and saving opportunities that match your profile.",
             allCaughtUp: "You're all caught up! Check back later for updates.",
             welcomeMessage: "Welcome to your notification center. You will see activity here.",
@@ -620,6 +620,7 @@ export const LanguageProvider = ({ children }) => {
             institution: "المؤسسة التعليمية",
             aboutMe: "نبذة عني",
             // Dashboard & Home
+            employerDashboardSubtitle: "أهلاً بك في لوحة تحكم أصحاب العمل",
             popularCategories: "الأقسام الشائعة",
             categoriesSubtitle: "استكشف الوظائف حسب اهتماماتك المهنية",
             handPickedJobs: "فرص مختارة بعناية",
