@@ -276,3 +276,9 @@ select option {
   background: rgba(239, 68, 68, 0.1);
   border-color: #ef4444;
 }
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

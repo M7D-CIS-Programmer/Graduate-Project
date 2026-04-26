@@ -1,5 +1,4 @@
 import React from 'react';
-import Spinner from '../../components/ui/Spinner';
 import {
     Search,
     MapPin,
@@ -13,6 +12,7 @@ import { useLanguage } from '../../context/LanguageContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useJobs } from '../../hooks/useJobs';
 import { useCategories } from '../../hooks/useCategories';
+import { useDebounce } from '../../hooks/useDebounce';
 import './Jobs.css';
 
 
@@ -30,12 +30,16 @@ const JobListings = () => {
     const [selectedSalaries, setSelectedSalaries] = React.useState([]);
     const [selectedCategory, setSelectedCategory] = React.useState('');
 
+    // Debounced value — only updates 400 ms after the user stops typing.
+    // This is what gets forwarded to the API so we don't fire a request on every keystroke.
+    const debouncedQuery = useDebounce(searchQuery, 400);
+
     const { data: categories = [] } = useCategories();
 
     const { data: jobs = [], isLoading, error } = useJobs({
         type: selectedTypes.join(','),
         workMode: selectedWorkModes.join(','),
-        q: searchQuery,
+        q: debouncedQuery,
         categoryId: selectedCategory
     });
 
@@ -93,7 +97,6 @@ const JobListings = () => {
         }
     };
 
-    if (isLoading) return <Spinner />;
     if (error) return <div style={{ padding: '2rem', textAlign: 'center', color: 'red' }}>Error: {error.message}</div>;
 
     return (
@@ -205,7 +208,18 @@ const JobListings = () => {
                     </form>
 
                     <div className="jobs-grid">
-                        {filteredJobs.length > 0 ? filteredJobs.map(job => (
+                        {isLoading ? (
+                            // Inline spinner — keeps the page (and focused input) mounted
+                            <div style={{ width: '100%', display: 'flex', justifyContent: 'center', padding: '4rem 0' }}>
+                                <div style={{
+                                    width: '40px', height: '40px',
+                                    border: '3px solid var(--border-color)',
+                                    borderTop: '3px solid var(--primary)',
+                                    borderRadius: '50%',
+                                    animation: 'spin 0.7s linear infinite'
+                                }} />
+                            </div>
+                        ) : filteredJobs.length > 0 ? filteredJobs.map(job => (
                             <div key={job.id} className="card" onClick={() => navigate(`/jobs/${job.id}`)} style={{ cursor: 'pointer' }}>
                                 <div className="job-card-header">
                                     <div className="company-logo-placeholder">
