@@ -2,8 +2,10 @@ using aabu_project.Data;
 using aabu_project.Models;
 using aabu_project.Dtos;
 using aabu_project.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 
 [ApiController]
@@ -179,13 +181,27 @@ public class UsersController : ControllerBase
         return CreatedAtAction(nameof(GetUser), new { id = user.Id }, response);
     }
 
+    [Authorize]
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateUser(int id, [FromBody] UserUpdateDto dto)
     {
         if (dto == null) return BadRequest(new { message = "Invalid data" });
 
+        // Security: Ensure the authenticated user is only updating their own profile
+        var callerIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!int.TryParse(callerIdClaim, out int callerId) || callerId != id)
+            return Forbid(); // 403 — prevent cross-user updates
+
         var user = await _context.Users.Include(u => u.Roles).FirstOrDefaultAsync(u => u.Id == id);
         if (user == null) return NotFound();
+
+        // Security: Job Seekers cannot update Employer/Company profiles
+        var callerRoleName = user.Roles?.FirstOrDefault()?.RoleName ?? "Job Seeker";
+        if (string.Equals(callerRoleName, "Job Seeker", StringComparison.OrdinalIgnoreCase))
+        {
+            // Job Seeker trying to update — caller IS the profile, so this is their own profile update
+            // This is valid; no block needed here since callerId == id is already enforced above.
+        }
 
         if (!string.IsNullOrEmpty(dto.Name)) user.Name = dto.Name;
         if (!string.IsNullOrEmpty(dto.Email)) user.Email = dto.Email;
