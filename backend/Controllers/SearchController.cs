@@ -14,7 +14,7 @@ public class SearchController(MyDbContext context) : ControllerBase
     private readonly MyDbContext _context = context;
 
     [HttpGet]
-    public async Task<IActionResult> GetUnifiedSearch([FromQuery] string q, [FromQuery] string? role = null, [FromQuery] int? userId = null)
+    public async Task<IActionResult> GetUnifiedSearch([FromQuery] string q, [FromQuery] string? role = null, [FromQuery] int? userId = null, [FromQuery] string lang = "en")
     {
         if (string.IsNullOrWhiteSpace(q))
             return Ok(new SearchResponseDto());
@@ -64,16 +64,16 @@ public class SearchController(MyDbContext context) : ControllerBase
         }
 
         // 3. Static Pages Search (Multilingual Mapping)
-        var pagesList = GetMultilingualPages(role);
+        var pagesList = GetMultilingualPages(role, lang);
         response.Pages = pagesList
             .Where(p => searchTerms.Any(t => p.SearchKey != null && p.SearchKey.Contains(t)))
             .ToList();
 
-        // 4. Sort results based on language relevance
-        SortByLanguage(response.Jobs, queryIsArabic);
-        SortByLanguage(response.Candidates, queryIsArabic);
-        SortByLanguage(response.Companies, queryIsArabic);
-        SortByLanguage(response.Pages, queryIsArabic);
+        // 4. Strict language filtering
+        bool isArabicUI = lang == "ar";
+        response.Jobs.RemoveAll(x => SearchUtility.IsArabic(x.Title) != isArabicUI);
+        response.Candidates.RemoveAll(x => SearchUtility.IsArabic(x.Title) != isArabicUI);
+        response.Companies.RemoveAll(x => SearchUtility.IsArabic(x.Title) != isArabicUI);
 
         return Ok(response);
     }
@@ -102,7 +102,7 @@ public class SearchController(MyDbContext context) : ControllerBase
         return query;
     }
 
-    private List<SearchResultDto> GetMultilingualPages(string? role)
+    private List<SearchResultDto> GetMultilingualPages(string? role, string lang)
     {
         var list = new List<SearchResultDto>();
         // Add pages with bilingual SearchKeys
@@ -110,8 +110,8 @@ public class SearchController(MyDbContext context) : ControllerBase
         {
             list.Add(new SearchResultDto 
             { 
-                Title = enTitle, 
-                Description = enDesc, 
+                Title = lang == "ar" ? arTitle : enTitle, 
+                Description = lang == "ar" ? arDesc : enDesc, 
                 Type = "Page", 
                 Link = link, 
                 SearchKey = SearchUtility.GenerateSearchKey(enTitle, arTitle, enDesc, arDesc) 
@@ -138,32 +138,12 @@ public class SearchController(MyDbContext context) : ControllerBase
             AddPage("Saved Jobs", "الوظائف المحفوظة", "Your bookmarks", "محفوظاتك", "/saved-jobs");
             AddPage("Resume Builder", "منشئ السيرة الذاتية", "Create CV", "إنشاء سيرة ذاتية", "/resume-builder");
             AddPage("Find Jobs", "البحث عن وظائف", "Browse all jobs", "تصفح جميع الوظائف", "/jobs");
+            AddPage("CV Analyzer", "محلل السيرة الذاتية", "Compare CV to job", "مقارنة السيرة الذاتية بالوظيفة", "/cv-analyzer");
+            AddPage("AI Interview", "مقابلة الذكاء الاصطناعي", "Practice interview", "تدريب على المقابلة", "/interview");
         }
 
         return list;
     }
 
-    private void SortByLanguage(List<SearchResultDto> results, bool queryIsArabic)
-    {
-        if (results == null || results.Count <= 1) return;
-
-        // Rank results that match the query language first
-        results.Sort((a, b) => {
-            bool aIsAr = SearchUtility.IsArabic(a.Title);
-            bool bIsAr = SearchUtility.IsArabic(b.Title);
-            
-            if (queryIsArabic)
-            {
-                if (aIsAr && !bIsAr) return -1;
-                if (!aIsAr && bIsAr) return 1;
-            }
-            else
-            {
-                if (!aIsAr && bIsAr) return -1;
-                if (aIsAr && !bIsAr) return 1;
-            }
-            return 0;
-        });
-    }
 }
 

@@ -98,7 +98,7 @@ export const api = {
     deleteNotification:       (id)     => del(`${BASE_URL}/Notifications/${id}`),
 
     // Search
-    search: (query, role, userId) => get(`${BASE_URL}/Search?q=${query}&role=${role || ''}&userId=${userId || ''}`),
+    search: (query, role, userId, lang) => get(`${BASE_URL}/Search?q=${query}&role=${role || ''}&userId=${userId || ''}&lang=${lang || 'en'}`),
 
     // Support Chatbot
     sendSupportMessage: (message, userId = null) =>

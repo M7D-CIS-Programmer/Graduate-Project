@@ -59,7 +59,7 @@ const Navbar = ({ toggleSidebar }) => {
             setShowResults(true);
             setActiveIndex(-1);
             try {
-                const data = await api.search(searchQuery, user?.role, user?.id);
+                const data = await api.search(searchQuery, user?.role, user?.id, language);
                 setResults(data);
             } catch (err) {
                 console.error('Search error:', err);
@@ -69,7 +69,7 @@ const Navbar = ({ toggleSidebar }) => {
         }, 500);
 
         return () => clearTimeout(timer);
-    }, [searchQuery, user]);
+    }, [searchQuery, user, language]);
 
     const allResults = React.useMemo(() => {
         if (!results) return [];

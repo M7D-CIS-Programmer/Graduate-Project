@@ -75,8 +75,9 @@ public static class SearchUtility
         return text;
     }
 
-    public static bool IsArabic(string text)
+    public static bool IsArabic(string? text)
     {
+        if (string.IsNullOrWhiteSpace(text)) return false;
         return Regex.IsMatch(text, @"[\u0600-\u06FF]");
     }
 
