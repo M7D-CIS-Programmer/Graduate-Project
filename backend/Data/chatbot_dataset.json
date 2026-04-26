@@ -1,0 +1,1066 @@
+{
+  "version": "1.0",
+  "language": "ar+en",
+  "intents": [
+
+   
+    {
+      "intent": "greeting",
+      "group": "general",
+      "patterns": [
+        "مرحبا", "أهلا", "أهلاً وسهلاً", "السلام عليكم", "هلا", "هلو", "هاي",
+        "كيفك", "كيف الحال", "كيف حالك", "شو الأخبار", "شو كيفك", "وين كنت",
+        "صباح الخير", "مساء الخير", "صباح النور", "يسعد صباحك",
+        "hi", "hello", "hey", "good morning", "good evening", "good day",
+        "what's up", "howdy", "greetings", "sup", "yo", "hiya",
+        "مرحبتين", "اهلين", "هلا والله", "هلا فيك"
+      ],
+      "response_ar": "أهلاً وسهلاً! 👋 أنا مساعد InsightCV الذكي. بقدر أساعدك في: محلل الـ CV، المقابلات الذكية، البحث عن وظائف، أو إعداد السيرة الذاتية. شو بدك تعرف؟",
+      "response_en": "Hello! 👋 I'm the InsightCV smart assistant. I can help you with: CV Analyzer, AI Interview, job search, or resume builder. What would you like to know?"
+    },
+
+    {
+      "intent": "farewell",
+      "group": "general",
+      "patterns": [
+        "مع السلامة", "باي", "إلى اللقاء", "وداعاً", "تصبح على خير", "يسعدك",
+        "يعطيك العافية", "شكراً ومع السلامة", "راح", "بروح هلأ",
+        "تصبح على خير", "خير إن شاء الله", "الله معك", "بوس إيدك ويع",
+        "bye", "goodbye", "see you", "see ya", "later", "take care",
+        "have a good day", "good night", "farewell", "cya", "ttyl",
+        "catch you later", "until next time", "peace out"
+      ],
+      "response_ar": "مع السلامة! 😊 بالتوفيق في مسيرتك المهنية. إذا احتجت مساعدة مرة ثانية، أنا هون!",
+      "response_en": "Goodbye! 😊 Best of luck with your career. Come back anytime you need help!"
+    },
+
+    {
+      "intent": "thanks",
+      "group": "general",
+      "patterns": [
+        "شكراً", "شكراً جزيلاً", "يسلموا", "الله يسلمك", "مشكور", "مشكورين",
+        "كتر خيرك", "الله يخليك", "ممنون", "ممنونك", "تسلم", "تسلمي",
+        "عاشت إيدك", "يعطيك العافية", "شكرًا على المساعدة",
+        "thank you", "thanks", "thank you so much", "thanks a lot",
+        "much appreciated", "appreciate it", "you're helpful", "great help",
+        "thx", "ty", "many thanks", "brilliant", "perfect", "exactly what I needed"
+      ],
+      "response_ar": "العفو! 😊 أنا دايماً هون لمساعدتك. في شي ثاني بقدر أساعدك فيه؟",
+      "response_en": "You're welcome! 😊 I'm always here to help. Is there anything else I can assist you with?"
+    },
+
+    {
+      "intent": "about_platform",
+      "group": "general",
+      "patterns": [
+        "شو هو InsightCV", "إيش هو الموقع هاد", "وش هذا الموقع", "عن المنصة",
+        "إيش بتقدم المنصة", "شو بتقدم InsightCV", "هاد الموقع ليش",
+        "بخبرني عن المنصة", "ايش هو InsightCV", "عرفني على الموقع",
+        "what is InsightCV", "what is this platform", "tell me about this site",
+        "what does InsightCV do", "what can this website do",
+        "what is this website", "about InsightCV", "describe this platform",
+        "what services do you offer", "what can I do here", "platform overview",
+        "what is the purpose of this site", "explain this platform"
+      ],
+      "response_ar": "InsightCV هي منصة مهنية متكاملة تساعدك في: 🔍 البحث عن وظائف والتقديم عليها، 📄 تحليل CV مقابل وصف الوظيفة، 🎤 التدرب على المقابلات بالذكاء الاصطناعي، 📝 بناء سيرة ذاتية احترافية. انضم الآن وطور مسيرتك المهنية!",
+      "response_en": "InsightCV is a professional career platform that helps you: 🔍 Search and apply for jobs, 📄 Analyze your CV against job descriptions, 🎤 Practice interviews with AI, 📝 Build a professional resume. Join now and advance your career!"
+    },
+
+    {
+      "intent": "platform_features_overview",
+      "group": "general",
+      "patterns": [
+        "شو في الموقع", "إيش الميزات الموجودة", "شو الخدمات المتاحة",
+        "قولي شو بقدر أعمل هون", "ايش الأشياء اللي بقدر أعملها",
+        "شو الخصائص", "بدي أعرف عن الميزات", "ايش في بالموقع",
+        "what features are available", "what can I do on this platform",
+        "list all features", "what are the main features", "show me what you offer",
+        "platform capabilities", "all features", "what services are there",
+        "what tools are available", "main functions", "features list",
+        "ايش الادوات الموجودة", "شو الأدوات"
+      ],
+      "response_ar": "المنصة تحتوي على: \n1️⃣ محلل CV مقابل الوظيفة - اعرف مدى تطابق CV مع الوظيفة\n2️⃣ مقابلة ذكاء اصطناعي - تدرب على المقابلات\n3️⃣ البحث عن وظائف - تصفح وتقدم على آلاف الوظائف\n4️⃣ بناء السيرة الذاتية - أنشئ CV احترافي\n5️⃣ لوحة التحكم - تتبع طلباتك وإشعاراتك",
+      "response_en": "The platform includes:\n1️⃣ CV vs Job Analyzer - see how your CV matches a job\n2️⃣ AI Interview Simulator - practice mock interviews\n3️⃣ Job Search - browse and apply for thousands of jobs\n4️⃣ Resume Builder - create a professional CV\n5️⃣ Dashboard - track your applications and notifications"
+    },
+
+    {
+      "intent": "contact_support",
+      "group": "general",
+      "patterns": [
+        "كيف أتواصل مع الدعم", "وين الدعم الفني", "بدي أتكلم مع شخص حقيقي",
+        "في دعم بشري", "كيف أوصل للدعم", "رقم الدعم الفني", "ابعتلي إيميل",
+        "بدي أبلغ عن مشكلة", "وين أشتكي", "فريق الدعم",
+        "how to contact support", "customer support", "talk to a human",
+        "contact us", "get help from support", "report a problem",
+        "support team", "email support", "live chat support",
+        "where to get help", "I need human support", "contact team",
+        "how do I reach you", "help desk", "technical support"
+      ],
+      "response_ar": "بقدر تتواصل مع فريق الدعم من خلال: \n📧 صفحة 'تواصل معنا' في الفوتر\n💬 أو من خلال المحادثة هاي\nالفريق بيرد خلال 24 ساعة. شو المشكلة اللي عندك؟",
+      "response_en": "You can contact our support team via:\n📧 The 'Contact Us' page in the footer\n💬 Or through this chat\nThe team responds within 24 hours. What's your issue?"
+    },
+
+    {
+      "intent": "language_switch",
+      "group": "general",
+      "patterns": [
+        "كيف أغير اللغة", "بدي أحول للعربي", "وين أغير اللغة", "غير اللغة",
+        "حول للإنجليزي", "الموقع بالعربي", "بدي الموقع بالإنجليزي",
+        "how to change language", "switch to arabic", "switch to english",
+        "change language", "language settings", "arabic version",
+        "english version", "how to switch language", "toggle language",
+        "where is the language button", "change to arabic",
+        "كيف أحول اللغة", "الموقع باللغة العربية"
+      ],
+      "response_ar": "لتغيير اللغة: اضغط على زر 'AR/EN' في شريط التصفح العلوي. الموقع بيتحول كامل بين العربي والإنجليزي مع دعم الاتجاه من اليمين لليسار.",
+      "response_en": "To change the language: click the 'AR/EN' button in the top navigation bar. The entire website switches between Arabic and English, including right-to-left layout support."
+    },
+
+    {
+      "intent": "theme_switch",
+      "group": "general",
+      "patterns": [
+        "كيف أغير الثيم", "بدي الوضع الليلي", "وين وضع الليل", "الوضع الداكن",
+        "dark mode وين", "بدي أغير لون الموقع", "الثيم الفاتح",
+        "how to enable dark mode", "switch to dark mode", "light mode",
+        "dark theme", "change theme", "night mode", "day mode",
+        "where is dark mode", "enable dark theme", "toggle theme",
+        "appearance settings", "كيف أشغل الوضع المظلم", "الشاشة الداكنة"
+      ],
+      "response_ar": "لتغيير الثيم: اضغط على أيقونة الشمس/القمر 🌙☀️ في شريط التصفح العلوي. بتقدر تتنقل بين الوضع الفاتح والداكن بضغطة واحدة.",
+      "response_en": "To change the theme: click the sun/moon icon 🌙☀️ in the top navigation bar. You can toggle between light and dark mode with a single click."
+    },
+
+   
+    {
+      "intent": "upload_cv_help",
+      "group": "cv",
+      "patterns": [
+        "كيف ارفع السي في", "وين ارفع CV", "مش قادر ارفع الملف",
+        "كيف أرفع سيرتي الذاتية", "بدي ارفع CV", "ما عرفت ارفع الملف",
+        "مش شايف زر الرفع", "كيف أحمل الملف", "أين أرفع ملف السيرة الذاتية",
+        "طريقة رفع الـ CV", "مش عارف ارفع", "كيف بشتغل الرفع",
+        "how to upload my CV", "how to upload resume", "where to upload CV",
+        "I can't upload my file", "upload button not working",
+        "how do I upload", "can't find upload button",
+        "upload my curriculum vitae", "how to add my resume",
+        "where do I upload my resume", "file upload help",
+        "can't upload pdf", "how to submit my cv"
+      ],
+      "response_ar": "لرفع الـ CV: \n1️⃣ اذهب لـ 'محلل CV مقابل الوظيفة' من الشريط الجانبي\n2️⃣ ادخل عنوان الوظيفة والوصف الوظيفي\n3️⃣ انقر على منطقة الرفع أو اسحب الملف إليها\n4️⃣ الملف يجب أن يكون PDF فقط (حتى 10 ميغا)\nاضغط 'تحليل المطابقة' بعد ذلك.",
+      "response_en": "To upload your CV:\n1️⃣ Go to 'CV vs Job Analyzer' from the sidebar\n2️⃣ Enter the job title and description\n3️⃣ Click the upload area or drag your file onto it\n4️⃣ File must be PDF only (max 10 MB)\nThen click 'Analyze Match'."
+    },
+
+    {
+      "intent": "cv_analyzer_explain",
+      "group": "cv",
+      "patterns": [
+        "شو هو محلل CV", "كيف يشتغل محلل السيرة الذاتية", "ايش بيعمل محلل الـ CV",
+        "شرح محلل CV", "كيف أستخدم محلل CV", "ايش النتائج اللي بطلع",
+        "شو يعني CV مقابل وظيفة", "كيف بستفيد من المحلل",
+        "what is CV analyzer", "how does CV analyzer work",
+        "explain CV analysis", "what does CV analyzer do",
+        "how to use CV analyzer", "CV analysis tool",
+        "what results do I get from CV analyzer",
+        "how does the job match work", "CV vs job feature",
+        "tell me about CV analyzer", "cv analysis explained",
+        "what is the cv vs job tool"
+      ],
+      "response_ar": "محلل CV يقارن سيرتك الذاتية مع وصف الوظيفة ويعطيك:\n📊 درجة ATS (0-100) - مدى توافق CV مع أنظمة الفرز الآلي\n🎯 نسبة المطابقة مع الوظيفة\n✅ الكلمات المفتاحية الموجودة في CV\n❌ الكلمات المفتاحية الناقصة\n💡 مهارات ناقصة واقتراحات للتحسين",
+      "response_en": "The CV Analyzer compares your resume with a job description and gives you:\n📊 ATS Score (0-100) - how well your CV passes automated screening\n🎯 Job match percentage\n✅ Keywords found in your CV\n❌ Keywords missing from your CV\n💡 Missing skills and improvement suggestions"
+    },
+
+    {
+      "intent": "ats_score_explain",
+      "group": "cv",
+      "patterns": [
+        "شو يعني ATS", "ايش هو الـ ATS", "كيف يتحسب الـ ATS score",
+        "درجة ATS شو تعني", "ليش درجتي منخفضة بالـ ATS",
+        "شو هو نظام الفرز الآلي", "كيف أحسن درجة ATS",
+        "ATS يعني ايش", "ما فهمت الـ ATS score",
+        "what is ATS score", "what does ATS mean", "ATS score explained",
+        "why is my ATS score low", "how is ATS score calculated",
+        "what is applicant tracking system", "how to improve ATS score",
+        "ATS score meaning", "understand ATS", "ATS explained",
+        "what score is good for ATS", "ATS passing score"
+      ],
+      "response_ar": "ATS (Applicant Tracking System) هو نظام الفرز الآلي للشركات. درجته من 0 إلى 100:\n🟢 70-100: ممتاز - CV جاهز للتقديم\n🟡 40-69: متوسط - يحتاج تحسين\n🔴 0-39: ضعيف - يحتاج مراجعة كاملة\nالدرجة تعتمد على: المهارات، الكلمات المفتاحية، هيكل CV، والخبرة.",
+      "response_en": "ATS (Applicant Tracking System) is the automated screening system companies use. Score is 0-100:\n🟢 70-100: Excellent - CV is ready to submit\n🟡 40-69: Moderate - needs improvement\n🔴 0-39: Weak - needs major revision\nScore depends on: skills, keywords, CV structure, and experience."
+    },
+
+    {
+      "intent": "job_match_percentage",
+      "group": "cv",
+      "patterns": [
+        "شو تعني نسبة المطابقة", "كيف تتحسب نسبة التطابق مع الوظيفة",
+        "نسبة المطابقة شو يعني", "ليش نسبة المطابقة منخفضة",
+        "كيف أزيد نسبة المطابقة", "100% مطابقة كيف أوصل",
+        "what is match percentage", "how is job match calculated",
+        "why is my match percentage low", "how to improve match percentage",
+        "job compatibility score", "match score explained",
+        "how to get higher match", "100% match how to achieve",
+        "perfect job match", "improve compatibility with job",
+        "ايش يعني 65% match", "نسبة التوافق مع الوظيفة"
+      ],
+      "response_ar": "نسبة المطابقة تعبر عن مدى توافق مهاراتك مع متطلبات الوظيفة:\n🎯 فوق 70%: مطابقة قوية\n⚡ 40-70%: مطابقة متوسطة\n⚠️ تحت 40%: فجوة كبيرة\n\nلتحسينها: أضف المهارات الناقصة لـ CV، واستخدم نفس مصطلحات الوظيفة.",
+      "response_en": "The match percentage shows how well your skills align with job requirements:\n🎯 Above 70%: Strong match\n⚡ 40-70%: Moderate match\n⚠️ Below 40%: Significant gap\n\nTo improve it: add missing skills to your CV and use the same terminology as the job description."
+    },
+
+    {
+      "intent": "missing_skills",
+      "group": "cv",
+      "patterns": [
+        "شو المهارات الناقصة", "مهارات ناقصة وين بشوفها", "كيف أعرف شو ناقصني",
+        "بدي أعرف شو محتاج أضيف", "المهارات المفقودة", "ايش ناقص بـ CV",
+        "كيف أضيف المهارات الناقصة", "شو المهارات اللي المطلوبة",
+        "what are missing skills", "how to find missing skills",
+        "skills I need to add", "skills gap analysis",
+        "what skills am I missing", "required skills not in my CV",
+        "how to close skills gap", "which skills should I add",
+        "missing skills section", "skill gap report",
+        "what should I learn to get this job"
+      ],
+      "response_ar": "المهارات الناقصة موجودة في نتائج محلل CV تحت قسم 'المهارات المفقودة'. هاي المهارات موجودة بالوصف الوظيفي بس مش موجودة بـ CV. \n\n💡 نصيحة: حاول تضيفها لـ CV أو اتعلمها وأضفها لـ المشاريع.",
+      "response_en": "Missing skills appear in the CV Analyzer results under 'Missing Skills'. These are skills mentioned in the job description but not found in your CV.\n\n💡 Tip: Try to add them to your CV or learn them and add them to your projects section."
+    },
+
+    {
+      "intent": "cv_improvements",
+      "group": "cv",
+      "patterns": [
+        "كيف أحسن CV", "اقتراحات تحسين السيرة الذاتية", "شو اللي لازم أغير بـ CV",
+        "CV ضعيف كيف أحسنه", "نصايح لتحسين CV", "بدي أطور CV",
+        "ايش أغير بسيرتي الذاتية", "كيف أقوي الـ CV",
+        "how to improve my CV", "CV improvement tips", "make my CV better",
+        "CV is weak how to fix", "CV optimization", "resume improvements",
+        "how to strengthen resume", "CV writing tips", "make resume stronger",
+        "improve my resume", "CV recommendations", "how to upgrade my CV",
+        "resume suggestions", "tips to improve resume"
+      ],
+      "response_ar": "لتحسين CV:\n1️⃣ أضف الكلمات المفتاحية من الوصف الوظيفي\n2️⃣ ضمّن المهارات المفقودة\n3️⃣ أضف مشاريع وإنجازات ملموسة\n4️⃣ اجعل الهيكل واضح (تعليم، خبرة، مهارات)\n5️⃣ تأكد أن الـ PDF نصي مش صورة\nاستخدم محلل CV لترى التحسن فوراً!",
+      "response_en": "To improve your CV:\n1️⃣ Add keywords from the job description\n2️⃣ Include missing skills\n3️⃣ Add concrete projects and achievements\n4️⃣ Keep structure clear (education, experience, skills)\n5️⃣ Make sure the PDF is text-based, not scanned\nUse the CV Analyzer to see improvement instantly!"
+    },
+
+    {
+      "intent": "cv_strengths_weaknesses",
+      "group": "cv",
+      "patterns": [
+        "شو نقاط قوتي بـ CV", "وين بشوف نقاط الضعف", "نقاط القوة والضعف وين",
+        "ايش نقاط ضعف CV", "ايش مميزات CV",
+        "what are my CV strengths", "CV strengths and weaknesses",
+        "where to see strengths in CV results", "weakness in my CV",
+        "CV strong points", "CV weak points",
+        "strengths section in analysis", "weaknesses in CV analysis",
+        "what's good about my CV", "what's bad about my CV"
+      ],
+      "response_ar": "في نتائج محلل CV ستجد:\n💪 نقاط القوة: ما يميز CV ويتناسب مع الوظيفة\n⚠️ نقاط الضعف: ما يعيق تمرير الـ ATS أو لا يتناسب مع الوظيفة\n\nهذه النقاط مخصصة لكل وظيفة تحللها.",
+      "response_en": "In the CV Analyzer results you'll find:\n💪 Strengths: what makes your CV stand out for this job\n⚠️ Weaknesses: what hurts your ATS score or doesn't match the job\n\nThese are specific to each job you analyze."
+    },
+
+    {
+      "intent": "keyword_matching",
+      "group": "cv",
+      "patterns": [
+        "شو يعني الكلمات المفتاحية", "كلمات مفتاحية موجودة وين",
+        "ايش هي الكلمات المفتاحية المطابقة", "الكلمات الناقصة وين",
+        "كيف أحسن الكلمات المفتاحية", "keyword match شو يعني",
+        "what are keyword matches", "keywords in CV analysis",
+        "matched keywords explained", "missing keywords",
+        "how to add keywords to CV", "keyword optimization",
+        "what keywords should I use", "job keywords",
+        "how keywords affect ATS score", "keyword density"
+      ],
+      "response_ar": "الكلمات المفتاحية المطابقة: كلمات من الوصف الوظيفي موجودة بـ CV ✅\nالكلمات المفتاحية الناقصة: كلمات من الوصف الوظيفي غير موجودة بـ CV ❌\n\n💡 أضف الكلمات الناقصة بشكل طبيعي لـ CV. مثلاً: إذا الوظيفة تطلب 'React' وما ذكرتها، أضفها للمهارات.",
+      "response_en": "Matched keywords: words from the job description found in your CV ✅\nMissing keywords: words from the job description NOT in your CV ❌\n\n💡 Add missing keywords naturally to your CV. For example: if the job requires 'React' and you haven't mentioned it, add it to your skills."
+    },
+
+    {
+      "intent": "cv_format_requirements",
+      "group": "cv",
+      "patterns": [
+        "شو صيغة الملف المقبولة", "ايش الملفات المدعومة", "PDF فقط؟",
+        "بقدر ارفع Word", "شو الحجم الأقصى للملف", "10 ميغا كافية",
+        "هل تقبل doc", "هل تقبل docx", "صيغة CV",
+        "what file format is accepted", "only PDF?", "can I upload Word file",
+        "maximum file size", "accepted file types", "file format for upload",
+        "can I upload docx", "supported file formats",
+        "CV file requirements", "what type of file",
+        "file size limit", "MB limit for upload"
+      ],
+      "response_ar": "محلل CV يقبل:\n✅ PDF فقط\n✅ الحجم الأقصى: 10 ميغابايت\n✅ يجب أن يكون PDF نصي (وليس صورة ممسوحة ضوئياً)\n\n❌ لا يقبل: Word (.doc/.docx)، صور، أو PDFs ممسوحة",
+      "response_en": "The CV Analyzer accepts:\n✅ PDF files only\n✅ Maximum size: 10 MB\n✅ Must be a text-based PDF (not a scanned image)\n\n❌ Does NOT accept: Word (.doc/.docx), images, or scanned PDFs"
+    },
+
+    {
+      "intent": "cv_scanned_error",
+      "group": "cv",
+      "patterns": [
+        "CV ممسوح ضوئياً ما بقبله", "الملف ما اشتغل", "قالي مافي نص بالـ PDF",
+        "PDF صورة مش نص", "ليش ما بقرأ الملف", "CV مصور مش شغال",
+        "scanned PDF error", "PDF is an image not text",
+        "can't extract text from PDF", "PDF not readable",
+        "my PDF is scanned", "scanner PDF rejected",
+        "no text found in PDF", "image PDF not accepted",
+        "CV is a photo", "PDF scan not working"
+      ],
+      "response_ar": "المشكلة: الـ PDF اللي رفعته صورة ممسوحة وليس نصاً.\n\n✅ الحل:\n1. استخدم PDF أصلي من Word أو أي برنامج تصميم\n2. أو استخدم OCR لتحويل الصورة لنص\n3. أنشئ CV جديد باستخدام منشئ السيرة الذاتية في الموقع",
+      "response_en": "The problem: The PDF you uploaded is a scanned image, not text.\n\n✅ Solution:\n1. Use an original PDF from Word or a design tool\n2. Or use OCR to convert the image to text\n3. Create a new CV using the Resume Builder on this platform"
+    },
+
+    {
+      "intent": "resume_builder_explain",
+      "group": "cv",
+      "patterns": [
+        "كيف أبني سيرة ذاتية", "منشئ السيرة الذاتية كيف يشتغل",
+        "بدي أعمل CV من الصفر", "وين أنشئ CV", "كيف أستخدم منشئ CV",
+        "resume builder شرح", "كيف أعمل سيرة ذاتية احترافية",
+        "ابني سيرة ذاتية خطوة خطوة",
+        "how to build a resume", "resume builder help", "create a CV",
+        "build my CV from scratch", "resume creator", "how to make a resume",
+        "step by step resume creation", "create professional CV",
+        "resume builder tutorial", "how to use resume builder",
+        "build resume online", "make CV online"
+      ],
+      "response_ar": "منشئ السيرة الذاتية:\n1️⃣ اذهب لـ 'منشئ السيرة الذاتية' من الشريط الجانبي\n2️⃣ أدخل: البيانات الشخصية، الخبرات، التعليم، المهارات\n3️⃣ شاهد المعاينة الحية أثناء الكتابة\n4️⃣ نزّل CV بصيغة PDF بجودة احترافية",
+      "response_en": "Resume Builder steps:\n1️⃣ Go to 'Resume Builder' from the sidebar\n2️⃣ Enter: personal info, experience, education, skills\n3️⃣ See the live preview as you type\n4️⃣ Download your CV as a professional PDF"
+    },
+
+    {
+      "intent": "resume_download",
+      "group": "cv",
+      "patterns": [
+        "كيف أنزل CV", "تحميل السيرة الذاتية كيف", "وين زر التنزيل",
+        "بدي أحمل CV بصيغة PDF", "تحميل PDF للسيرة الذاتية",
+        "مش لاقي زر التنزيل", "download button where",
+        "how to download my resume", "download CV as PDF",
+        "export resume to PDF", "save my CV", "download button",
+        "where is download button", "can't download my resume",
+        "how to save CV", "download resume PDF"
+      ],
+      "response_ar": "لتنزيل السيرة الذاتية:\n1️⃣ اذهب لـ 'منشئ السيرة الذاتية'\n2️⃣ أكمل ملء بياناتك\n3️⃣ اضغط زر 'تحميل PDF' 📥 الموجود في أعلى الصفحة\nالملف سيُنزَّل تلقائياً على جهازك.",
+      "response_en": "To download your resume:\n1️⃣ Go to 'Resume Builder'\n2️⃣ Complete your information\n3️⃣ Click the 'Download PDF' 📥 button at the top of the page\nThe file will be downloaded automatically to your device."
+    },
+
+    {
+      "intent": "resume_sections_help",
+      "group": "cv",
+      "patterns": [
+        "شو الأقسام اللي لازم أضيفها لـ CV", "مش عارف أضيف خبرة", "كيف أضيف مهارات",
+        "كيف أضيف تعليم", "قسم الخبرة وين", "كيف أضيف مشروع",
+        "sections في السيرة الذاتية", "ايش الأقسام المطلوبة",
+        "what sections to add to CV", "how to add experience section",
+        "how to add skills to resume", "resume sections help",
+        "education section", "work experience section",
+        "how to add projects", "skills section help",
+        "what to include in resume", "CV sections guide"
+      ],
+      "response_ar": "أقسام السيرة الذاتية:\n📌 المعلومات الشخصية: الاسم، الإيميل، الهاتف، الموقع\n💼 الخبرات: المسمى الوظيفي، الشركة، التواريخ، الوصف\n🎓 التعليم: الدرجة، المؤسسة، سنة التخرج\n🛠️ المهارات: اذكر مهاراتك التقنية والشخصية\n📁 المشاريع: اختيارية لكن تقوي CV كثير",
+      "response_en": "CV sections:\n📌 Personal Info: name, email, phone, location\n💼 Experience: job title, company, dates, description\n🎓 Education: degree, institution, graduation year\n🛠️ Skills: list your technical and soft skills\n📁 Projects: optional but strengthens your CV greatly"
+    },
+
+    {
+      "intent": "improve_ats_score",
+      "group": "cv",
+      "patterns": [
+        "كيف أحسن درجة ATS", "بدي درجة ATS أعلى", "ليش ATS منخفض",
+        "رفع درجة ATS كيف", "شو يؤثر على ATS",
+        "how to improve ATS score", "increase ATS score",
+        "my ATS score is low", "ATS score too low fix",
+        "tips to boost ATS score", "how to get higher ATS",
+        "ATS score improvement tips", "pass ATS filter",
+        "why is ATS score low", "fix ATS score"
+      ],
+      "response_ar": "لرفع درجة ATS:\n1️⃣ أضف الكلمات المفتاحية من الوصف الوظيفي\n2️⃣ استخدم عناوين أقسام واضحة (Experience, Skills, Education)\n3️⃣ تجنب الجداول والرسوم البيانية المعقدة\n4️⃣ اذكر المهارات التقنية بوضوح\n5️⃣ أضف الخبرة بالسنوات\n6️⃣ تأكد أن CV نصي وليس صورة",
+      "response_en": "To boost ATS score:\n1️⃣ Add keywords from the job description\n2️⃣ Use clear section headers (Experience, Skills, Education)\n3️⃣ Avoid complex tables and graphics\n4️⃣ List technical skills clearly\n5️⃣ Mention years of experience\n6️⃣ Ensure the CV is text-based, not an image"
+    },
+
+    {
+      "intent": "interview_start_how",
+      "group": "interview",
+      "patterns": [
+        "كيف أبدأ المقابلة", "وين المقابلة الذكية", "بدي أجرب المقابلة",
+        "كيف أجري مقابلة", "شو خطوات بدء المقابلة", "المقابلة مع الذكاء الاصطناعي كيف",
+        "ابدأ مقابلة تدريبية", "كيف أتدرب على مقابلة",
+        "how to start interview", "start AI interview", "begin mock interview",
+        "how to begin interview", "start practice interview",
+        "where is AI interview", "AI interview how to start",
+        "interview simulator start", "how to use interview feature",
+        "start interview practice", "begin AI mock interview"
+      ],
+      "response_ar": "لبدء المقابلة الذكية:\n1️⃣ اذهب لـ 'مقابلة الذكاء الاصطناعي' من الشريط الجانبي\n2️⃣ أدخل عنوان الوظيفة والوصف الوظيفي\n3️⃣ اضغط 'ابدأ المقابلة'\n4️⃣ أجب على 5 أسئلة متتالية\n5️⃣ احصل على تقييم وتغذية راجعة نهائية",
+      "response_en": "To start the AI Interview:\n1️⃣ Go to 'AI Interview' from the sidebar\n2️⃣ Enter the job title and job description\n3️⃣ Click 'Start Interview'\n4️⃣ Answer 5 consecutive questions\n5️⃣ Get a final evaluation and feedback"
+    },
+
+    {
+      "intent": "interview_explain",
+      "group": "interview",
+      "patterns": [
+        "شو هو نظام المقابلة", "ايش بيعمل محاكي المقابلة", "كيف يشتغل نظام المقابلة",
+        "شو المقابلة الذكية بتعمل", "شرح ميزة المقابلة",
+        "what is the interview feature", "explain AI interview",
+        "how does interview simulator work", "what is mock interview",
+        "interview system explained", "AI interview description",
+        "what happens in the interview", "describe the interview feature",
+        "interview ai how it works", "interview simulation explained",
+        "what does the interview tool do"
+      ],
+      "response_ar": "نظام المقابلة الذكية:\n🎤 يجري معك مقابلة تدريبية لأي وظيفة تختارها\n❓ يسألك 5 أسئلة تقنية ومهنية متسلسلة\n💬 بعد كل إجابة يعطيك تغذية راجعة فورية ودرجة\n📊 في النهاية تحصل على تقرير شامل مع نقاط القوة والضعف والنتيجة النهائية",
+      "response_en": "The AI Interview Simulator:\n🎤 Conducts a practice interview for any job you choose\n❓ Asks you 5 sequential technical and professional questions\n💬 After each answer gives you instant feedback and a score\n📊 At the end you get a comprehensive report with strengths, weaknesses, and final score"
+    },
+
+    {
+      "intent": "interview_questions_types",
+      "group": "interview",
+      "patterns": [
+        "شو نوع الأسئلة بالمقابلة", "ايش أسئلة المقابلة", "كيف الأسئلة بالمقابلة",
+        "أسئلة تقنية أو سلوكية", "شو راح يسألني", "صعوبة الأسئلة",
+        "what type of questions in interview", "what questions will be asked",
+        "technical or behavioral questions", "how hard are the questions",
+        "interview questions difficulty", "question types in AI interview",
+        "will I get technical questions", "behavioral interview questions",
+        "interview question examples", "what to expect in interview"
+      ],
+      "response_ar": "أسئلة المقابلة تشمل:\n🔧 أسئلة تقنية: مرتبطة بمهارات الوظيفة التي اخترتها\n💼 أسئلة سلوكية: خبراتك ومواقفك المهنية\n🧠 أسئلة تحليلية: حل مشكلات وتفكير نقدي\n\nالذكاء الاصطناعي يكيّف صعوبة الأسئلة بناءً على إجاباتك.",
+      "response_en": "Interview questions include:\n🔧 Technical questions: related to the skills of the job you chose\n💼 Behavioral questions: your experiences and professional situations\n🧠 Analytical questions: problem-solving and critical thinking\n\nThe AI adapts question difficulty based on your answers."
+    },
+
+    {
+      "intent": "interview_score_explain",
+      "group": "interview",
+      "patterns": [
+        "كيف تتحسب درجة المقابلة", "شو تعني درجة المقابلة", "الدرجة النهائية كيف",
+        "100 بالمقابلة يعني ايش", "درجة كل سؤال كيف", "النتيجة النهائية",
+        "how is interview score calculated", "interview score meaning",
+        "final interview score", "per question score", "how to get 100 in interview",
+        "interview evaluation score", "scoring system interview",
+        "what does my score mean", "interview grade explained"
+      ],
+      "response_ar": "درجة المقابلة:\n📝 كل سؤال يحصل على درجة من 0 إلى 10\n🔢 الدرجة النهائية = متوسط كل الأسئلة × 10\n🟢 70-100: أداء ممتاز\n🟡 45-69: أداء جيد يحتاج تطوير\n🔴 0-44: يحتاج تحسين كبير\n\nبعد انتهاء المقابلة بتشوف التقرير الكامل.",
+      "response_en": "Interview scoring:\n📝 Each question scored 0-10\n🔢 Final score = average of all questions × 10\n🟢 70-100: Excellent performance\n🟡 45-69: Good performance needs improvement\n🔴 0-44: Needs major improvement\n\nAfter the interview ends, you see the full report."
+    },
+
+    {
+      "intent": "interview_feedback",
+      "group": "interview",
+      "patterns": [
+        "شو هي التغذية الراجعة بالمقابلة", "ايش التقييم بعد كل جواب",
+        "كيف بشوف ملاحظات المقابلة", "ليش ما في تغذية راجعة",
+        "تقرير المقابلة وين", "نتائج المقابلة",
+        "what is interview feedback", "per-answer feedback explained",
+        "where to see interview feedback", "interview results",
+        "interview report", "how to view interview feedback",
+        "feedback after each answer", "interview evaluation report",
+        "see interview results", "interview performance review"
+      ],
+      "response_ar": "التغذية الراجعة في المقابلة:\n💬 بعد كل إجابة: تعليق فوري ودرجة من 10\n📊 في نهاية المقابلة: تقرير شامل يشمل:\n   - الدرجة الإجمالية\n   - ملخص الأداء\n   - نقاط القوة\n   - مجالات التحسين\n   - سجل كل الأسئلة والإجابات",
+      "response_en": "Interview feedback includes:\n💬 After each answer: instant comment and score out of 10\n📊 At the end: comprehensive report including:\n   - Overall score\n   - Performance summary\n   - Strengths\n   - Areas for improvement\n   - Full Q&A history"
+    },
+
+    {
+      "intent": "interview_job_description_input",
+      "group": "interview",
+      "patterns": [
+        "ما أعرف أضع وصف الوظيفة", "وين أحط الوصف الوظيفي", "مش لاقي خانة الوصف",
+        "وصف الوظيفة كيف أكتبه", "شو أحط بخانة الوصف الوظيفي",
+        "where to enter job description", "job description field help",
+        "what to write in job description", "can't find job description field",
+        "how to enter job details", "job description input help",
+        "what should I write for job description", "empty job description",
+        "minimum job description length", "job description example"
+      ],
+      "response_ar": "في خانة الوصف الوظيفي:\n📋 الصق الوصف الكامل للوظيفة من إعلان التوظيف\n✅ يجب أن يكون 20 حرف على الأقل\n💡 كلما كان الوصف أكثر تفصيلاً، كانت الأسئلة أكثر دقة وملاءمة للوظيفة",
+      "response_en": "In the job description field:\n📋 Paste the full job description from the job posting\n✅ Must be at least 20 characters long\n💡 The more detailed the description, the more accurate and relevant the interview questions will be"
+    },
+
+    {
+      "intent": "interview_tips",
+      "group": "interview",
+      "patterns": [
+        "نصايح للمقابلة", "كيف أجيب على أسئلة المقابلة", "كيف أحصل على درجة عالية",
+        "شو الأشياء اللي لازم أعملها بالمقابلة", "نصائح للأداء الجيد",
+        "tips for AI interview", "how to do well in interview",
+        "how to answer interview questions", "interview success tips",
+        "how to get high score in interview", "interview preparation tips",
+        "best practices for interview", "how to ace the interview",
+        "improve interview performance", "interview advice"
+      ],
+      "response_ar": "نصائح للمقابلة:\n✅ اقرأ الوصف الوظيفي جيداً قبل البدء\n✅ كن محدداً في إجاباتك وأعطِ أمثلة\n✅ اذكر تجاربك العملية والمشاريع\n✅ تجنب الإجابات القصيرة جداً\n✅ استخدم مصطلحات تقنية مناسبة\n✅ أجب بثقة وبشكل منظم",
+      "response_en": "Interview tips:\n✅ Read the job description carefully before starting\n✅ Be specific in your answers and give examples\n✅ Mention work experience and projects\n✅ Avoid very short answers\n✅ Use appropriate technical terminology\n✅ Answer confidently and in an organized way"
+    },
+
+    {
+      "intent": "interview_retry",
+      "group": "interview",
+      "patterns": [
+        "بقدر أعيد المقابلة", "كيف أبدأ مقابلة جديدة", "بدي أحاول مرة ثانية",
+        "إعادة المقابلة كيف", "ابدأ مقابلة من الأول",
+        "can I redo the interview", "restart interview", "take interview again",
+        "new interview session", "how to retry interview",
+        "start fresh interview", "can I practice again",
+        "redo interview", "interview reset", "how to start over"
+      ],
+      "response_ar": "نعم! بقدر تعيد المقابلة كم مرة بدك:\n1️⃣ بعد انتهاء المقابلة اضغط 'ابدأ مقابلة جديدة'\n2️⃣ أو ارجع لصفحة المقابلة وادخل بيانات جديدة\n3️⃣ كل مقابلة جديدة بتعطيك أسئلة مختلفة 🎯",
+      "response_en": "Yes! You can redo the interview as many times as you want:\n1️⃣ After finishing, click 'Start New Interview'\n2️⃣ Or go back to the interview page and enter new details\n3️⃣ Each new interview gives you different questions 🎯"
+    },
+
+    {
+      "intent": "interview_session_error",
+      "group": "interview",
+      "patterns": [
+        "المقابلة انقطعت", "جلسة المقابلة انتهت", "مشكلة بالمقابلة",
+        "المقابلة ما شتغلت", "انتهت الجلسة بالمقابلة", "ما قدرت أكمل المقابلة",
+        "interview session expired", "interview stopped working",
+        "lost my interview session", "interview disconnected",
+        "interview not loading", "interview session error",
+        "couldn't complete interview", "interview crashed",
+        "interview froze", "my interview ended unexpectedly"
+      ],
+      "response_ar": "إذا انقطعت جلسة المقابلة:\n1️⃣ الجلسة تنتهي بعد 30 دقيقة من عدم النشاط\n2️⃣ ابدأ مقابلة جديدة من 'مقابلة الذكاء الاصطناعي'\n3️⃣ إذا استمرت المشكلة، جرب تحديث الصفحة\n💡 ننصح بإكمال المقابلة دون انقطاع.",
+      "response_en": "If your interview session was interrupted:\n1️⃣ Sessions expire after 30 minutes of inactivity\n2️⃣ Start a new interview from 'AI Interview'\n3️⃣ If the problem persists, try refreshing the page\n💡 We recommend completing the interview without interruption."
+    },
+
+  
+    {
+      "intent": "find_jobs_how",
+      "group": "jobs",
+      "patterns": [
+        "كيف أبحث عن وظيفة", "وين بلاقي الوظائف", "بدي أشوف الوظائف المتاحة",
+        "شو الوظائف الموجودة", "كيف أفتح صفحة الوظائف", "بحث عن عمل",
+        "فين الوظائف", "ابحث عن وظيفة كيف", "بدي أدور على شغل",
+        "how to find jobs", "where to search for jobs", "job search",
+        "browse jobs", "search for work", "find available jobs",
+        "how to look for jobs", "job listings", "jobs page",
+        "view all jobs", "job board", "see job openings"
+      ],
+      "response_ar": "للبحث عن وظائف:\n1️⃣ اضغط على 'البحث عن وظائف' من الشريط الجانبي\n2️⃣ استخدم الفلاتر: النوع، الموقع، الراتب، الفئة\n3️⃣ انقر على أي وظيفة لعرض التفاصيل\n4️⃣ اضغط 'قدم الآن' للتقديم أو 🔖 للحفظ",
+      "response_en": "To find jobs:\n1️⃣ Click 'Find Jobs' from the sidebar\n2️⃣ Use filters: type, location, salary, category\n3️⃣ Click any job to view details\n4️⃣ Click 'Apply Now' to apply or 🔖 to save"
+    },
+
+    {
+      "intent": "apply_for_job",
+      "group": "jobs",
+      "patterns": [
+        "كيف أتقدم لوظيفة", "بدي أقدم على وظيفة", "طريقة التقديم",
+        "زر التقديم وين", "خطوات التقديم على وظيفة", "ما قدرت أقدم",
+        "كيف أقدم طلب توظيف", "التقديم على وظيفة كيف",
+        "how to apply for a job", "job application process",
+        "apply now button", "submit job application",
+        "can't apply for job", "application steps",
+        "how to submit application", "job apply help",
+        "application not going through", "apply to job posting"
+      ],
+      "response_ar": "للتقديم على وظيفة:\n1️⃣ افتح صفحة الوظيفة التي تريدها\n2️⃣ اضغط زر 'قدم الآن'\n3️⃣ تأكد أنك مسجل دخول\n4️⃣ راجع طلباتك من 'طلباتي' في الشريط الجانبي\n\n⚠️ لازم يكون عندك حساب Job Seeker للتقديم.",
+      "response_en": "To apply for a job:\n1️⃣ Open the job page you want\n2️⃣ Click 'Apply Now' button\n3️⃣ Make sure you're logged in\n4️⃣ Check your applications from 'My Applications' in the sidebar\n\n⚠️ You must have a Job Seeker account to apply."
+    },
+
+    {
+      "intent": "save_job",
+      "group": "jobs",
+      "patterns": [
+        "كيف أحفظ وظيفة", "بدي أحفظ وظيفة لاحقاً", "الوظائف المحفوظة وين",
+        "bookmark وظيفة كيف", "حفظ وظيفة للمراجعة لاحقاً",
+        "how to save a job", "save job for later", "saved jobs how to",
+        "bookmark a job", "favorite job", "save job posting",
+        "where are saved jobs", "how to unsave a job",
+        "job wishlist", "saved jobs list", "mark job as favorite"
+      ],
+      "response_ar": "لحفظ وظيفة:\n1️⃣ اضغط أيقونة 🔖 الموجودة على بطاقة الوظيفة\n2️⃣ الوظيفة ستُضاف لـ 'الوظائف المحفوظة'\n3️⃣ اعرض وظائفك المحفوظة من 'الوظائف المحفوظة' في الشريط الجانبي",
+      "response_en": "To save a job:\n1️⃣ Click the 🔖 icon on the job card\n2️⃣ The job will be added to 'Saved Jobs'\n3️⃣ View your saved jobs from 'Saved Jobs' in the sidebar"
+    },
+
+    {
+      "intent": "job_filters_how",
+      "group": "jobs",
+      "patterns": [
+        "كيف أستخدم الفلاتر", "فلترة الوظائف كيف", "بدي أفلتر حسب الراتب",
+        "فلتر حسب الموقع", "فلتر حسب النوع", "تصفية الوظائف",
+        "how to filter jobs", "job filter options", "salary filter",
+        "location filter", "job type filter", "filter by category",
+        "advanced job search", "search filters", "filter results",
+        "how to narrow job search", "filter by remote",
+        "filter by full time", "sort jobs"
+      ],
+      "response_ar": "فلاتر البحث عن الوظائف:\n💰 الراتب: حدد نطاق الراتب المناسب\n📍 الموقع: فلتر حسب المدينة أو المنطقة\n⏰ نوع العمل: دوام كامل، جزئي، عن بُعد، عقد\n🏷️ الفئة: تكنولوجيا، تصميم، تسويق، وغيرها\n\nاستخدمها معاً للحصول على نتائج أدق.",
+      "response_en": "Job search filters:\n💰 Salary: set your desired salary range\n📍 Location: filter by city or region\n⏰ Job Type: full-time, part-time, remote, contract\n🏷️ Category: technology, design, marketing, and more\n\nCombine them for more precise results."
+    },
+
+    {
+      "intent": "job_types_explain",
+      "group": "jobs",
+      "patterns": [
+        "ايش أنواع الوظائف", "شو يعني دوام كامل", "شو يعني دوام جزئي",
+        "وظيفة عن بُعد يعني ايش", "ريموت وين بلاقي", "وظيفة عقد يعني ايش",
+        "what are job types", "full time meaning", "part time job meaning",
+        "remote job meaning", "work from home jobs", "contract job meaning",
+        "hybrid job", "freelance jobs", "job categories explained",
+        "difference between job types", "on-site vs remote"
+      ],
+      "response_ar": "أنواع الوظائف:\n🏢 دوام كامل: 8 ساعات يومياً، 5 أيام أسبوعياً\n⏰ دوام جزئي: ساعات أقل وأوقات مرنة\n🏠 عن بُعد: العمل من المنزل\n🔀 هجين: مزيج من المكتب والبيت\n📋 عقد: لفترة محددة",
+      "response_en": "Job types:\n🏢 Full-time: 8 hours/day, 5 days/week\n⏰ Part-time: fewer hours, flexible schedule\n🏠 Remote: work from home\n🔀 Hybrid: mix of office and home\n📋 Contract: for a fixed period"
+    },
+
+    {
+      "intent": "application_status",
+      "group": "jobs",
+      "patterns": [
+        "كيف أتابع طلب التوظيف", "وين بشوف حالة الطلب", "طلبي وين راح",
+        "هل قبلوا طلبي", "حالة الطلب كيف أعرفها", "متابعة الطلبات",
+        "how to track application", "application status check",
+        "where to see application status", "was my application accepted",
+        "track job application", "my applications status",
+        "application progress", "check if employer viewed my application",
+        "application tracking", "job application updates"
+      ],
+      "response_ar": "لمتابعة طلبات التوظيف:\n1️⃣ اذهب لـ 'طلباتي' في الشريط الجانبي\n2️⃣ ستجد كل طلباتك مع الحالة: قيد المراجعة، مختصر، مقبول، مرفوض\n3️⃣ ستصلك إشعارات عند تحديث أي طلب",
+      "response_en": "To track job applications:\n1️⃣ Go to 'My Applications' in the sidebar\n2️⃣ Find all your applications with status: Under Review, Shortlisted, Accepted, Rejected\n3️⃣ You'll receive notifications when any application is updated"
+    },
+
+    {
+      "intent": "job_recommendations",
+      "group": "jobs",
+      "patterns": [
+        "كيف أحصل على وظائف مناسبة", "وظائف مقترحة وين", "وظائف تتناسب مع ملفي",
+        "وين بلاقي وظائف مناسبة لمهاراتي", "توصيات وظائف",
+        "job recommendations", "recommended jobs", "jobs matching my skills",
+        "personalized job suggestions", "matching jobs for my profile",
+        "how to get job suggestions", "relevant jobs for me",
+        "jobs matching my CV", "job matches", "suggested jobs"
+      ],
+      "response_ar": "للحصول على وظائف مناسبة:\n1️⃣ أكمل ملفك الشخصي وأضف مهاراتك\n2️⃣ أنشئ سيرة ذاتية كاملة من منشئ السيرة الذاتية\n3️⃣ استخدم محلل CV لمعرفة مدى توافقك مع أي وظيفة\n4️⃣ استخدم فلاتر البحث لتخصيص النتائج",
+      "response_en": "To get relevant job recommendations:\n1️⃣ Complete your profile and add your skills\n2️⃣ Build a full resume using the Resume Builder\n3️⃣ Use CV Analyzer to check compatibility with any job\n4️⃣ Use search filters to customize results"
+    },
+
+    {
+      "intent": "employers_browse",
+      "group": "jobs",
+      "patterns": [
+        "كيف أشوف الشركات", "وين بلاقي الشركات", "قائمة الشركات",
+        "تصفح الشركات كيف", "بدي أعرف الشركات المتاحة",
+        "browse companies", "view companies", "company list",
+        "how to see employers", "explore companies",
+        "find companies", "company directory", "employers list",
+        "company profiles", "which companies are hiring"
+      ],
+      "response_ar": "لعرض الشركات:\n1️⃣ اضغط على 'الشركات' في الشريط الجانبي أو القائمة\n2️⃣ ستجد قائمة بالشركات مع عدد الوظائف المتاحة والقطاع\n3️⃣ انقر على أي شركة لعرض ملفها ووظائفها المفتوحة",
+      "response_en": "To view companies:\n1️⃣ Click 'Companies' in the sidebar or menu\n2️⃣ You'll find a list of companies with job openings count and industry\n3️⃣ Click any company to view their profile and open positions"
+    },
+
+  
+    {
+      "intent": "register_account",
+      "group": "account",
+      "patterns": [
+        "كيف أسجل حساب", "بدي أعمل حساب جديد", "التسجيل كيف",
+        "إنشاء حساب جديد", "مش عارف أسجل", "وين زر التسجيل",
+        "سجلني بالموقع", "كيف أنضم للمنصة", "خطوات التسجيل",
+        "how to register", "create a new account", "sign up",
+        "registration steps", "how to join", "create account",
+        "register on the platform", "sign up process",
+        "new user registration", "make an account",
+        "how to create profile", "joining the platform"
+      ],
+      "response_ar": "للتسجيل في المنصة:\n1️⃣ اضغط 'تسجيل' في الزاوية العلوية اليمنى\n2️⃣ اختر دورك: باحث عن عمل أو شركة\n3️⃣ أدخل: الاسم الكامل، الإيميل، وكلمة المرور\n4️⃣ اضغط 'إنشاء حساب'\n✅ ستنتقل مباشرة للوحة التحكم الخاصة بك",
+      "response_en": "To register on the platform:\n1️⃣ Click 'Register' in the top right corner\n2️⃣ Choose your role: Job Seeker or Company\n3️⃣ Enter: full name, email, and password\n4️⃣ Click 'Create Account'\n✅ You'll be taken directly to your dashboard"
+    },
+
+    {
+      "intent": "login_help",
+      "group": "account",
+      "patterns": [
+        "كيف أسجل دخول", "وين صفحة الدخول", "نسيت أدخل", "ما قدرت أدخل",
+        "مشكلة تسجيل الدخول", "الدخول للحساب", "sign in كيف",
+        "how to login", "sign in help", "can't log in",
+        "login page", "where to sign in", "login problem",
+        "access my account", "log into account",
+        "sign in button", "login not working", "account access"
+      ],
+      "response_ar": "لتسجيل الدخول:\n1️⃣ اضغط 'تسجيل الدخول' في الزاوية العلوية اليمنى\n2️⃣ أدخل إيميلك وكلمة المرور\n3️⃣ اضغط 'تسجيل الدخول'\n\n🔑 نسيت كلمة المرور؟ استخدم خيار 'نسيت كلمة المرور' في صفحة الدخول.",
+      "response_en": "To login:\n1️⃣ Click 'Sign In' in the top right corner\n2️⃣ Enter your email and password\n3️⃣ Click 'Sign In'\n\n🔑 Forgot password? Use 'Forgot Password' on the login page."
+    },
+
+    {
+      "intent": "forgot_password",
+      "group": "account",
+      "patterns": [
+        "نسيت كلمة المرور", "ما تذكرت الباسورد", "كيف أسترجع كلمة المرور",
+        "إعادة تعيين كلمة المرور", "باسورد ضايع", "مش قادر أتذكر الباسورد",
+        "forgot my password", "reset password", "recover password",
+        "lost password", "can't remember password", "password recovery",
+        "change forgotten password", "password reset help",
+        "how to reset password", "reset my account password"
+      ],
+      "response_ar": "لاسترجاع كلمة المرور:\n1️⃣ اذهب لصفحة تسجيل الدخول\n2️⃣ اضغط على 'نسيت كلمة المرور'\n3️⃣ أدخل إيميل حسابك\n4️⃣ ستصلك رسالة إعادة تعيين\n5️⃣ اتبع التعليمات لإنشاء كلمة مرور جديدة",
+      "response_en": "To recover your password:\n1️⃣ Go to the login page\n2️⃣ Click 'Forgot Password'\n3️⃣ Enter your account email\n4️⃣ You'll receive a reset email\n5️⃣ Follow the instructions to create a new password"
+    },
+
+    {
+      "intent": "change_password",
+      "group": "account",
+      "patterns": [
+        "بدي أغير كلمة المرور", "تغيير الباسورد كيف", "كيف أحدث كلمة المرور",
+        "وين أغير الباسورد", "تعديل كلمة المرور",
+        "how to change password", "update password",
+        "password change settings", "where to change password",
+        "edit my password", "new password setup",
+        "change account password", "update account password"
+      ],
+      "response_ar": "لتغيير كلمة المرور:\n1️⃣ اذهب للإعدادات من الشريط الجانبي\n2️⃣ اختر 'الأمان'\n3️⃣ اضغط 'تغيير كلمة المرور'\n4️⃣ أدخل كلمة المرور الحالية والجديدة\n5️⃣ اضغط 'حفظ التغييرات'",
+      "response_en": "To change your password:\n1️⃣ Go to Settings from the sidebar\n2️⃣ Select 'Security'\n3️⃣ Click 'Change Password'\n4️⃣ Enter current and new password\n5️⃣ Click 'Save Changes'"
+    },
+
+    {
+      "intent": "update_profile",
+      "group": "account",
+      "patterns": [
+        "كيف أحدث ملفي الشخصي", "بدي أعدل بياناتي", "تحديث الملف الشخصي",
+        "وين أغير معلوماتي", "تعديل الاسم أو الإيميل", "ملفي الشخصي كيف أعدله",
+        "how to update profile", "edit my profile", "update personal info",
+        "change my name", "update my details", "profile settings",
+        "edit account information", "modify profile",
+        "how to change profile info", "update profile picture"
+      ],
+      "response_ar": "لتحديث الملف الشخصي:\n1️⃣ اذهب لـ 'الملف الشخصي' من الشريط الجانبي\n2️⃣ انقر على 'تعديل'\n3️⃣ حدث: الاسم، الموقع، الهاتف، اللينكدإن، والبيو\n4️⃣ اضغط 'حفظ الملف'",
+      "response_en": "To update your profile:\n1️⃣ Go to 'Profile' from the sidebar\n2️⃣ Click 'Edit'\n3️⃣ Update: name, location, phone, LinkedIn, and bio\n4️⃣ Click 'Save Profile'"
+    },
+
+    {
+      "intent": "notification_settings",
+      "group": "account",
+      "patterns": [
+        "الإشعارات كيف أتحكم بها", "وين إعدادات الإشعارات", "بدي أوقف الإشعارات",
+        "تفعيل الإشعارات", "إشعارات الإيميل", "إشعارات الموقع",
+        "اشعارات", "الاشعارات", "اشعار", "وين الاشعارات",
+        "كيف أشوف الإشعارات", "بدي أشوف اشعاراتي",
+        "notification settings", "turn off notifications", "enable notifications",
+        "email notifications", "how to manage notifications",
+        "notification preferences", "disable alerts", "notifications",
+        "where are notification settings", "stop getting notifications"
+      ],
+      "response_ar": "لإدارة الإشعارات:\n1️⃣ اذهب للإعدادات\n2️⃣ اختر 'تفضيلات الإشعارات'\n3️⃣ فعّل أو أوقف: إشعارات الإيميل وإشعارات الموقع\n\n🔔 الإشعارات تشمل: تحديثات الطلبات، مشاهدات الملف، ووظائف جديدة.",
+      "response_en": "To manage notifications:\n1️⃣ Go to Settings\n2️⃣ Select 'Notification Preferences'\n3️⃣ Enable or disable: email notifications and browser notifications\n\n🔔 Notifications include: application updates, profile views, and new jobs."
+    },
+
+    {
+      "intent": "my_applications_view",
+      "group": "account",
+      "patterns": [
+        "وين طلباتي", "بدي أشوف الوظائف اللي قدمت عليها", "طلباتي المقدمة",
+        "قائمة طلباتي", "كيف أشوف وظائف تقدمت عليها",
+        "my applications", "where to see applied jobs", "view applications",
+        "jobs I applied to", "application history", "submitted applications",
+        "how to view my applications", "list of applications",
+        "applied jobs list", "my job applications"
+      ],
+      "response_ar": "لعرض طلباتك:\n1️⃣ اذهب لـ 'طلباتي' في الشريط الجانبي\n2️⃣ ستجد قائمة بكل الوظائف التي تقدمت عليها\n3️⃣ كل طلب يظهر: اسم الوظيفة، الشركة، تاريخ التقديم، والحالة",
+      "response_en": "To view your applications:\n1️⃣ Go to 'My Applications' in the sidebar\n2️⃣ You'll see a list of all jobs you've applied to\n3️⃣ Each application shows: job name, company, application date, and status"
+    },
+
+    {
+      "intent": "saved_jobs_view",
+      "group": "account",
+      "patterns": [
+        "وين وظائفي المحفوظة", "بدي أشوف الوظائف اللي حفظتها", "الوظائف المفضلة",
+        "saved jobs وين", "قائمة الوظائف المحفوظة",
+        "my saved jobs", "view saved jobs", "where are my bookmarked jobs",
+        "how to see saved jobs", "job bookmarks",
+        "favorite jobs list", "saved jobs page", "view bookmarks"
+      ],
+      "response_ar": "لعرض الوظائف المحفوظة:\n1️⃣ اضغط على 'الوظائف المحفوظة' في الشريط الجانبي\n2️⃣ ستجد كل الوظائف التي حفظتها مسبقاً\n3️⃣ بإمكانك التقديم عليها مباشرة أو إزالتها",
+      "response_en": "To view saved jobs:\n1️⃣ Click 'Saved Jobs' in the sidebar\n2️⃣ You'll see all jobs you've previously bookmarked\n3️⃣ You can apply directly from there or remove them"
+    },
+
+    {
+      "intent": "delete_account",
+      "group": "account",
+      "patterns": [
+        "بدي أمسح حسابي", "حذف الحساب كيف", "بدي أسحب من الموقع",
+        "إلغاء الحساب", "كيف أحذف ملفي", "مسح البيانات",
+        "delete my account", "how to delete account",
+        "remove my account", "deactivate account", "cancel account",
+        "close my account", "unregister", "erase my data",
+        "delete profile", "account deletion"
+      ],
+      "response_ar": "لحذف الحساب:\n1️⃣ اذهب للإعدادات\n2️⃣ اختر 'حذف الحساب'\n3️⃣ اقرأ التحذير بعناية\n4️⃣ أكد القرار\n\n⚠️ تنبيه: هذا الإجراء لا يمكن التراجع عنه. كل بياناتك ستُحذف نهائياً.",
+      "response_en": "To delete your account:\n1️⃣ Go to Settings\n2️⃣ Select 'Delete Account'\n3️⃣ Read the warning carefully\n4️⃣ Confirm your decision\n\n⚠️ Warning: This action cannot be undone. All your data will be permanently deleted."
+    },
+
+    
+    {
+      "intent": "post_job_how",
+      "group": "employer",
+      "patterns": [
+        "كيف أنشر وظيفة", "بدي أضيف إعلان وظيفة", "نشر وظيفة كيف",
+        "وين أنشر وظيفة", "إضافة وظيفة جديدة", "خطوات نشر وظيفة",
+        "how to post a job", "add job listing", "publish a job",
+        "create job posting", "post new vacancy", "job posting steps",
+        "how to advertise a position", "how to list a job",
+        "add new job", "employer posting job", "job post creation"
+      ],
+      "response_ar": "لنشر وظيفة (للشركات):\n1️⃣ سجل دخول بحساب شركة\n2️⃣ اذهب لـ 'نشر وظيفة' في الشريط الجانبي\n3️⃣ أدخل: المسمى الوظيفي، الوصف، النوع، الموقع، الراتب\n4️⃣ اضغط 'نشر الوظيفة'",
+      "response_en": "To post a job (for companies):\n1️⃣ Login with a company account\n2️⃣ Go to 'Post a Job' in the sidebar\n3️⃣ Enter: job title, description, type, location, salary\n4️⃣ Click 'Publish Job'"
+    },
+
+    {
+      "intent": "manage_applicants",
+      "group": "employer",
+      "patterns": [
+        "كيف أراجع المتقدمين", "وين أشوف الطلبات الواردة", "إدارة المتقدمين",
+        "قبول أو رفض الطلبات", "مراجعة السير الذاتية", "متقدمين الوظيفة",
+        "how to review applicants", "manage job applications",
+        "view received applications", "accept or reject candidates",
+        "review CVs of applicants", "applicant management",
+        "employer applications dashboard", "shortlist candidates",
+        "how to hire", "view job applicants"
+      ],
+      "response_ar": "لإدارة المتقدمين:\n1️⃣ اذهب للوحة تحكم صاحب العمل\n2️⃣ اضغط على 'المتقدمون' أو 'وظائفي'\n3️⃣ اختر الوظيفة لعرض قائمة المتقدمين\n4️⃣ راجع السيرة الذاتية وغير حالة الطلب: مختصر، مقبول، مرفوض",
+      "response_en": "To manage applicants:\n1️⃣ Go to the Employer Dashboard\n2️⃣ Click 'Candidates' or 'My Jobs'\n3️⃣ Select a job to see the applicant list\n4️⃣ Review CVs and change application status: Shortlisted, Accepted, Rejected"
+    },
+
+    {
+      "intent": "employer_dashboard",
+      "group": "employer",
+      "patterns": [
+        "لوحة تحكم الشركة", "dashboard الشركة", "وين لوحتي كصاحب عمل",
+        "إحصائيات الوظائف", "شو بشوف بلوحة تحكم الشركة",
+        "employer dashboard", "company dashboard", "employer control panel",
+        "employer statistics", "what can I see in employer dashboard",
+        "employer panel", "hiring dashboard", "recruiter dashboard",
+        "company account dashboard", "employer home page"
+      ],
+      "response_ar": "لوحة تحكم صاحب العمل تعرض:\n📊 إجمالي وظائفك المنشورة\n👥 عدد المتقدمين\n📈 إحصائيات الأداء\n🔔 إشعارات جديدة\n\nاذهب للـ Dashboard من الشريط الجانبي.",
+      "response_en": "The Employer Dashboard shows:\n📊 Total jobs posted\n👥 Number of applicants\n📈 Performance statistics\n🔔 New notifications\n\nGo to Dashboard from the sidebar."
+    },
+
+  
+    {
+      "intent": "dashboard_navigation",
+      "group": "navigation",
+      "patterns": [
+        "وين لوحة التحكم", "كيف أروح للداشبورد", "الداشبورد كيف أفتحه",
+        "شو في لوحة التحكم", "وين أشوف إحصائياتي",
+        "لوحة تحكم", "لوحه التحكم", "داشبورد", "dashboard",
+        "كيف اروح للداشبورد", "كيف اوصل للوحة التحكم",
+        "where is the dashboard", "how to open dashboard",
+        "dashboard navigation", "what is in dashboard",
+        "how to access dashboard", "my dashboard",
+        "dashboard location", "home dashboard", "account overview"
+      ],
+      "response_ar": "للوصول للوحة التحكم:\n1️⃣ اضغط على 'لوحة التحكم' في الشريط الجانبي\n2️⃣ أو اضغط على اسمك في الزاوية العلوية اليمنى\n\nلوحة التحكم تعرض: نشاطك، طلباتك، وظائفك المحفوظة، والإشعارات.",
+      "response_en": "To access the Dashboard:\n1️⃣ Click 'Dashboard' in the sidebar\n2️⃣ Or click your name in the top right corner\n\nDashboard shows: your activity, applications, saved jobs, and notifications."
+    },
+
+    {
+      "intent": "sidebar_help",
+      "group": "navigation",
+      "patterns": [
+        "وين القائمة الجانبية", "شو في الشريط الجانبي", "ما بشوف القائمة",
+        "الشريط الجانبي ما بيظهر", "كيف أفتح القائمة", "القائمة اختفت",
+        "where is the sidebar", "sidebar not showing", "can't see menu",
+        "navigation menu help", "how to open sidebar",
+        "menu disappeared", "side menu", "navigation bar help",
+        "where is the navigation", "site navigation"
+      ],
+      "response_ar": "الشريط الجانبي:\n- على الكمبيوتر: ظاهر دائماً على اليسار\n- على الموبايل: اضغط أيقونة ☰ في الأعلى\n\nإذا اختفى: اضغط أيقونة ☰ الموجودة في الشريط العلوي لإعادة فتحه.",
+      "response_en": "The sidebar:\n- On desktop: always visible on the left\n- On mobile: tap the ☰ icon at the top\n\nIf it disappeared: click the ☰ icon in the top bar to reopen it."
+    },
+
+    {
+      "intent": "settings_navigation",
+      "group": "navigation",
+      "patterns": [
+        "وين الإعدادات", "كيف أفتح الإعدادات", "صفحة الإعدادات وين",
+        "الإعدادات ما بلاقيها", "شو في قسم الإعدادات",
+        "اعدادات", "الاعدادات", "للاعدادات", "للإعدادات",
+        "كيف اروح للاعدادات", "كيف اروح للإعدادات",
+        "كيف اوصل للاعدادات", "وين اعدادات الموقع",
+        "بدي اعدل الاعدادات", "فين الاعدادات",
+        "كيف أغير الإعدادات", "تغيير الإعدادات",
+        "settings", "go to settings",
+        "where are settings", "how to open settings",
+        "settings page location", "can't find settings",
+        "account settings", "settings navigation",
+        "access settings", "settings menu", "find settings",
+        "open settings page", "where is settings"
+      ],
+      "response_ar": "للوصول للإعدادات:\n1️⃣ اضغط على 'الإعدادات' في أسفل الشريط الجانبي\n2️⃣ أو اضغط على صورة ملفك الشخصي ثم 'إعدادات'\n\nالإعدادات تشمل: الحساب، الأمان، الإشعارات، واللغة.",
+      "response_en": "To access Settings:\n1️⃣ Click 'Settings' at the bottom of the sidebar\n2️⃣ Or click your profile picture then 'Settings'\n\nSettings include: account, security, notifications, and language."
+    },
+
+   
+    {
+      "intent": "page_not_loading",
+      "group": "errors",
+      "patterns": [
+        "الصفحة ما بتفتح", "الموقع بطيء", "الموقع واقف", "ما بيشتغل الموقع",
+        "صفحة بيضاء", "تحميل بطيء", "الصفحة ما بتكمل تحميل",
+        "page not loading", "website is slow", "site not working",
+        "white screen", "page won't load", "slow loading",
+        "website down", "can't access the site", "page loading issue",
+        "blank page", "website not responding", "loading forever"
+      ],
+      "response_ar": "إذا كانت الصفحة لا تُحمَّل:\n1️⃣ اضغط F5 لتحديث الصفحة\n2️⃣ امسح ذاكرة التخزين المؤقت (Ctrl+Shift+Delete)\n3️⃣ جرب متصفح مختلف\n4️⃣ تحقق من اتصال الإنترنت\n5️⃣ إذا استمرت المشكلة، تواصل معنا",
+      "response_en": "If the page won't load:\n1️⃣ Press F5 to refresh\n2️⃣ Clear your browser cache (Ctrl+Shift+Delete)\n3️⃣ Try a different browser\n4️⃣ Check your internet connection\n5️⃣ If problem persists, contact us"
+    },
+
+    {
+      "intent": "login_error",
+      "group": "errors",
+      "patterns": [
+        "ما قدرت أدخل للحساب", "خطأ في تسجيل الدخول", "الباسورد غلط",
+        "بيقول كلمة المرور خاطئة", "حساب مش موجود", "ما بقبل إيميلي",
+        "login failed", "wrong password error", "login not working",
+        "account not found", "email not accepted", "authentication failed",
+        "invalid credentials", "sign in error", "login problem",
+        "my login doesn't work", "incorrect password"
+      ],
+      "response_ar": "مشكلة تسجيل الدخول:\n1️⃣ تأكد أن الإيميل وكلمة المرور صحيحين\n2️⃣ تأكد أن Caps Lock مطفأ\n3️⃣ جرب 'نسيت كلمة المرور' لإعادة التعيين\n4️⃣ تأكد أنك مسجل بهذا الإيميل أصلاً\n5️⃣ إذا استمرت المشكلة، تواصل مع الدعم",
+      "response_en": "Login problem:\n1️⃣ Make sure email and password are correct\n2️⃣ Check that Caps Lock is off\n3️⃣ Try 'Forgot Password' to reset\n4️⃣ Make sure you're actually registered with this email\n5️⃣ If problem persists, contact support"
+    },
+
+    {
+      "intent": "upload_failed",
+      "group": "errors",
+      "patterns": [
+        "الرفع فشل", "ما استطعت رفع الملف", "خطأ عند الرفع", "الملف ما رفع",
+        "فشل تحميل CV", "مشكلة في رفع الملف", "ما قبل الملف",
+        "upload failed", "file upload error", "couldn't upload file",
+        "upload not working", "file rejected", "error uploading",
+        "my file won't upload", "upload keeps failing",
+        "file upload problem", "can't submit file"
+      ],
+      "response_ar": "أسباب فشل الرفع:\n1️⃣ الملف ليس PDF → حوّله لـ PDF\n2️⃣ حجم الملف أكبر من 10 ميغا → صغّر الحجم\n3️⃣ PDF مصور وليس نصياً → استخدم PDF أصلي\n4️⃣ مشكلة في الإنترنت → تحقق من الاتصال\n5️⃣ جرب تحديث الصفحة والمحاولة مجدداً",
+      "response_en": "Reasons for upload failure:\n1️⃣ File is not PDF → convert it to PDF\n2️⃣ File size exceeds 10 MB → reduce the size\n3️⃣ PDF is scanned (image) → use original text PDF\n4️⃣ Internet issue → check your connection\n5️⃣ Try refreshing the page and trying again"
+    },
+
+    {
+      "intent": "feature_not_working",
+      "group": "errors",
+      "patterns": [
+        "الميزة ما بتشتغل", "المحلل ما اشتغل", "المقابلة ما اشتغلت",
+        "الزر ما بيشتغل", "خطأ غير معروف", "الموقع بيعطيني error",
+        "feature not working", "tool not working", "button not working",
+        "getting an error", "unknown error", "something went wrong",
+        "feature broken", "not functioning", "error message appearing",
+        "system error", "unexpected error"
+      ],
+      "response_ar": "إذا توقفت ميزة عن العمل:\n1️⃣ حدّث الصفحة (F5)\n2️⃣ امسح ذاكرة التخزين المؤقت\n3️⃣ تأكد أنك مسجل دخول\n4️⃣ جرب متصفح مختلف\n5️⃣ إذا استمرت المشكلة، تواصل مع الدعم وأخبرنا ما الميزة المتأثرة",
+      "response_en": "If a feature stops working:\n1️⃣ Refresh the page (F5)\n2️⃣ Clear browser cache\n3️⃣ Make sure you're logged in\n4️⃣ Try a different browser\n5️⃣ If it persists, contact support and tell us which feature is affected"
+    },
+
+    {
+      "intent": "session_expired",
+      "group": "errors",
+      "patterns": [
+        "انتهت جلستي", "أُخرجت من الحساب تلقائياً", "خرجت من الموقع وحده",
+        "الجلسة انتهت", "تسجيل خروج تلقائي",
+        "session expired", "got logged out automatically",
+        "automatically signed out", "session timeout",
+        "kicked out of account", "lost my session",
+        "why was I logged out", "token expired"
+      ],
+      "response_ar": "انتهاء الجلسة طبيعي لأمان حسابك:\n⏰ الجلسة تنتهي بعد 24 ساعة من تسجيل الدخول\n✅ الحل: سجل دخول مجدداً\n🔒 هذا يحمي حسابك من الوصول غير المصرح به",
+      "response_en": "Session expiry is normal for account security:\n⏰ Sessions expire after 24 hours of login\n✅ Solution: simply log in again\n🔒 This protects your account from unauthorized access"
+    },
+
+    {
+      "intent": "mobile_usage",
+      "group": "errors",
+      "patterns": [
+        "الموقع على الموبايل", "هل يعمل الموقع على الهاتف", "تطبيق جوال",
+        "موبايل إصدار", "الموقع على الأيفون", "الموقع على الأندرويد",
+        "does the site work on mobile", "mobile version",
+        "is there a mobile app", "iOS app", "Android app",
+        "website on phone", "responsive design", "mobile friendly",
+        "phone browser", "tablet usage"
+      ],
+      "response_ar": "InsightCV يعمل على المتصفح في:\n📱 الهاتف الذكي (iOS و Android)\n💻 الكمبيوتر واللاب توب\n📟 التابلت\n\nالموقع متجاوب ويتكيف مع كل الشاشات. لا يوجد تطبيق جوال حالياً.",
+      "response_en": "InsightCV works in the browser on:\n📱 Smartphones (iOS and Android)\n💻 Desktops and laptops\n📟 Tablets\n\nThe site is responsive and adapts to all screen sizes. There is no mobile app currently."
+    },
+
+   
+    {
+      "intent": "platform_security",
+      "group": "general",
+      "patterns": [
+        "بياناتي آمنة", "الموقع آمن", "هل معلوماتي محمية", "أمان الحساب",
+        "خصوصية البيانات", "هل تبيعون بياناتي",
+        "is my data safe", "platform security", "data privacy",
+        "is the site secure", "privacy policy", "data protection",
+        "do you sell my data", "account security", "safe to use",
+        "HTTPS encryption", "data security"
+      ],
+      "response_ar": "أمان بياناتك:\n🔒 الموقع يستخدم تشفير HTTPS\n🛡️ كلمات المرور مشفرة بالكامل\n🔑 نظام JWT لحماية الجلسات\n📋 بياناتك لا تُباع أو تُشارك مع أطراف ثالثة\n\nلقراءة سياسة الخصوصية الكاملة، اذهب للرابط في أسفل الصفحة.",
+      "response_en": "Your data security:\n🔒 The site uses HTTPS encryption\n🛡️ Passwords are fully encrypted\n🔑 JWT system for session protection\n📋 Your data is never sold or shared with third parties\n\nTo read the full privacy policy, check the link at the bottom of the page."
+    },
+
+    {
+      "intent": "profile_completeness",
+      "group": "account",
+      "patterns": [
+        "كيف أكمل ملفي الشخصي", "ملف ناقص كيف أكمله", "معلومات ناقصة بالملف",
+        "شو المعلومات اللي لازم أضيفها", "إكمال البيانات",
+        "complete my profile", "profile incomplete", "missing profile info",
+        "how to fill profile", "profile completion",
+        "what info to add to profile", "profile setup",
+        "finish setting up profile", "profile empty"
+      ],
+      "response_ar": "لإكمال ملفك الشخصي أضف:\n✅ الاسم الكامل والإيميل\n✅ صورة شخصية\n✅ الموقع الجغرافي\n✅ رقم الهاتف\n✅ اللينكدإن والجيت هاب\n✅ نبذة شخصية (bio)\n✅ المهارات والصناعة\n\nالملف الكامل يزيد فرصتك في الظهور لأصحاب العمل.",
+      "response_en": "To complete your profile add:\n✅ Full name and email\n✅ Profile photo\n✅ Location\n✅ Phone number\n✅ LinkedIn and GitHub\n✅ Personal bio\n✅ Skills and industry\n\nA complete profile increases your visibility to employers."
+    },
+
+    {
+      "intent": "candidates_browse",
+      "group": "navigation",
+      "patterns": [
+        "كيف أبحث عن مرشحين", "عرض المرشحين", "قائمة الباحثين عن عمل",
+        "كيف أجد موظفين", "مرشحين للعمل",
+        "how to browse candidates", "view candidates",
+        "job seeker list", "find employees", "search for talent",
+        "candidate directory", "talent pool", "browse job seekers",
+        "how to find workers", "candidates page"
+      ],
+      "response_ar": "لتصفح المرشحين (للشركات):\n1️⃣ سجل دخول بحساب شركة\n2️⃣ اذهب لـ 'المرشحون' من القائمة\n3️⃣ اعرض ملفات الباحثين عن عمل ومهاراتهم\n4️⃣ يمكنك عرض السيرة الذاتية لكل مرشح",
+      "response_en": "To browse candidates (for companies):\n1️⃣ Login with a company account\n2️⃣ Go to 'Candidates' from the menu\n3️⃣ View job seeker profiles and their skills\n4️⃣ You can view each candidate's CV"
+    },
+
+    {
+      "intent": "score_improvement_overall",
+      "group": "cv",
+      "patterns": [
+        "كيف أحسن نتائجي بشكل عام", "بدي نتائج أفضل", "درجاتي منخفضة كيف أرفعها",
+        "كيف أحسن كل شي بـ CV", "تحسين شامل للـ CV",
+        "how to improve overall score", "better results on platform",
+        "all scores are low", "overall CV improvement",
+        "how to boost everything", "improve all metrics",
+        "comprehensive CV improvement", "full CV optimization"
+      ],
+      "response_ar": "لتحسين نتائجك الشاملة:\n1️⃣ أضف كلمات مفتاحية من الوظيفة التي تريدها\n2️⃣ أكمل ملفك الشخصي بالكامل\n3️⃣ أضف مشاريع وإنجازات محددة\n4️⃣ تدرب على المقابلات بالمحاكي\n5️⃣ كرر تحليل CV مع وظائف مختلفة لتتعلم أكثر",
+      "response_en": "To improve your overall results:\n1️⃣ Add keywords from your target job\n2️⃣ Complete your profile fully\n3️⃣ Add specific projects and achievements\n4️⃣ Practice interviews with the simulator\n5️⃣ Repeat CV analysis with different jobs to learn more"
+    },
+
+    {
+      "intent": "account_role_difference",
+      "group": "account",
+      "patterns": [
+        "ايش الفرق بين باحث عمل وشركة", "شو نوع الحساب المناسب لي",
+        "حساب شركة أو باحث عمل", "ايش يختلف الحسابين",
+        "job seeker vs employer account", "account types difference",
+        "which account should I create", "employer vs job seeker",
+        "difference between account types", "company account vs personal",
+        "what type of account to register", "role selection help"
+      ],
+      "response_ar": "أنواع الحسابات:\n👤 باحث عن عمل:\n- تقدم على وظائف\n- ابنِ سيرة ذاتية\n- حلّل CV مقابل وظائف\n- تدرب على المقابلات\n\n🏢 شركة / صاحب عمل:\n- انشر وظائف\n- راجع المتقدمين\n- إدارة المرشحين",
+      "response_en": "Account types:\n👤 Job Seeker:\n- Apply for jobs\n- Build a resume\n- Analyze CV vs jobs\n- Practice interviews\n\n🏢 Company / Employer:\n- Post jobs\n- Review applicants\n- Manage candidates"
+    },
+
+  
+    {
+      "intent": "unknown",
+      "group": "general",
+      "patterns": [],
+      "response_ar": "ما فهمت سؤالك تماماً. ممكن توضح أكثر؟ 😊 أنا هون لمساعدتك في: محلل CV، المقابلات، البحث عن وظائف، أو حسابك.",
+      "response_en": "I didn't fully understand your question. Can you clarify? 😊 I'm here to help with: CV Analyzer, AI Interview, job search, or your account."
+    }
+
+  ]
+}

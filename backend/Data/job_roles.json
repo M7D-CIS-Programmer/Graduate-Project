@@ -1,0 +1,68 @@
+{
+  "backend": [
+    "C#", "ASP.NET", "ASP.NET Core", ".NET", ".NET Core", "Java", "Spring", "Spring Boot",
+    "Python", "Django", "Flask", "FastAPI", "Node.js", "Express", "PHP", "Laravel",
+    "Ruby", "Rails", "Go", "Rust", "Scala", "Kotlin",
+    "SQL", "MySQL", "PostgreSQL", "SQLite", "Oracle", "SQL Server", "MSSQL",
+    "MongoDB", "Redis", "Elasticsearch", "Cassandra", "DynamoDB",
+    "REST", "RESTful", "API", "Web API", "GraphQL", "gRPC", "SOAP", "Microservices",
+    "OOP", "SOLID", "Design Patterns", "Entity Framework", "Dapper", "Hibernate",
+    "RabbitMQ", "Kafka", "SignalR", "WebSockets", "OAuth", "JWT", "Authentication",
+    "Unit Testing", "Integration Testing", "xUnit", "NUnit", "Moq"
+  ],
+  "frontend": [
+    "HTML", "CSS", "JavaScript", "TypeScript", "ES6", "ES2015",
+    "React", "Vue", "Angular", "Next.js", "Nuxt", "Svelte", "Gatsby",
+    "Redux", "Zustand", "MobX", "Context API", "React Query", "TanStack",
+    "Tailwind", "Bootstrap", "Material UI", "Sass", "SCSS", "Less",
+    "Webpack", "Vite", "Rollup", "Babel", "Parcel",
+    "jQuery", "Axios", "Fetch API", "REST", "GraphQL",
+    "Figma", "Adobe XD", "Responsive Design", "PWA", "SPA",
+    "Jest", "Cypress", "Playwright", "Testing Library",
+    "Accessibility", "WCAG", "SEO", "Web Performance"
+  ],
+  "mobile": [
+    "React Native", "Flutter", "Swift", "SwiftUI", "Objective-C",
+    "Kotlin", "Android", "iOS", "Expo", "Dart",
+    "Xcode", "Android Studio", "App Store", "Google Play",
+    "Push Notifications", "Firebase", "Mobile UI", "Responsive"
+  ],
+  "devops": [
+    "Docker", "Kubernetes", "K8s", "Helm", "Terraform", "Ansible",
+    "AWS", "Azure", "GCP", "Google Cloud", "Cloud", "Serverless",
+    "CI/CD", "GitHub Actions", "Jenkins", "GitLab CI", "CircleCI", "Travis CI",
+    "Linux", "Bash", "Shell", "PowerShell", "Nginx", "Apache",
+    "Monitoring", "Prometheus", "Grafana", "ELK", "Logging",
+    "Networking", "Load Balancing", "Reverse Proxy", "SSL", "TLS"
+  ],
+  "data": [
+    "Python", "Pandas", "NumPy", "SciPy", "Matplotlib", "Seaborn",
+    "TensorFlow", "PyTorch", "Keras", "Scikit-learn", "Scikit",
+    "Machine Learning", "Deep Learning", "NLP", "Computer Vision",
+    "Data Science", "Data Analysis", "Data Engineering", "Data Pipeline",
+    "SQL", "Power BI", "Tableau", "Looker", "Excel",
+    "Spark", "Hadoop", "Hive", "Airflow", "dbt",
+    "Statistics", "A/B Testing", "Feature Engineering", "ETL"
+  ],
+  "security": [
+    "Cybersecurity", "Information Security", "Penetration Testing", "Pentest",
+    "OWASP", "Encryption", "OAuth", "JWT", "SSL", "TLS", "HTTPS",
+    "Firewall", "VPN", "SIEM", "SOC", "Incident Response",
+    "Vulnerability Assessment", "Risk Assessment", "Compliance", "GDPR"
+  ],
+  "tools": [
+    "Git", "GitHub", "GitLab", "Bitbucket", "SVN",
+    "Jira", "Confluence", "Trello", "Slack", "Teams",
+    "Postman", "Swagger", "OpenAPI", "Insomnia",
+    "Visual Studio", "VS Code", "IntelliJ", "Eclipse", "PyCharm",
+    "Linux", "Bash", "PowerShell", "Terminal",
+    "npm", "yarn", "pip", "Maven", "Gradle"
+  ],
+  "soft_skills": [
+    "Agile", "Scrum", "Kanban", "SAFe", "Lean",
+    "Leadership", "Communication", "Teamwork", "Collaboration",
+    "Problem Solving", "Critical Thinking", "Analytical",
+    "Time Management", "Project Management", "Mentoring",
+    "English", "Arabic", "French", "German"
+  ]
+}

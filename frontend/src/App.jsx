@@ -39,6 +39,8 @@ import FAQ from './pages/FAQ';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfService from './pages/TermsOfService';
 import Chatbot from './pages/Chatbot';
+import CVAnalyzer from './pages/CVAnalyzer/CVAnalyzer';
+import Interview from './pages/Interview/Interview';
 import Spinner from './components/ui/Spinner';
 
 const ConditionalHome = () => {
@@ -137,6 +139,9 @@ function App() {
                   <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                   <Route path="/terms-of-service" element={<TermsOfService />} />
                   <Route path="/chatbot" element={<Chatbot />} />
+                  <Route path="/support" element={<Chatbot />} />
+                  <Route path="/cv-analyzer" element={<CVAnalyzer />} />
+                  <Route path="/interview"  element={<Interview />} />
 
                   {/* Fallback */}
                   <Route path="*" element={

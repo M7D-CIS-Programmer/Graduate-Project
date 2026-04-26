@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { MessageCircle, X, Send, User, Bot, Paperclip, File as FileIcon, Maximize2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
+import { api } from '../api/api';
 import './Chatbot.css';
 
 const Chatbot = ({ isSidebarOpen }) => {
@@ -9,12 +10,14 @@ const Chatbot = ({ isSidebarOpen }) => {
     const navigate = useNavigate();
     const [isOpen, setIsOpen] = useState(false);
     const [message, setMessage] = useState('');
+    const [isTyping, setIsTyping] = useState(false);
     const [selectedFile, setSelectedFile] = useState(null);
     const [chatHistory, setChatHistory] = useState([
         { id: 1, type: 'bot', text: t('chatbotWelcome') }
     ]);
     const scrollRef = useRef(null);
     const fileInputRef = useRef(null);
+    const lastSentRef = useRef(0);
 
     useEffect(() => {
         if (scrollRef.current) {
@@ -22,30 +25,55 @@ const Chatbot = ({ isSidebarOpen }) => {
         }
     }, [chatHistory]);
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         if (!message.trim() && !selectedFile) return;
 
+        // Rate-limit: 2 s between sends
+        const now = Date.now();
+        if (now - lastSentRef.current < 2000) return;
+        lastSentRef.current = now;
+
+        const sentText = message.trim();
         const userMsg = {
-            id: Date.now(),
+            id: now,
             type: 'user',
-            text: message,
+            text: sentText,
             file: selectedFile
         };
 
         setChatHistory(prev => [...prev, userMsg]);
         setMessage('');
         setSelectedFile(null);
+        setIsTyping(true);
 
-        // Mock bot response
-        setTimeout(() => {
-            const botMsg = {
+        // Skip API call if only a file was attached with no message text
+        if (!sentText) {
+            setIsTyping(false);
+            return;
+        }
+
+        try {
+            const data = await api.sendSupportMessage(sentText);
+            setChatHistory(prev => [...prev, {
                 id: Date.now() + 1,
                 type: 'bot',
-                text: "I'm a demo assistant! I can help you find jobs, build your resume, or answer platform questions."
-            };
-            setChatHistory(prev => [...prev, botMsg]);
-        }, 1000);
+                text: data.reply
+            }]);
+        } catch (err) {
+            const msg = err.message || '';
+            // Detect a connection / 404 error (backend not running)
+            const isOffline = msg.includes('Failed to fetch') || msg.includes('NetworkError') || msg.includes('404') || msg.includes('Not Found');
+            setChatHistory(prev => [...prev, {
+                id: Date.now() + 2,
+                type: 'bot',
+                text: isOffline
+                    ? '⚠️ Cannot reach the server. Please make sure the backend is running, then try again.'
+                    : (msg || "Sorry, I'm having trouble. Please try again.")
+            }]);
+        } finally {
+            setIsTyping(false);
+        }
     };
 
     return (
@@ -102,6 +130,14 @@ const Chatbot = ({ isSidebarOpen }) => {
                                 </div>
                             </div>
                         ))}
+                        {isTyping && (
+                            <div className="message-wrapper bot">
+                                <div className="message-icon"><Bot size={14} /></div>
+                                <div className="typing-indicator">
+                                    <span /><span /><span />
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     {selectedFile && (
@@ -135,7 +171,7 @@ const Chatbot = ({ isSidebarOpen }) => {
                             value={message}
                             onChange={(e) => setMessage(e.target.value)}
                         />
-                        <button type="submit" disabled={!message.trim() && !selectedFile}>
+                        <button type="submit" disabled={(!message.trim() && !selectedFile) || isTyping}>
                             <Send size={18} />
                         </button>
                     </form>

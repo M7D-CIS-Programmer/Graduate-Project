@@ -1,8 +1,24 @@
-const BASE_URL = import.meta.env.VITE_API_URL;
-if (!BASE_URL) throw new Error('VITE_API_URL is not set');
+const BASE_URL = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL;
+if (!BASE_URL) throw new Error('API base URL is not set. Define VITE_API_URL in frontend/.env');
 
 const handleResponse = async (res) => {
-    if (!res.ok) throw new Error((await res.text()) || res.statusText);
+    if (!res.ok) {
+        const raw = await res.text();
+        let message = res.statusText;
+        try {
+            const parsed = JSON.parse(raw);
+            // Backend returns { error } (our API) or { message } or ProblemDetails { title, errors }
+            message = parsed.error
+                || parsed.message
+                || parsed.title
+                || Object.values(parsed.errors || {})?.[0]?.[0]
+                || raw
+                || res.statusText;
+        } catch {
+            message = raw || res.statusText;
+        }
+        throw new Error(message);
+    }
     const text = await res.text();
     const data = text ? JSON.parse(text) : {};
     return data?.$values || data;
@@ -81,4 +97,27 @@ export const api = {
 
     // Search
     search: (query, role, userId) => get(`${BASE_URL}/Search?q=${query}&role=${role || ''}&userId=${userId || ''}`),
+
+    // Support Chatbot
+    sendSupportMessage: (message, userId = null) =>
+        post(`${BASE_URL}/support/chat`, { message, userId }),
+
+    // Interview AI
+    startInterview: (jobTitle, jobDescription) =>
+        post(`${BASE_URL}/interview/start`, { jobTitle, jobDescription }),
+    answerInterview: (sessionId, answer) =>
+        post(`${BASE_URL}/interview/answer`, { sessionId, answer }),
+
+    // CV vs Job Analysis — multipart/form-data (do NOT set Content-Type; browser sets boundary)
+    analyzeCv: (file, jobTitle, jobDescription) => {
+        const form = new FormData();
+        form.append('file', file);
+        form.append('jobTitle', jobTitle);
+        form.append('jobDescription', jobDescription);
+        const headers = {};
+        const token = sessionStorage.getItem('token');
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+        return fetch(`${BASE_URL}/cv/analyze`, { method: 'POST', headers, body: form })
+            .then(handleResponse);
+    },
 };

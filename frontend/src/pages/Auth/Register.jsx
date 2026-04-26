@@ -47,17 +47,15 @@ const Register = () => {
         setErrors({});
 
         try {
-            // Ensure we send correct role name to backend
             const roleName = formData.role === 'seeker' ? 'Job Seeker' : 'Employer';
-            
+
             const userResponse = await api.register({
-                name: formData.fullName,
-                email: formData.email,
+                name: formData.fullName.trim(),
+                email: formData.email.trim().toLowerCase(),
                 pass: formData.password,
                 roleName: roleName
             });
 
-            // Dashboard paths mapping
             const dashboardPaths = {
                 'admin': '/dashboard/admin',
                 'employer': '/dashboard/employer',
@@ -70,13 +68,17 @@ const Register = () => {
                 dashboardPath: dashboardPaths[userRole] || '/dashboard/seeker'
             };
 
-            // CRITICAL: Update Auth state and THEN navigate
             login(userData);
             navigate(userData.dashboardPath, { replace: true });
         } catch (err) {
             console.error('Registration failed:', err);
-            setErrors({ 
-                email: t('registrationFailed') || 'Registration failed. Email might already exist.' 
+            const msg = err.message || '';
+            const isEmailTaken = msg.toLowerCase().includes('already registered')
+                || msg.toLowerCase().includes('already exists');
+            setErrors({
+                email: isEmailTaken
+                    ? 'This email is already registered. Please sign in instead.'
+                    : msg || 'Registration failed. Please try again.'
             });
         } finally {
             setLoading(false);

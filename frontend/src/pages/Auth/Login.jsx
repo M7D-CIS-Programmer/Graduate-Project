@@ -32,18 +32,17 @@ const Login = () => {
         setErrors({});
 
         try {
-            const response = await api.login({ 
-                email: formData.email, 
-                password: formData.password 
+            const response = await api.login({
+                email: formData.email.trim().toLowerCase(),
+                password: formData.password
             });
-            
-            // Map roles to dashboard paths
+
             const dashboardPaths = {
                 'admin': '/dashboard/admin',
                 'employer': '/dashboard/employer',
                 'job seeker': '/dashboard/seeker'
             };
-            
+
             const userRole = (response.role || 'job seeker').toLowerCase().trim();
             const userData = {
                 ...response,
@@ -54,8 +53,8 @@ const Login = () => {
             navigate(userData.dashboardPath, { replace: true });
         } catch (err) {
             console.error('Login failed:', err);
-            setErrors({ 
-                email: t('invalidCredentials') || 'Invalid email or password' 
+            setErrors({
+                email: err.message || t('invalidCredentials') || 'Invalid email or password'
             });
         } finally {
             setLoading(false);

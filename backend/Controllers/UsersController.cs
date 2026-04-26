@@ -36,16 +36,15 @@ public class UsersController : ControllerBase
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        // Find user by email
+        // Normalize email before lookup so casing and whitespace never cause mismatches
+        var normalizedEmail = dto.Email.Trim().ToLower();
+
         var user = await _context.Users
             .Include(u => u.Roles)
-            .FirstOrDefaultAsync(u => u.Email == dto.Email);
+            .FirstOrDefaultAsync(u => u.Email.ToLower() == normalizedEmail);
 
         if (user == null)
-        {
-            Console.WriteLine($"[Login Debug] User not found: {dto.Email}");
             return Unauthorized(new { message = "Invalid email or password" });
-        }
 
         // Verify password
         bool isValid = _authService.VerifyPassword(dto.Password, user.Pass);
@@ -119,7 +118,9 @@ public class UsersController : ControllerBase
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        // Check if email already exists
+        // Normalize email before storing so lookups are always consistent
+        dto.Email = dto.Email.Trim().ToLower();
+
         var existingUser = await _context.Users
             .FirstOrDefaultAsync(u => u.Email == dto.Email);
         

@@ -14,7 +14,9 @@ import {
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { useTheme } from '../context/ThemeContext';
+import { useAuth } from '../context/AuthContext';
 import { formatFriendlyDate } from '../utils/dateUtils';
+import { api } from '../api/api';
 import Button from '../components/ui/Button';
 import Modal from '../components/ui/Modal';
 import './Chatbot.css';
@@ -22,6 +24,8 @@ import './Chatbot.css';
 const Chatbot = () => {
     const { t, dir, language } = useLanguage();
     const { theme } = useTheme();
+    const { user } = useAuth();
+    const lastSentRef = useRef(0); // simple rate-limit: 2 s between sends
     const [messages, setMessages] = useState(() => {
         const saved = localStorage.getItem('chat_history');
         return saved ? JSON.parse(saved) : [
@@ -52,56 +56,46 @@ const Chatbot = () => {
         if (e) e.preventDefault();
         if (!input.trim()) return;
 
+        // Simple rate-limit: at least 2 s between sends
+        const now = Date.now();
+        if (now - lastSentRef.current < 2000) return;
+        lastSentRef.current = now;
+
         const userMessage = {
-            id: Date.now(),
-            text: input,
+            id: now,
+            text: input.trim(),
             sender: 'user',
             timestamp: new Date().toISOString()
         };
 
         setMessages(prev => [...prev, userMessage]);
+        const sentText = input.trim();
         setInput('');
         setIsTyping(true);
 
         try {
-            // Simulated API Call - Replace with your actual endpoint
-            // const response = await fetch('/api/chat', {
-            //     method: 'POST',
-            //     headers: { 'Content-Type': 'application/json' },
-            //     body: JSON.stringify({ message: input, lang: language })
-            // });
-            // const data = await response.json();
-
-            // Simulation logic
-            setTimeout(() => {
-                const botReply = {
-                    id: Date.now() + 1,
-                    text: generateBotResponse(input),
-                    sender: 'bot',
-                    timestamp: new Date().toISOString()
-                };
-                setMessages(prev => [...prev, botReply]);
-                setIsTyping(false);
-            }, 1500);
-
-        } catch (error) {
-            console.error("Chat error:", error);
-            setIsTyping(false);
+            const data = await api.sendSupportMessage(sentText, user?.id ?? null);
             setMessages(prev => [...prev, {
-                id: Date.now() + 2,
-                text: t('chatError') || "Sorry, I'm having trouble connecting right now.",
+                id: Date.now() + 1,
+                text: data.reply,
                 sender: 'bot',
                 timestamp: new Date().toISOString()
             }]);
+        } catch (error) {
+            console.error('Support chat error:', error);
+            const msg = error.message || '';
+            const isOffline = msg.includes('Failed to fetch') || msg.includes('NetworkError') || msg.includes('404') || msg.includes('Not Found');
+            setMessages(prev => [...prev, {
+                id: Date.now() + 2,
+                text: isOffline
+                    ? '⚠️ Cannot reach the server. Please make sure the backend is running, then try again.'
+                    : (msg || "Sorry, I'm having trouble connecting right now. Please try again."),
+                sender: 'bot',
+                timestamp: new Date().toISOString()
+            }]);
+        } finally {
+            setIsTyping(false);
         }
-    };
-
-    const generateBotResponse = (userInput) => {
-        const lower = userInput.toLowerCase();
-        if (lower.includes('job') || lower.includes('وظيفة')) return t('botJobTip') || "You can find latest jobs in the 'Find Jobs' section. Would you like me to show you how to filter them?";
-        if (lower.includes('resume') || lower.includes('سيرة')) return t('botResumeTip') || "Our Resume Builder is located in your dashboard. You can create a professional PDF in minutes!";
-        if (lower.includes('hello') || lower.includes('مرحبا')) return t('botHello') || "Hello there! How can I assist with your career search today?";
-        return t('botDefault') || "That's interesting! Tell me more, or ask me about jobs, resumes, or interview tips.";
     };
 
     const clearChat = () => {
