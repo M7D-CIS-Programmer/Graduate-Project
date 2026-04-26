@@ -9,6 +9,14 @@ export const useApplications = () =>
         staleTime: 30_000,
     });
 
+export const useApplicationsByCompany = (companyId) =>
+    useQuery({
+        queryKey: [...queryKeys.applications, 'company', companyId],
+        queryFn:  () => api.getApplicationsByCompany(companyId),
+        enabled:  !!companyId,
+        staleTime: 30_000,
+    });
+
 export const useApplyForJob = () => {
     const queryClient = useQueryClient();
     return useMutation({

@@ -26,6 +26,24 @@ public class ApplicationJobsController : ControllerBase
             .ToListAsync());
     }
 
+    /// <summary>
+    /// Returns only applications for jobs posted by the specified company (employer).
+    /// Filters by Job.UserId == companyId to prevent cross-company data leakage.
+    /// </summary>
+    [HttpGet("company/{companyId}")]
+    public async Task<IActionResult> GetByCompany(int companyId)
+    {
+        var applications = await _context.ApplicationJobs
+            .Include(a => a.Job)
+                .ThenInclude(j => j.User)
+            .Include(a => a.User)
+            .Where(a => a.Job.UserId == companyId)
+            .OrderByDescending(a => a.Date)
+            .ToListAsync();
+
+        return Ok(applications);
+    }
+
     [HttpPost]
     public async Task<IActionResult> Apply(ApplicationJobCreateDto dto)
     {

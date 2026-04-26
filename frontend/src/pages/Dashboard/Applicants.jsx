@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useApplications, useUpdateApplicationStatus } from '../../hooks/useApplications';
+import { useApplicationsByCompany, useUpdateApplicationStatus } from '../../hooks/useApplications';
+import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import { useLanguage } from '../../context/LanguageContext';
 import {
@@ -22,11 +23,12 @@ import { formatFriendlyDate } from '../../utils/dateUtils';
 const Applicants = () => {
     const { t, dir, language } = useLanguage();
     const navigate = useNavigate();
+    const { user } = useAuth();
     const { addToast } = useToast();
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('All');
 
-    const { data: applications = [], isLoading, error } = useApplications();
+    const { data: applications = [], isLoading, error } = useApplicationsByCompany(user?.id);
     const { mutate: updateStatus } = useUpdateApplicationStatus();
 
     const getStatusColor = (status) => {
