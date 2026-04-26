@@ -71,13 +71,13 @@ const Applicants = () => {
             const role = app.job?.title || '';
             const matchesSearch = name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 role.toLowerCase().includes(searchTerm.toLowerCase());
-            
+
             let status = app.candidateStatus || 'New';
             if (status === 'Applied') status = 'New';
             if (status === 'Accepted') status = 'Shortlisted';
-            
+
             const matchesStatus = statusFilter === 'All' || status === statusFilter;
-            
+
             return matchesSearch && matchesStatus;
         }).sort((a, b) => new Date(b.date) - new Date(a.date));
     }, [applications, searchTerm, statusFilter]);
@@ -87,14 +87,14 @@ const Applicants = () => {
             <div className="dashboard-header">
                 <h1 className="dashboard-title">{t('allApplicants')}</h1>
                 <div className="header-actions" style={{ display: 'flex', gap: '1rem' }}>
-                    <div className="search-box glass" style={{ display: 'flex', alignItems: 'center', padding: '0.5rem 1rem', borderRadius: '12px' }}>
+                    <div className="search-box glass" style={{ display: 'flex', alignItems: 'center', padding: '0.5rem 1rem', borderRadius: '12px', color: 'var(--text-muted)' }}>
                         <Search size={18} style={{ color: 'var(--text-muted)', marginRight: dir === 'ltr' ? '0.5rem' : '0', marginLeft: dir === 'rtl' ? '0.5rem' : '0' }} />
                         <input
                             type="text"
                             placeholder={t('search')}
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            style={{ background: 'none', border: 'none', color: 'white', outline: 'none' }}
+                            style={{ background: 'none', border: 'none', color: 'var(--text-muted)', outline: 'none' }}
                         />
                     </div>
                 </div>
@@ -166,10 +166,7 @@ const Applicants = () => {
                                 </td>
                                 <td style={{ padding: '1.25rem 1rem' }}>
                                     <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
-                                        <button className="btn-candidate-action" onClick={() => handleAction('viewResume', applicant)} title={t('viewResume')}>
-                                            <Download size={16} />
-                                            <span>{t('viewResume') || 'Resume'}</span>
-                                        </button>
+
                                         <button className="btn-candidate-action" onClick={() => handleAction('viewProfile', applicant)} title={t('viewProfile')}>
                                             <Eye size={16} />
                                             <span>{t('viewProfile') || 'Profile'}</span>

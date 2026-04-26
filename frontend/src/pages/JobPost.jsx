@@ -29,12 +29,12 @@ export default function JobPost() {
         queryKey: ['categories'],
         queryFn: api.getCategories
     });
-    
+
     const [step, setStep] = useState(1);
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [formData, setFormData] = useState({
         title: '',
-        company: '', 
+        company: '',
         category: '',
         type: 'Full-time',
         location: '',
@@ -68,7 +68,7 @@ export default function JobPost() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
+
         if (step < 3) {
             handleNext();
             return;
@@ -77,7 +77,7 @@ export default function JobPost() {
         try {
             // Find category ID by name
             const categoryObj = categories.find(c => c.name === formData.category || c.id.toString() === formData.category);
-            
+
             // Map frontend data to backend model
             const jobData = {
                 userId: user?.id || 1,
@@ -89,7 +89,7 @@ export default function JobPost() {
                 requirements: formData.requirements,
                 categoryId: categoryObj?.id || 1,
                 isSalaryNegotiable: formData.isNegotiable,
-                salaryMin: 2000, 
+                salaryMin: 2000,
                 salaryMax: 4000,
                 features: formData.benefits,
                 status: 'Active'
@@ -124,7 +124,6 @@ export default function JobPost() {
                         </button>
                         <button
                             className="btn-primary"
-                            style={{ background: 'rgba(255,255,255,0.05)', boxShadow: 'none' }}
                             onClick={() => {
                                 setIsSubmitted(false);
                                 setStep(1);

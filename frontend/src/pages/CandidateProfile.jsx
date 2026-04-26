@@ -58,16 +58,7 @@ const CandidateProfile = () => {
                     </button>
                     <h1 className="dashboard-title">{t('candidateProfile') || 'Candidate Profile'}</h1>
                 </div>
-                <div style={{ display: 'flex', gap: '1rem' }}>
-                    <Button variant="outline" onClick={() => window.print()}>
-                        <FileText size={18} />
-                        {t('printCV') || 'Print Profile'}
-                    </Button>
-                    <Button onClick={() => navigate(`/resume/${id}`)}>
-                        <ExternalLink size={18} />
-                        {t('viewFullResume') || 'View Resume'}
-                    </Button>
-                </div>
+
             </div>
 
             <div className="profile-layout">
@@ -82,10 +73,10 @@ const CandidateProfile = () => {
                             )}
                         </div>
                     </div>
-                    
+
                     <h2 className="candidate-name">{candidate.name}</h2>
                     <p className="candidate-role">{candidate.industry || t('jobSeeker')}</p>
-                    
+
                     <div className="candidate-stats">
                         <div className="stat-item">
                             <span className="stat-val">{candidate.appliedJobs?.length || 0}</span>
@@ -161,7 +152,7 @@ const CandidateProfile = () => {
                             </h3>
                             <div className="info-summary-card">
                                 <p className="text-muted">
-                                    {t('experienceLevel') || 'Experience Level'}: 
+                                    {t('experienceLevel') || 'Experience Level'}:
                                     <span className="text-main"> {candidate.experienceLevel || t('notSpecified') || 'Not specified'}</span>
                                 </p>
                             </div>
@@ -176,8 +167,8 @@ const CandidateProfile = () => {
                                 {candidate.resumes?.[0]?.skills?.map((skill, index) => (
                                     <span key={index} className="skill-tag">{skill.name}</span>
                                 )) || (
-                                    <p className="text-muted">{t('noSkills') || 'No skills listed.'}</p>
-                                )}
+                                        <p className="text-muted">{t('noSkills') || 'No skills listed.'}</p>
+                                    )}
                             </div>
                         </section>
                     </div>

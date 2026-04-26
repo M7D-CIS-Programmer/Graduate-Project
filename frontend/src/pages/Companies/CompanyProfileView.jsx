@@ -208,10 +208,7 @@ const CompanyProfileView = () => {
                             )}
                         </div>
 
-                        <Button className="cv-btn-full" onClick={scrollToJobs}>
-                            <Briefcase size={16} />
-                            {t('viewJobs') || 'View Jobs'}
-                        </Button>
+
                     </div>
                 </aside>
 

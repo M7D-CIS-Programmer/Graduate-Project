@@ -167,14 +167,14 @@ const Candidates = () => {
 
                     <div className="jobs-grid">
                         {filteredCandidates.length > 0 ? filteredCandidates.map(app => (
-                    <div key={app.id} className="card" onClick={() => navigate(`/profile/${app.userId}`)} style={{ cursor: 'pointer' }}>
+                            <div key={app.id} className="card" onClick={() => navigate(`/profile/${app.userId}`)} style={{ cursor: 'pointer' }}>
                                 <div className="job-card-header">
                                     <div className="company-logo-placeholder" style={{ background: 'rgba(99, 102, 241, 0.1)', color: 'var(--primary)' }}>
                                         <Users size={24} />
                                     </div>
                                     <div style={{ display: 'flex', gap: '0.5rem' }}>
                                         {app.candidateStatus && app.candidateStatus !== 'New' && (
-                                            <span className={`job-type-badge ${app.candidateStatus === 'Hired' ? 'success' : app.candidateStatus === 'Rejected' ? 'danger' : ''}`} style={{ 
+                                            <span className={`job-type-badge ${app.candidateStatus === 'Hired' ? 'success' : app.candidateStatus === 'Rejected' ? 'danger' : ''}`} style={{
                                                 backgroundColor: app.candidateStatus === 'Hired' ? 'rgba(16, 185, 129, 0.1)' : app.candidateStatus === 'Rejected' ? 'rgba(239, 68, 68, 0.1)' : '',
                                                 color: app.candidateStatus === 'Hired' ? '#10b981' : app.candidateStatus === 'Rejected' ? '#ef4444' : ''
                                             }}>
@@ -191,14 +191,14 @@ const Candidates = () => {
                                     <div className="job-meta-item"><Users size={16} /> {app.user?.name || 'Candidate'}</div>
                                     <div className="job-meta-item"><MapPin size={16} /> {app.job?.workMode || 'Remote'}</div>
                                 </div>
-                                <div className="job-card-footer" style={{ 
-                                    borderTop: '1px solid var(--border-color)', 
-                                    paddingTop: '1rem', 
-                                    display: 'flex', 
-                                    justifyContent: 'space-between', 
-                                    alignItems: 'center', 
-                                    flexWrap: 'wrap', 
-                                    gap: '1rem' 
+                                <div className="job-card-footer" style={{
+                                    borderTop: '1px solid var(--border-color)',
+                                    paddingTop: '1rem',
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center',
+                                    flexWrap: 'wrap',
+                                    gap: '1rem'
                                 }}>
                                     <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                                         <button className="btn-candidate-action" onClick={(e) => handleAction(e, 'download', app)}>
