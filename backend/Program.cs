@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Text;
 using aabu_project.Data;
 using aabu_project.Services;
+using aabu_project.Dtos;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<MyDbContext>(options =>
@@ -11,6 +12,32 @@ builder.Services.AddDbContext<MyDbContext>(options =>
 
 // Register AuthService
 builder.Services.AddScoped<AuthService>();
+
+// In-memory cache used by CVAnalysisService to avoid duplicate Gemini calls
+builder.Services.AddMemoryCache();
+
+// Local analysis engine — singleton, loads job_roles.json once at startup
+builder.Services.AddSingleton<CvLocalAnalyzer>();
+
+// CVAnalysisService — typed HttpClient; IMemoryCache + CvLocalAnalyzer injected automatically
+builder.Services.AddHttpClient<ICVAnalysisService, CVAnalysisService>();
+
+// InterviewService — typed HttpClient + IMemoryCache for session state
+builder.Services.AddHttpClient<IInterviewService, InterviewService>();
+
+// SupportService — platform-focused AI chatbot with response caching
+builder.Services.AddHttpClient<ISupportService, SupportService>();
+
+// ── GeminiResumeService ───────────────────────────────────────────────────────
+// Named HttpClient with a generous timeout (Gemini on Free Tier can be slow)
+// and pre-set Accept header.  IHttpClientFactory handles socket pooling.
+builder.Services.AddHttpClient(GeminiResumeService.HttpClientName, client =>
+{
+    client.Timeout = TimeSpan.FromSeconds(90);           // Free Tier can lag
+    client.DefaultRequestHeaders.Add("Accept", "application/json");
+});
+builder.Services.AddScoped<IGeminiResumeService, GeminiResumeService>();
+// ─────────────────────────────────────────────────────────────────────────────
 
 // JWT Configuration
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");

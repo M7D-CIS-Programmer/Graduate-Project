@@ -13,7 +13,9 @@ import {
     Bell,
     User as UserIcon,
     FileEdit,
-    Mail
+    Mail,
+    ScanText,
+    MessageSquare
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -47,6 +49,8 @@ const Sidebar = ({ isOpen }) => {
                 { name: t('myApplications'), icon: <Briefcase size={20} />, path: '/dashboard/seeker/applications' },
                 { name: t('savedJobs'), icon: <Bookmark size={20} />, path: '/saved-jobs' },
                 { name: t('resumeBuilder'), icon: <FileEdit size={20} />, path: '/resume-builder' },
+                { name: t('cvAnalyzer'),  icon: <ScanText size={20} />,       path: '/cv-analyzer' },
+                { name: t('interview'),   icon: <MessageSquare size={20} />, path: '/interview'   },
             ];
         }
 
