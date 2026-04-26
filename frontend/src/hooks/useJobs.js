@@ -41,6 +41,14 @@ export const useDeleteJob = () => {
     });
 };
 
+export const useUpdateJob = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({ id, job }) => api.updateJob(id, job),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.jobs }),
+    });
+};
+
 export const useCreateJob = () => {
     const queryClient = useQueryClient();
     return useMutation({

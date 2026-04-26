@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
-import { useMyJobs } from '../../hooks/useJobs';
+import { useMyJobs, useDeleteJob } from '../../hooks/useJobs';
 import Spinner from '../../components/ui/Spinner';
 import {
     Briefcase,
@@ -19,8 +20,10 @@ import { formatFriendlyDate } from '../../utils/dateUtils';
 const MyJobs = () => {
     const { t, dir, language } = useLanguage();
     const { user } = useAuth();
+    const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState('');
     const { data: jobs = [], isLoading } = useMyJobs(user?.id);
+    const deleteJobMutation = useDeleteJob();
 
     const filteredJobs = jobs.filter(job =>
         job.title.toLowerCase().includes(searchTerm.toLowerCase())
@@ -28,6 +31,16 @@ const MyJobs = () => {
 
     const getStatusColor = (status) => {
         return status === 'Active' ? '#10b981' : '#f59e0b';
+    };
+
+    const handleDelete = async (id) => {
+        if (window.confirm(t('confirmDelete') || 'Are you sure you want to delete this job?')) {
+            try {
+                await deleteJobMutation.mutateAsync(id);
+            } catch (error) {
+                console.error('Failed to delete job', error);
+            }
+        }
     };
 
     if (isLoading) return <Spinner />;
@@ -110,9 +123,9 @@ const MyJobs = () => {
                                     </td>
                                     <td style={{ padding: '1.25rem 1rem' }}>
                                         <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
-                                            <button className="btn-icon" title={t('edit')}><Edit size={18} /></button>
-                                            <button className="btn-icon" title={t('viewAll')}><ExternalLink size={18} /></button>
-                                            <button className="btn-icon" title={t('delete')} style={{ color: '#ef4444' }}><Trash2 size={18} /></button>
+                                            <button className="btn-icon" title={t('edit')} onClick={() => navigate(`/jobs/post?editId=${job.id}`)}><Edit size={18} /></button>
+                                            <button className="btn-icon" title={t('viewJob')} onClick={() => navigate(`/jobs/${job.id}`)}><ExternalLink size={18} /></button>
+                                            <button className="btn-icon" title={t('delete')} style={{ color: '#ef4444' }} onClick={() => handleDelete(job.id)}><Trash2 size={18} /></button>
                                         </div>
                                     </td>
                                 </tr>

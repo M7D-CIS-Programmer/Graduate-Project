@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useEffect } from 'react';
 import {
     Briefcase,
     MapPin,
@@ -17,14 +18,18 @@ import { useLanguage } from '../context/LanguageContext';
 import './JobPost.css';
 import { api } from '../api/api';
 import { useAuth } from '../context/AuthContext';
-import { useCreateJob } from '../hooks/useJobs';
+import { useCreateJob, useUpdateJob, useJob } from '../hooks/useJobs';
 import { useQuery } from '@tanstack/react-query';
 
 export default function JobPost() {
     const { t, dir } = useLanguage();
     const navigate = useNavigate();
     const { user } = useAuth();
+    const [searchParams] = useSearchParams();
+    const editId = searchParams.get('editId');
     const createJobMutation = useCreateJob();
+    const updateJobMutation = useUpdateJob();
+    const { data: editJobData } = useJob(editId);
     const { data: categories = [] } = useQuery({
         queryKey: ['categories'],
         queryFn: api.getCategories
@@ -45,6 +50,24 @@ export default function JobPost() {
         requirements: '',
         benefits: ''
     });
+
+    useEffect(() => {
+        if (editId && editJobData) {
+            setFormData({
+                title: editJobData.title || '',
+                company: editJobData.company || '',
+                category: editJobData.categoryId || '',
+                type: editJobData.type || 'Full-time',
+                location: editJobData.location || '',
+                salary: (editJobData.salaryMin && editJobData.salaryMax) ? `$${editJobData.salaryMin} - $${editJobData.salaryMax}` : '',
+                isNegotiable: editJobData.isSalaryNegotiable || false,
+                description: editJobData.description || '',
+                responsibilities: editJobData.responsibilities || '',
+                requirements: editJobData.requirements || '',
+                benefits: editJobData.features || ''
+            });
+        }
+    }, [editId, editJobData]);
 
     const jordanCities = ['Amman', 'Irbid', 'Zarqa', 'Balqa', 'Madaba', 'Karak', 'Tafilah', 'Ma\'an', 'Aqaba', 'Mafraq', 'Jerash', 'Ajloun'];
 
@@ -95,7 +118,11 @@ export default function JobPost() {
                 status: 'Active'
             };
 
-            await createJobMutation.mutateAsync(jobData);
+            if (editId) {
+                await updateJobMutation.mutateAsync({ id: editId, job: jobData });
+            } else {
+                await createJobMutation.mutateAsync(jobData);
+            }
             setIsSubmitted(true);
             window.scrollTo(0, 0);
         } catch (err) {
@@ -111,8 +138,8 @@ export default function JobPost() {
                     <div className="success-icon">
                         <CheckCircle2 size={48} />
                     </div>
-                    <h2>{t('jobPostedSuccess')}</h2>
-                    <p>{t('jobPostedSubtitle')}</p>
+                    <h2>{editId ? t('jobUpdatedSuccess') || 'Job Updated Successfully!' : t('jobPostedSuccess')}</h2>
+                    <p>{editId ? '' : t('jobPostedSubtitle')}</p>
 
                     <div className="success-actions">
                         <button
@@ -154,8 +181,8 @@ export default function JobPost() {
     return (
         <div className={`job-post-container ${dir}`}>
             <div className="job-post-header">
-                <h1>{t('postJobHeader')}</h1>
-                <p>{t('postJobSubtitle')}</p>
+                <h1>{editId ? (t('editJobHeader') || 'Edit Job') : t('postJobHeader')}</h1>
+                <p>{editId ? '' : t('postJobSubtitle')}</p>
             </div>
 
             {/* Stepper */}
@@ -364,7 +391,7 @@ export default function JobPost() {
 
                     <div className="form-actions">
                         {step > 1 ? (
-                            <button type="button" className="btn-primary" style={{ background: 'rgba(255,255,255,0.05)', boxShadow: 'none' }} onClick={handlePrev}>
+                            <button type="button" className="btn-primary" style={{ background: 'var(--primary)', boxShadow: 'none' }} onClick={handlePrev}>
                                 <ChevronLeft size={20} /> {t('back')}
                             </button>
                         ) : (
@@ -378,7 +405,7 @@ export default function JobPost() {
                         )}
                         {step === 3 && (
                             <button type="submit" className="btn-primary">
-                                <CheckCircle2 size={20} /> {t('publishJob')}
+                                <CheckCircle2 size={20} /> {editId ? (t('saveChanges') || 'Save Changes') : t('publishJob')}
                             </button>
                         )}
                     </div>
