@@ -29,6 +29,8 @@ const Profile = () => {
     const fileInputRef = useRef(null);
 
     const isOwnProfile = !id || id === currentUser?.id?.toString();
+    // Stable ID used as effect dependency — avoids re-running after save when currentUser object reference changes
+    const currentUserId = currentUser?.id;
 
     const [formData, setFormData] = useState({
         name: '',
@@ -52,9 +54,9 @@ const Profile = () => {
                     name: currentUser?.name || '',
                     email: currentUser?.email || '',
                     location: currentUser?.location || '',
-                    bio: currentUser?.description || '',
+                    bio: currentUser?.description || '',        // API: description → form: bio
                     website: currentUser?.website || '',
-                    linkedin: currentUser?.linkedIn || '',
+                    linkedin: currentUser?.linkedIn || '',      // API: linkedIn → form: linkedin
                     github: currentUser?.github || '',
                     phone: currentUser?.phone || '',
                     photo: currentUser?.photo || null,
@@ -68,9 +70,9 @@ const Profile = () => {
                         name: fetchedUser.name || '',
                         email: fetchedUser.email || '',
                         location: fetchedUser.location || '',
-                        bio: fetchedUser.description || '',
+                        bio: fetchedUser.description || '',     // API: description → form: bio
                         website: fetchedUser.website || '',
-                        linkedin: fetchedUser.linkedIn || '',
+                        linkedin: fetchedUser.linkedIn || '',   // API: linkedIn → form: linkedin
                         github: fetchedUser.github || '',
                         phone: fetchedUser.phone || '',
                         photo: fetchedUser.photo || null,
@@ -86,7 +88,7 @@ const Profile = () => {
         };
 
         fetchUserData();
-    }, [id, currentUser, isOwnProfile, addToast]);
+    }, [id, currentUserId]); // intentionally omit full currentUser object — avoids overwriting form after save
 
     const handlePhotoChange = (e) => {
         const file = e.target.files[0];
@@ -101,17 +103,34 @@ const Profile = () => {
 
     const handleSave = async () => {
         try {
-            await updateUser({
+            const payload = {
                 name: formData.name,
                 email: formData.email,
                 location: formData.location,
                 website: formData.website,
                 phone: formData.phone,
-                description: formData.bio,
-                linkedIn: formData.linkedin,
+                description: formData.bio,      // form: bio → API: description
+                linkedIn: formData.linkedin,     // form: linkedin → API: linkedIn
                 github: formData.github,
                 photo: formData.photo
-            });
+            };
+
+            const updatedUser = await updateUser(payload);
+
+            // Sync form state from the API response so inputs immediately reflect saved values
+            setFormData(prev => ({
+                ...prev,
+                name:     updatedUser.name     || prev.name,
+                email:    updatedUser.email    || prev.email,
+                location: updatedUser.location ?? prev.location,
+                bio:      updatedUser.description ?? prev.bio,       // API: description → form: bio
+                website:  updatedUser.website  ?? prev.website,
+                linkedin: updatedUser.linkedIn  ?? prev.linkedin,    // API: linkedIn → form: linkedin
+                github:   updatedUser.github   ?? prev.github,
+                phone:    updatedUser.phone    ?? prev.phone,
+                photo:    updatedUser.photo    ?? prev.photo,
+            }));
+
             addToast(t('profileUpdated'), 'success');
         } catch (error) {
             addToast(t('actionFailed') || 'Failed to update profile. Please try again.', 'error');
