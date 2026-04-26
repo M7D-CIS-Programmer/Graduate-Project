@@ -70,7 +70,7 @@ const AppliedJobs = () => {
                 {applications.length > 0 ? (
                     applications.map(app => (
                         <div key={app.id} className="notification-item">
-                            <div 
+                            <div
                                 className="notification-icon-wrapper"
                                 style={{
                                     background: 'rgba(99, 102, 241, 0.1)',
@@ -79,7 +79,7 @@ const AppliedJobs = () => {
                             >
                                 <Building2 size={24} />
                             </div>
-                            
+
                             <div className="notification-content">
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
                                     <div>
@@ -103,9 +103,9 @@ const AppliedJobs = () => {
                                             </span>
                                         </div>
                                     </div>
-                                    
+
                                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.5rem' }}>
-                                        <span 
+                                        <span
                                             className={`status-badge ${getStatusClass(app.candidateStatus)}`}
                                             style={{
                                                 display: 'inline-flex',
@@ -128,8 +128,8 @@ const AppliedJobs = () => {
                 ) : (
                     <div className="empty-state">
                         <Briefcase size={64} className="empty-icon" />
-                        <h3>{t('noJobsFound')}</h3>
-                        <p style={{ color: 'var(--text-muted)', marginTop: '0.5rem' }}>{t('exploreCompanies')}</p>
+                        <h3>{t('noAppliedJobsYet')}</h3>
+                        <p style={{ color: 'var(--text-muted)', marginTop: '0.5rem' }}>{t('exploreJobs')}</p>
                     </div>
                 )}
             </div>
