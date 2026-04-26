@@ -234,7 +234,7 @@ const AdminDashboard = () => {
                     <Link 
                         to="/dashboard/admin/users" 
                         className="btn-primary" 
-                        style={{ width: '100%', marginTop: '1.5rem', background: 'rgba(255,255,255,0.05)', boxShadow: 'none', textAlign: 'center', textDecoration: 'none', display: 'block' }}
+                        style={{ width: '100%',color:'var(--text-main)', marginTop: '1.5rem', background: 'var(bg-dark)', boxShadow: 'none', textAlign: 'center', textDecoration: 'none', display: 'block' }}
                     >
                         {t('viewAll')}
                     </Link>

@@ -21,7 +21,7 @@ import './Sidebar.css';
 
 const Sidebar = ({ isOpen }) => {
     const { user, logout } = useAuth();
-    const { t, dir } = useLanguage();
+    const { t } = useLanguage();
     const location = useLocation();
     const navigate = useNavigate();
 

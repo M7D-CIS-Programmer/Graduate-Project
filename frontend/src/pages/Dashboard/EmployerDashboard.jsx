@@ -103,7 +103,7 @@ const EmployerDashboard = () => {
         return {
             labels: topJobs.map(j => j.title),
             apps: topJobs.map(j => employerApplications.filter(a => a.jobId === j.id).length),
-            views: topJobs.map(j => (j.id * 15) % 100 + 20) // Simulated views based on ID for now
+            views: topJobs.map(j => j.viewsCount || 0)
         };
     }, [employerJobs, employerApplications]);
 
