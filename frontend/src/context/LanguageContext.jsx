@@ -296,7 +296,7 @@ export const LanguageProvider = ({ children }) => {
             unknownCompany: "Unknown Company",
             salaryNegotiable: "Salary Negotiable",
             // 
-
+            employerDashboard: "Employer Dashboard",
             employerDashboardSubtitle: "Welcome to your employer dashboard",
             matchingSubtitle: "Start exploring and saving opportunities that match your profile.",
             allCaughtUp: "You're all caught up! Check back later for updates.",
@@ -620,6 +620,7 @@ export const LanguageProvider = ({ children }) => {
             institution: "المؤسسة التعليمية",
             aboutMe: "نبذة عني",
             // Dashboard & Home
+            employerDashboard: "لوحة تحكم أصحاب العمل",
             employerDashboardSubtitle: "أهلاً بك في لوحة تحكم أصحاب العمل",
             popularCategories: "الأقسام الشائعة",
             categoriesSubtitle: "استكشف الوظائف حسب اهتماماتك المهنية",
