@@ -66,6 +66,7 @@ export const api = {
     // Users
     getUsers:            ()           => get(`${BASE_URL}/Users`),
     getUser:             (id, viewerId) => get(`${BASE_URL}/Users/${id}${viewerId ? `?viewerId=${viewerId}` : ''}`),
+    getCompanyProfile:   (id)         => get(`${BASE_URL}/Users/${id}`), // Read-only; no auth needed
     updateUser:          (id, data)   => put(`${BASE_URL}/Users/${id}`, data),
     updateUserStatus:    (id, status) => put(`${BASE_URL}/Users/${id}/status`, status),
     deleteUser:          (id)         => del(`${BASE_URL}/Users/${id}`),

@@ -29,6 +29,7 @@ import Notifications from './pages/Notifications';
 import ResumeBuilder from './pages/ResumeBuilder';
 import JobPost from './pages/JobPost';
 import Companies from './pages/Companies/Companies';
+import CompanyProfileView from './pages/Companies/CompanyProfileView';
 import Candidates from './pages/Candidates';
 import Settings from './pages/Settings/Settings';
 import ResumeView from './pages/Dashboard/ResumeView';
@@ -130,7 +131,7 @@ function App() {
 
                   {/* Other Routes */}
                   <Route path="/companies" element={<Companies />} />
-                  <Route path="/companies/:id" element={<Profile />} />
+                  <Route path="/companies/:id" element={<CompanyProfileView />} />
                   <Route path="/candidates" element={<Candidates />} />
                   <Route path="/settings" element={<Settings />} />
                   <Route path="/about" element={<AboutUs />} />

@@ -39,6 +39,12 @@ export const AuthProvider = ({ children }) => {
       role: userData.role,
       location: userData.location,
       phone: userData.phone,
+      website: userData.website || '',
+      description: userData.description || '',
+      linkedIn: userData.linkedIn || '',
+      github: userData.github || '',
+      industry: userData.industry || '',
+      photo: userData.photo || null,
       createdAt: userData.createdAt,
       dashboardPath: userData.dashboardPath,
       savedJobs: userData.savedJobs || [],
@@ -70,7 +76,7 @@ export const AuthProvider = ({ children }) => {
       };
       setUser(updatedUser);
       
-      // Update localStorage (preserve token separately)
+      // Update sessionStorage — include ALL profile fields so inputs stay populated
       const userToStore = {
         id: updatedUser.id,
         name: updatedUser.name,
@@ -78,6 +84,12 @@ export const AuthProvider = ({ children }) => {
         role: updatedUser.role,
         location: updatedUser.location,
         phone: updatedUser.phone,
+        website: updatedUser.website || '',
+        description: updatedUser.description || '',
+        linkedIn: updatedUser.linkedIn || '',
+        github: updatedUser.github || '',
+        industry: updatedUser.industry || '',
+        photo: updatedUser.photo || null,
         createdAt: updatedUser.createdAt,
         dashboardPath: updatedUser.dashboardPath,
         savedJobs: updatedUser.savedJobs || [],

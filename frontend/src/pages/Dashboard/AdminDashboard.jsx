@@ -28,6 +28,7 @@ import { Line } from 'react-chartjs-2';
 import './Dashboard.css';
 import { useUsers } from '../../hooks/useUsers';
 import { useJobs } from '../../hooks/useJobs';
+import { useApplications } from '../../hooks/useApplications';
 
 ChartJS.register(
     CategoryScale,
@@ -45,7 +46,8 @@ const AdminDashboard = () => {
     const { t, dir } = useLanguage();
     const { data: rawUsers = [], isLoading: usersLoading } = useUsers();
     const { data: rawJobs = [], isLoading: jobsLoading } = useJobs();
-    const isLoading = usersLoading || jobsLoading;
+    const { data: rawApplications = [], isLoading: appsLoading } = useApplications();
+    const isLoading = usersLoading || jobsLoading || appsLoading;
 
     const stats = [
         { label: t('totalUsers'), value: rawUsers.length.toString(), icon: <Users />, color: '#6366f1', trend: '+12%' },
@@ -61,12 +63,40 @@ const AdminDashboard = () => {
         status: u.status === 'Active' ? t('active') : u.status || t('active')
     }));
 
+    const monthKeys = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+    const dynamicLabels = [];
+    const dynamicActivityData = [];
+
+    for (let i = 5; i >= 0; i--) {
+        const d = new Date();
+        d.setMonth(d.getMonth() - i);
+        dynamicLabels.push(t(monthKeys[d.getMonth()]));
+
+        const m = d.getMonth();
+        const y = d.getFullYear();
+
+        const uCount = rawUsers.filter(u => {
+            const date = new Date(u.createdAt);
+            return date.getMonth() === m && date.getFullYear() === y;
+        }).length;
+        const jCount = rawJobs.filter(j => {
+            const date = new Date(j.postedDate);
+            return date.getMonth() === m && date.getFullYear() === y;
+        }).length;
+        const aCount = rawApplications.filter(a => {
+            const date = new Date(a.date);
+            return date.getMonth() === m && date.getFullYear() === y;
+        }).length;
+
+        dynamicActivityData.push(uCount + jCount + aCount);
+    }
+
     const chartData = {
-        labels: [t('jan'), t('feb'), t('mar'), t('apr'), t('may'), t('jun')],
+        labels: dynamicLabels,
         datasets: [
             {
                 label: t('platformActivity'),
-                data: [1200, 1900, 3000, 4500, 4200, 5800],
+                data: dynamicActivityData,
                 borderColor: '#6366f1',
                 backgroundColor: 'rgba(99, 102, 241, 0.1)',
                 tension: 0.4,
@@ -204,7 +234,7 @@ const AdminDashboard = () => {
                     <Link 
                         to="/dashboard/admin/users" 
                         className="btn-primary" 
-                        style={{ width: '100%', marginTop: '1.5rem', background: 'rgba(255,255,255,0.05)', boxShadow: 'none', textAlign: 'center', textDecoration: 'none', display: 'block' }}
+                        style={{ width: '100%',color:'var(--text-main)', marginTop: '1.5rem', background: 'var(bg-dark)', boxShadow: 'none', textAlign: 'center', textDecoration: 'none', display: 'block' }}
                     >
                         {t('viewAll')}
                     </Link>

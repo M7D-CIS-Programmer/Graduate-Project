@@ -4,14 +4,13 @@ const LanguageContext = createContext();
 
 export const LanguageProvider = ({ children }) => {
     const [language, setLanguage] = useState(localStorage.getItem('lang') || 'en');
-    const [dir, setDir] = useState(language === 'ar' ? 'rtl' : 'ltr');
+    const dir = language === 'ar' ? 'rtl' : 'ltr';
 
     useEffect(() => {
         localStorage.setItem('lang', language);
-        setDir(language === 'ar' ? 'rtl' : 'ltr');
-        document.documentElement.dir = language === 'ar' ? 'rtl' : 'ltr';
+        document.documentElement.dir = dir;
         document.documentElement.lang = language;
-    }, [language]);
+    }, [language, dir]);
 
     const toggleLanguage = () => {
         setLanguage((prev) => (prev === 'en' ? 'ar' : 'en'));
@@ -202,7 +201,7 @@ export const LanguageProvider = ({ children }) => {
             interviews: "Interviews",
             pending: "Pending",
             recentActivity: "Recent Activity",
-            chatbotWelcome: "Hello! I am your InsightCV assistant. How can I help you today?",
+
             fullPageChat: "Full Page Chat",
             typing: "Typing...",
             online: "Online",
@@ -222,7 +221,7 @@ export const LanguageProvider = ({ children }) => {
             cancel: "Cancel",
             clear: "Clear",
             chatError: "Sorry, I'm having trouble connecting right now.",
-            chatbotName: "InsightCV Assistant",
+
             uploadFile: "Upload File",
             chatbotPlaceholder: "Ask me anything...",
             recentApplications: "Recent Applications",
@@ -296,9 +295,9 @@ export const LanguageProvider = ({ children }) => {
             linkedin: "LinkedIn",
             unknownCompany: "Unknown Company",
             salaryNegotiable: "Salary Negotiable",
-            reportJob: "Report Job",
-            website: "Website",
-            linkedin: "LinkedIn",
+            // 
+            employerDashboard: "Employer Dashboard",
+            employerDashboardSubtitle: "Welcome to your employer dashboard",
             matchingSubtitle: "Start exploring and saving opportunities that match your profile.",
             allCaughtUp: "You're all caught up! Check back later for updates.",
             welcomeMessage: "Welcome to your notification center. You will see activity here.",
@@ -321,9 +320,7 @@ export const LanguageProvider = ({ children }) => {
             copyright: "All rights reserved.",
             chatbotName: "SmartAssistant",
             chatbotWelcome: "Hello! How can I help you today?",
-            chatbotPlaceholder: "Type your message...",
             typeAMessage: "Please type a message.",
-            uploadFile: "Upload File",
             fileUploaded: "File uploaded successfully!",
             addSkill: "Add Skill",
             graduationYear: "Graduation Year",
@@ -401,10 +398,6 @@ export const LanguageProvider = ({ children }) => {
             interviewReminder: "Interview Reminder",
             interviewReminderMsg: "You have an interview scheduled with {name} today at {time}",
             twoHoursAgo: "2 hours ago",
-            oneDayAgo: "1 day ago",
-            jobDescription: "Job Description",
-            responsibilities: "Responsibilities",
-            requirements: "Requirements",
             applySubtitle: "Interested in this position? Apply directly through our platform.",
             yourName: "Your Name",
             emailExample: "email@example.com",
@@ -429,13 +422,11 @@ export const LanguageProvider = ({ children }) => {
             step2: "Job Details",
             step3: "Review & Post",
             jobDescriptionPlaceholder: "Provide a detailed description of the role...",
-            category: "Category",
             selectCategory: "Select Category",
             design: "Design",
             engineering: "Engineering",
             marketing: "Marketing",
             management: "Management",
-            salaryNegotiable: "Salary Negotiable",
             benefits: "Benefits",
             benefitsPlaceholder: "e.g., Health Insurance, Flexible Hours",
             publishJob: "Publish Job",
@@ -471,7 +462,6 @@ export const LanguageProvider = ({ children }) => {
             approve: "Approve",
             approved: "Approved",
             pendingApproval: "Pending",
-            company: "Company",
             postedBy: "Posted By",
             location: "Location",
             industry: "Industry",
@@ -520,12 +510,10 @@ export const LanguageProvider = ({ children }) => {
             jul: "Jul", aug: "Aug", sep: "Sep", oct: "Oct", nov: "Nov", dec: "Dec",
             // More Statuses
             upcoming: "Upcoming",
-            views: "Views",
             performance: "Performance",
             applicationSent: "Application Sent",
             resumeViewed: "Resume Viewed",
             candidateRejected: "Candidate Rejected",
-            candidateAccepted: "Candidate accepted successfully!",
             candidateReviewing: "Candidate is now under review.",
             review: "Review",
             actionFailed: "Action failed. Please try again.",
@@ -690,6 +678,8 @@ export const LanguageProvider = ({ children }) => {
             institution: "المؤسسة التعليمية",
             aboutMe: "نبذة عني",
             // Dashboard & Home
+            employerDashboard: "لوحة تحكم أصحاب العمل",
+            employerDashboardSubtitle: "أهلاً بك في لوحة تحكم أصحاب العمل",
             popularCategories: "الأقسام الشائعة",
             categoriesSubtitle: "استكشف الوظائف حسب اهتماماتك المهنية",
             handPickedJobs: "فرص مختارة بعناية",
@@ -700,7 +690,6 @@ export const LanguageProvider = ({ children }) => {
             interviews: "المقابلات",
             pending: "قيد الانتظار",
             recentActivity: "النشاط الأخير",
-            chatbotWelcome: "مرحباً! أنا مساعد InsightCV الخاص بك. كيف يمكنني مساعدتك اليوم؟",
             fullPageChat: "محادثة كاملة",
             typing: "يكتب...",
             online: "متصل",
@@ -720,7 +709,6 @@ export const LanguageProvider = ({ children }) => {
             cancel: "إلغاء",
             clear: "مسح",
             chatError: "عذراً، أواجه مشكلة في الاتصال حالياً.",
-            chatbotName: "مساعد InsightCV",
             uploadFile: "رفع ملف",
             chatbotPlaceholder: "اسألني عن أي شيء...",
             recentApplications: "طلبات التوظيف الأخيرة",
@@ -794,9 +782,6 @@ export const LanguageProvider = ({ children }) => {
             linkedin: "لينكد إن",
             unknownCompany: "شركة غير معروفة",
             salaryNegotiable: "الراتب قابل للتفاوض",
-            reportJob: "الإبلاغ عن وظيفة",
-            website: "الموقع الإلكتروني",
-            linkedin: "لينكد إن",
 
             matchingSubtitle: "ابدأ في استكشاف وحفظ الفرص التي تتناسب مع ملفك الشخصي.",
             allCaughtUp: "لقد شاهدت كل التنبيهات! تفقد هذه الصفحة لاحقاً للمزيد.",
@@ -822,9 +807,7 @@ export const LanguageProvider = ({ children }) => {
             copyright: "جميع الحقوق محفوظة.",
             chatbotName: "المساعد الذكي",
             chatbotWelcome: "مرحباً! كيف يمكنني مساعدتك اليوم؟",
-            chatbotPlaceholder: "اكتب رسالتك هنا...",
             typeAMessage: "يرجى كتابة رسالة.",
-            uploadFile: "رفع ملف",
             fileUploaded: "تم رفع الملف بنجاح!",
             addSkill: "إضافة مهارة",
             graduationYear: "سنة التخرج",
@@ -869,10 +852,6 @@ export const LanguageProvider = ({ children }) => {
             interviewReminder: "تذكير بموعد مقابلة",
             interviewReminderMsg: "لديك مقابلة محددة مع {name} اليوم في تمام الساعة {time}",
             twoHoursAgo: "منذ ساعتين",
-            oneDayAgo: "منذ يوم",
-            jobDescription: "وصف الوظيفة",
-            responsibilities: "المسؤوليات",
-            requirements: "المتطلبات",
             applySubtitle: "مهتم بهذه الوظيفة؟ قدم مباشرة من خلال منصتنا.",
             yourName: "اسمك",
             emailExample: "email@example.com",
@@ -897,13 +876,11 @@ export const LanguageProvider = ({ children }) => {
             step2: "تفاصيل الوظيفة",
             step3: "المراجعة والنشر",
             jobDescriptionPlaceholder: "قدم وصفاً مفصلاً للدور الوظيفي...",
-            category: "الفئة",
             selectCategory: "اختر الفئة",
             design: "التصميم",
             engineering: "الهندسة",
             marketing: "التسويق",
             management: "الإدارة",
-            salaryNegotiable: "الراتب قابل للتفاوض",
             benefits: "المميزات",
             benefitsPlaceholder: "مثلاً: تأمين صحي، ساعات عمل مرنة",
             publishJob: "نشر الوظيفة",
@@ -939,7 +916,6 @@ export const LanguageProvider = ({ children }) => {
             approve: "موافقة",
             approved: "مقبول",
             pendingApproval: "قيد الانتظار",
-            company: "شركة",
             postedBy: "نشر بواسطة",
             location: "الموقع",
             industry: "القطاع",
@@ -947,7 +923,6 @@ export const LanguageProvider = ({ children }) => {
             generalSettings: "الإعدادات العامة",
             siteName: "اسم الموقع",
             contactEmail: "البريد الإلكتروني للاتصال",
-            saveChanges: "حفظ التغييرات",
             securitySettings: "إعدادات الأمان",
             requireEmailVerification: "طلب التحقق من البريد الإلكتروني",
             maintenanceMode: "وضع الصيانة",
@@ -988,7 +963,7 @@ export const LanguageProvider = ({ children }) => {
             jul: "يوليو", aug: "أغسطس", sep: "سبتمبر", oct: "أكتوبر", nov: "نوفمبر", dec: "ديسمبر",
             // More Statuses
             upcoming: "قادم",
-            views: "المشاهدات",
+            // views: "المشاهدات",
             performance: "الأداء",
             applicationSent: "تم إرسال الطلب",
             resumeViewed: "تمت مشاهدة السيرة الذاتية",
@@ -1117,8 +1092,6 @@ export const LanguageProvider = ({ children }) => {
             sendMessage: "إرسال الرسالة",
             contactSuccess: "شكراً لك! تم إرسال رسالتك بنجاح.",
             visitUsAmman: "مجمع الملك حسين للأعمال، عمان، الأردن",
-            candidateRejected: "تم رفض المرشح.",
-            candidateAccepted: "تم قبول المرشح بنجاح!",
             candidateReviewing: "المرشح قيد المراجعة الآن.",
             review: "مراجعة",
             actionFailed: "فشلت العملية. يرجى المحاولة مرة أخرى.",
