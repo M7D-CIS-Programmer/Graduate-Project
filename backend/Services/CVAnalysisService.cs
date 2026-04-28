@@ -22,9 +22,7 @@ namespace aabu_project.Services
         private readonly CvLocalAnalyzer   _localAnalyzer;
         private readonly ILogger<CVAnalysisService> _logger;
         private readonly string _apiKey;
-
-        private const string GeminiUrl =
-            "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
+        private readonly string _geminiUrl;
 
         // Trimmed job description limit — only needed for context, not full analysis
         private const int MaxJobDescChars = 1_200;
@@ -44,6 +42,10 @@ namespace aabu_project.Services
             _cache         = cache;
             _localAnalyzer = localAnalyzer;
             _apiKey        = configuration["GeminiSettings:ApiKey"] ?? string.Empty;
+
+            var model   = configuration["GeminiSettings:ModelName"] ?? "gemini-1.5-flash";
+            var baseUrl = configuration["GeminiSettings:BaseUrl"]   ?? "https://generativelanguage.googleapis.com/v1beta/models";
+            _geminiUrl  = $"{baseUrl}/{model}:generateContent";
         }
 
         // ── PDF Extraction ────────────────────────────────────────────────────────
@@ -196,7 +198,7 @@ namespace aabu_project.Services
             {
                 contents = new[] { new { parts = new[] { new { text = prompt } } } },
                 // Small output — we only need 3 short arrays
-                generationConfig = new { temperature = 0.2, maxOutputTokens = 400 }
+                generationConfig = new { temperature = 0.2, maxOutputTokens = 800, thinkingConfig = new { thinkingBudget = 0 } }
             };
 
             var content = new StringContent(
@@ -208,7 +210,7 @@ namespace aabu_project.Services
             try
             {
                 response = await _httpClient.PostAsync(
-                    $"{GeminiUrl}?key={_apiKey}", content, cts.Token);
+                    $"{_geminiUrl}?key={_apiKey}", content, cts.Token);
             }
             catch (TaskCanceledException)
             {
