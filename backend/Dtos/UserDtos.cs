@@ -23,6 +23,8 @@ public class UserCreateDto
     public string RoleName { get; set; } = null!;
 
     public string? Industry { get; set; }
+    public string? ProfilePicture { get; set; }
+
 }
 
 public class UserUpdateDto
@@ -36,14 +38,14 @@ public class UserUpdateDto
     public string? LinkedIn { get; set; }
     public string? Github { get; set; }
     public string? Industry { get; set; }
-    public string? Photo { get; set; } // For potential later use
+    public string? ProfilePicture { get; set; } // For potential later use
 }
 
 public record UserDto(
     int Id, string Name, string Email,
     string? Location, string? Website, string? Phone,
     string? Description, string? LinkedIn, string? Github, string? Status,
-    string? Role, DateTimeOffset CreatedAt, int ActiveJobsCount = 0, string? Industry = null
+    string? Role, DateTimeOffset CreatedAt, int ActiveJobsCount = 0, string? Industry = null, string? ProfilePicture = null
 );
 
 public class LoginDto
@@ -66,6 +68,7 @@ public class AuthResponseDto
     public string? Role { get; set; }
     public string Token { get; set; } = null!;
     public DateTimeOffset CreatedAt { get; set; }
+    public string? ProfilePicture { get; set; }
 }
 
 public class AuthResultDto

@@ -89,6 +89,7 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 app.UseCors("AllowReact");
 
+
 app.UseSwagger();
 app.UseSwaggerUI();
 

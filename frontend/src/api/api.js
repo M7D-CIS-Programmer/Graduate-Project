@@ -1,6 +1,15 @@
 const BASE_URL = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL;
 if (!BASE_URL) throw new Error('API base URL is not set. Define VITE_API_URL in frontend/.env');
 
+// Converts a relative server path (e.g. "uploads/profiles/x.jpg") to a full URL.
+// Strips the trailing "/api" segment from BASE_URL since static files are served at root.
+export const getImageUrl = (path) => {
+    if (!path) return null;
+    if (path.startsWith('http')) return path;
+    const origin = BASE_URL.replace(/\/api\/?$/, '');
+    return `${origin}/${path}`;
+};
+
 const handleResponse = async (res) => {
     if (!res.ok) {
         const raw = await res.text();
@@ -70,6 +79,21 @@ export const api = {
     updateUser:          (id, data)   => put(`${BASE_URL}/Users/${id}`, data),
     updateUserStatus:    (id, status) => put(`${BASE_URL}/Users/${id}/status`, status),
     deleteUser:          (id)         => del(`${BASE_URL}/Users/${id}`),
+
+    // Saved Jobs
+    getSavedJobs:   ()          => get(`${BASE_URL}/SavedJobs`),
+    checkSavedJob:  (jobId)     => get(`${BASE_URL}/SavedJobs/check/${jobId}`),
+    saveJob:        (jobId)     => fetch(`${BASE_URL}/SavedJobs/${jobId}`, { method: 'POST', headers: getHeaders() }).then(handleResponse),
+    unsaveJob:      (savedId)   => del(`${BASE_URL}/SavedJobs/${savedId}`),
+    uploadProfilePicture: (id, file) => {
+        const form = new FormData();
+        form.append('image', file);
+        const headers = {};
+        const token = sessionStorage.getItem('token');
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+        return fetch(`${BASE_URL}/Users/${id}/upload-profile-picture`, { method: 'POST', headers, body: form })
+            .then(handleResponse);
+    },
 
     // Applications
     getApplications:          ()           => get(`${BASE_URL}/ApplicationJobs`),

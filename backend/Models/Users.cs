@@ -20,6 +20,7 @@ public class User
     public string? Industry { get; set; }
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.Now;
     public string? SearchKey { get; set; }
+    public string? ProfilePicture { get; set; }
 
     // Navigation properties
     public ICollection<Resume> Resumes { get; set; } = new List<Resume>();
@@ -27,4 +28,5 @@ public class User
     public ICollection<Notification> Notifications { get; set; } = new List<Notification>();
     public ICollection<ApplicationJob> Applications { get; set; } = new List<ApplicationJob>();
     public ICollection<Role> Roles { get; set; } = new List<Role>();
+    public ICollection<SavedJob> SavedJobs { get; set; } = new List<SavedJob>();
 }
