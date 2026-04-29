@@ -42,8 +42,10 @@ export default function JobPost() {
         company: '',
         category: '',
         type: 'Full-time',
+        workMode: 'On-site',
         location: '',
-        salary: '',
+        salaryMin: '',
+        salaryMax: '',
         isNegotiable: false,
         description: '',
         responsibilities: '',
@@ -58,8 +60,10 @@ export default function JobPost() {
                 company: editJobData.company || '',
                 category: editJobData.categoryId || '',
                 type: editJobData.type || 'Full-time',
+                workMode: editJobData.workMode || 'On-site',
                 location: editJobData.location || '',
-                salary: (editJobData.salaryMin && editJobData.salaryMax) ? `$${editJobData.salaryMin} - $${editJobData.salaryMax}` : '',
+                salaryMin: editJobData.salaryMin || '',
+                salaryMax: editJobData.salaryMax || '',
                 isNegotiable: editJobData.isSalaryNegotiable || false,
                 description: editJobData.description || '',
                 responsibilities: editJobData.responsibilities || '',
@@ -107,13 +111,13 @@ export default function JobPost() {
                 title: formData.title,
                 description: formData.description,
                 type: formData.type,
-                workMode: 'On-site',
+                workMode: formData.workMode,
                 responsibilities: formData.responsibilities,
                 requirements: formData.requirements,
                 categoryId: categoryObj?.id || 1,
                 isSalaryNegotiable: formData.isNegotiable,
-                salaryMin: 2000,
-                salaryMax: 4000,
+                salaryMin: formData.salaryMin ? parseFloat(formData.salaryMin) : null,
+                salaryMax: formData.salaryMax ? parseFloat(formData.salaryMax) : null,
                 features: formData.benefits,
                 status: 'Active'
             };
@@ -159,8 +163,10 @@ export default function JobPost() {
                                     company: '',
                                     category: '',
                                     type: 'Full-time',
+                                    workMode: 'On-site',
                                     location: '',
-                                    salary: '',
+                                    salaryMin: '',
+                                    salaryMax: '',
                                     isNegotiable: false,
                                     description: '',
                                     responsibilities: '',
@@ -255,6 +261,19 @@ export default function JobPost() {
                                 </select>
                             </div>
                             <div className="form-group">
+                                <label>{t('workMode') || 'Work Mode'}</label>
+                                <select
+                                    name="workMode"
+                                    value={formData.workMode}
+                                    onChange={handleInputChange}
+                                    required
+                                >
+                                    <option value="On-site">{t('onSite') || 'On-site'}</option>
+                                    <option value="Remote">{t('remote') || 'Remote'}</option>
+                                    <option value="Hybrid">{t('hybrid') || 'Hybrid'}</option>
+                                </select>
+                            </div>
+                            <div className="form-group">
                                 <label>{t('locationPlaceholder')}</label>
                                 <select
                                     name="location"
@@ -269,13 +288,23 @@ export default function JobPost() {
                                 </select>
                             </div>
                             <div className="form-group">
-                                <label>{t('salaryRange')}</label>
+                                <label>{t('minSalary') || 'Minimum Salary'}</label>
                                 <input
-                                    type="text"
-                                    name="salary"
-                                    value={formData.salary}
+                                    type="number"
+                                    name="salaryMin"
+                                    value={formData.salaryMin}
                                     onChange={handleInputChange}
-                                    placeholder="e.g. $2,000 - $3,500"
+                                    placeholder="e.g. 2000"
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label>{t('maxSalary') || 'Maximum Salary'}</label>
+                                <input
+                                    type="number"
+                                    name="salaryMax"
+                                    value={formData.salaryMax}
+                                    onChange={handleInputChange}
+                                    placeholder="e.g. 3500"
                                 />
                             </div>
                             <div className="form-group checkbox-group">
@@ -355,12 +384,16 @@ export default function JobPost() {
                                         <span>{formData.type}</span>
                                     </div>
                                     <div className="review-item">
+                                        <label>{t('workMode') || 'Work Mode'}</label>
+                                        <span>{formData.workMode}</span>
+                                    </div>
+                                    <div className="review-item">
                                         <label>{t('locationPlaceholder')}</label>
                                         <span>{formData.location}</span>
                                     </div>
                                     <div className="review-item">
                                         <label>{t('salaryRange')}</label>
-                                        <span>{formData.salary} {formData.isNegotiable ? `(${t('salaryNegotiable')})` : ''}</span>
+                                        <span>${formData.salaryMin} - ${formData.salaryMax} {formData.isNegotiable ? `(${t('salaryNegotiable')})` : ''}</span>
                                     </div>
                                 </div>
                             </div>
