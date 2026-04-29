@@ -29,4 +29,5 @@ public class Job
     public User User { get; set; } = null!;
     public Category Category { get; set; } = null!;
     public ICollection<ApplicationJob> Applications { get; set; } = new List<ApplicationJob>();
+    public ICollection<SavedJob> SavedJobs { get; set; } = new List<SavedJob>();
 }

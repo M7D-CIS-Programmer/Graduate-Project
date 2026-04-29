@@ -30,14 +30,12 @@ namespace aabu_project.Services
         private readonly HttpClient   _http;
         private readonly IMemoryCache _cache;
         private readonly string       _apiKey;
+        private readonly string       _geminiUrl;
         private readonly ILogger<SupportService> _logger;
 
         // Loaded from chatbot_dataset.json at startup
         private readonly List<ChatbotIntent> _intents;
         private readonly ChatbotIntent?      _fallbackIntent;
-
-        private const string GeminiUrl =
-            "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
 
         private const string SystemPrompt = """
             You are a concise support assistant for InsightCV — a professional job platform.
@@ -64,6 +62,10 @@ namespace aabu_project.Services
             _logger = logger;
             _cache  = cache;
             _apiKey = configuration["GeminiSettings:ApiKey"] ?? string.Empty;
+
+            var model   = configuration["GeminiSettings:ModelName"] ?? "gemini-1.5-flash";
+            var baseUrl = configuration["GeminiSettings:BaseUrl"]   ?? "https://generativelanguage.googleapis.com/v1beta/models";
+            _geminiUrl  = $"{baseUrl}/{model}:generateContent";
 
             (_intents, _fallbackIntent) = LoadDataset(env.ContentRootPath, logger);
         }
@@ -250,7 +252,7 @@ namespace aabu_project.Services
             {
                 systemInstruction = new { parts = new[] { new { text = SystemPrompt } } },
                 contents = new[] { new { role = "user", parts = new[] { new { text = userMessage.Trim() } } } },
-                generationConfig = new { temperature = 0.4, maxOutputTokens = 400 }
+                generationConfig = new { temperature = 0.4, maxOutputTokens = 800, thinkingConfig = new { thinkingBudget = 0 } }
             };
 
             var content  = new StringContent(JsonSerializer.Serialize(body), Encoding.UTF8, "application/json");
@@ -259,7 +261,7 @@ namespace aabu_project.Services
             HttpResponseMessage response;
             try
             {
-                response = await _http.PostAsync($"{GeminiUrl}?key={_apiKey}", content, cts.Token);
+                response = await _http.PostAsync($"{_geminiUrl}?key={_apiKey}", content, cts.Token);
             }
             catch (TaskCanceledException)
             {

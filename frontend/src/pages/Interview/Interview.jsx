@@ -2,11 +2,45 @@ import React, { useState, useRef, useEffect } from 'react';
 import {
     MessageSquare, Briefcase, FileText, Play, Send,
     Loader2, Star, TrendingUp, AlertTriangle, RotateCcw,
-    CheckCircle, ChevronDown, ChevronUp, Bot, User
+    CheckCircle, ChevronDown, ChevronUp, Bot, User, Mic
 } from 'lucide-react';
 import { api } from '../../api/api';
 import { useLanguage } from '../../context/LanguageContext';
+import VoiceInterview from './VoiceInterview';
 import './Interview.css';
+import './VoiceInterview.css';
+
+// ── Mode selection screen ───────────────────────────────────────────────────
+const ModeSelect = ({ onSelect }) => (
+    <div className="iv-page">
+        <div className="iv-header">
+            <div className="iv-header-icon"><MessageSquare size={26} /></div>
+            <div>
+                <h1 className="iv-title">AI Interview Simulator</h1>
+                <p className="iv-subtitle">Choose your preferred interview mode to begin</p>
+            </div>
+        </div>
+        <div className="vi-mode-select">
+            <p className="vi-mode-lead">How would you like to answer the questions?</p>
+            <div className="vi-mode-cards">
+                <button className="vi-mode-card" onClick={() => onSelect('chat')}>
+                    <div className="vi-mode-card-icon vi-mode-card-icon--chat">
+                        <MessageSquare size={26} />
+                    </div>
+                    <p className="vi-mode-card-title">Chat Interview</p>
+                    <p className="vi-mode-card-desc">Type your answers in a conversation-style interface</p>
+                </button>
+                <button className="vi-mode-card" onClick={() => onSelect('voice')}>
+                    <div className="vi-mode-card-icon vi-mode-card-icon--voice">
+                        <Mic size={26} />
+                    </div>
+                    <p className="vi-mode-card-title">Voice Interview</p>
+                    <p className="vi-mode-card-desc">Speak your answers using your microphone</p>
+                </button>
+            </div>
+        </div>
+    </div>
+);
 
 // ── helpers ────────────────────────────────────────────────────────────────────
 
@@ -65,6 +99,9 @@ const FeedbackBubble = ({ feedback, score }) => (
 const Interview = () => {
     const { t, dir } = useLanguage();
     const chatEndRef = useRef(null);
+
+    // ── mode selection (null = picker, 'chat' = existing flow, 'voice' = new) ──
+    const [mode, setMode] = useState(null);
 
     // ── state ──────────────────────────────────────────────────────────────────
     const [phase, setPhase]           = useState('setup');    // setup | interview | results
@@ -174,6 +211,10 @@ const Interview = () => {
         setAnswer('');
         setHistOpen(false);
     };
+
+    // ── mode routing (must come before any phase renders) ─────────────────────
+    if (!mode)              return <ModeSelect onSelect={setMode} />;
+    if (mode === 'voice')   return <VoiceInterview onBack={() => setMode(null)} />;
 
     // ── render: setup phase ────────────────────────────────────────────────────
 

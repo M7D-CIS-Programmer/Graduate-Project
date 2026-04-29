@@ -19,6 +19,22 @@ public class JobCreateDto
     public string? Company { get; set; }
 }
 
+public record SavedJobDto(
+    int Id,
+    int JobId,
+    string Title,
+    string? Company,
+    string? Location,
+    string Type,
+    string WorkMode,
+    decimal? SalaryMin,
+    decimal? SalaryMax,
+    bool IsSalaryNegotiable,
+    string? Status,
+    string? Category,
+    DateTimeOffset SavedAt
+);
+
 public class JobUpdateDto
 {
     public string Title { get; set; } = null!;

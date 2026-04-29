@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { api } from '../api/api';
+import { api, getImageUrl } from '../api/api';
 import {
     User,
     Mail,
@@ -54,12 +54,12 @@ const Profile = () => {
                     name: currentUser?.name || '',
                     email: currentUser?.email || '',
                     location: currentUser?.location || '',
-                    bio: currentUser?.description || '',        // API: description → form: bio
+                    bio: currentUser?.description || '',
                     website: currentUser?.website || '',
-                    linkedin: currentUser?.linkedIn || '',      // API: linkedIn → form: linkedin
+                    linkedin: currentUser?.linkedIn || '',
                     github: currentUser?.github || '',
                     phone: currentUser?.phone || '',
-                    photo: currentUser?.photo || null,
+                    photo: getImageUrl(currentUser?.profilePicture || currentUser?.photo) || null,
                     role: currentUser?.role || ''
                 });
             } else {
@@ -70,12 +70,12 @@ const Profile = () => {
                         name: fetchedUser.name || '',
                         email: fetchedUser.email || '',
                         location: fetchedUser.location || '',
-                        bio: fetchedUser.description || '',     // API: description → form: bio
+                        bio: fetchedUser.description || '',
                         website: fetchedUser.website || '',
-                        linkedin: fetchedUser.linkedIn || '',   // API: linkedIn → form: linkedin
+                        linkedin: fetchedUser.linkedIn || '',
                         github: fetchedUser.github || '',
                         phone: fetchedUser.phone || '',
-                        photo: fetchedUser.photo || null,
+                        photo: getImageUrl(fetchedUser.profilePicture) || null,
                         role: fetchedUser.role || ''
                     });
                 } catch (error) {
@@ -90,14 +90,24 @@ const Profile = () => {
         fetchUserData();
     }, [id, currentUserId]); // intentionally omit full currentUser object — avoids overwriting form after save
 
-    const handlePhotoChange = (e) => {
+    const handlePhotoChange = async (e) => {
         const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setFormData({ ...formData, photo: reader.result });
-            };
-            reader.readAsDataURL(file);
+        if (!file) return;
+
+        // Show a local preview immediately while upload is in progress
+        const reader = new FileReader();
+        reader.onloadend = () => setFormData(prev => ({ ...prev, photo: reader.result }));
+        reader.readAsDataURL(file);
+
+        try {
+            const result = await api.uploadProfilePicture(currentUser.id, file);
+            const fullUrl = getImageUrl(result.imagePath);
+            setFormData(prev => ({ ...prev, photo: fullUrl }));
+            // Keep the auth context in sync so the avatar in the navbar updates too
+            updateUser({ profilePicture: result.imagePath });
+            addToast(t('profileUpdated') || 'Profile picture updated!', 'success');
+        } catch (error) {
+            addToast(t('actionFailed') || 'Failed to upload profile picture.', 'error');
         }
     };
 
@@ -109,26 +119,23 @@ const Profile = () => {
                 location: formData.location,
                 website: formData.website,
                 phone: formData.phone,
-                description: formData.bio,      // form: bio → API: description
-                linkedIn: formData.linkedin,     // form: linkedin → API: linkedIn
+                description: formData.bio,
+                linkedIn: formData.linkedin,
                 github: formData.github,
-                photo: formData.photo
             };
 
             const updatedUser = await updateUser(payload);
 
-            // Sync form state from the API response so inputs immediately reflect saved values
             setFormData(prev => ({
                 ...prev,
                 name:     updatedUser.name     || prev.name,
                 email:    updatedUser.email    || prev.email,
                 location: updatedUser.location ?? prev.location,
-                bio:      updatedUser.description ?? prev.bio,       // API: description → form: bio
+                bio:      updatedUser.description ?? prev.bio,
                 website:  updatedUser.website  ?? prev.website,
-                linkedin: updatedUser.linkedIn  ?? prev.linkedin,    // API: linkedIn → form: linkedin
+                linkedin: updatedUser.linkedIn  ?? prev.linkedin,
                 github:   updatedUser.github   ?? prev.github,
                 phone:    updatedUser.phone    ?? prev.phone,
-                photo:    updatedUser.photo    ?? prev.photo,
             }));
 
             addToast(t('profileUpdated'), 'success');

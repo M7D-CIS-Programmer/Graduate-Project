@@ -94,17 +94,8 @@ namespace aabu_project.Services
 
     public sealed class GeminiResumeService : IGeminiResumeService
     {
-        // ── Endpoint ──────────────────────────────────────────────────────────
-        //
-        // ✅ gemini-1.5-flash on /v1beta  — stable, Free Tier, no 404
-        //    Format: https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent
-        //
-        // ⚠️  Do NOT use /v1 for gemini-1.5-flash — that path is GA only.
-        // ⚠️  Do NOT use gemini-1.5-pro — needs billing enabled on Free Tier.
-        // ─────────────────────────────────────────────────────────────────────
-        private const string Model       = "gemini-1.5-flash";
-        private const string ApiEndpoint =
-            "https://generativelanguage.googleapis.com/v1beta/models/" + Model + ":generateContent";
+        // ── Retry configuration ───────────────────────────────────────────────
+        // Model and base URL come from GeminiSettings in appsettings.json.
 
         // ── Named HttpClient key (registered in Program.cs) ───────────────────
         public const string HttpClientName = "GeminiResume";
@@ -150,11 +141,14 @@ namespace aabu_project.Services
                     "Gemini API key is not configured. " +
                     "Set GeminiSettings:ApiKey in appsettings.json or environment variables.");
 
-            var url    = $"{ApiEndpoint}?key={apiKey}";
-            var prompt = BuildPrompt(resumeText);
+            var model       = _config["GeminiSettings:ModelName"] ?? "gemini-1.5-flash";
+            var baseUrl     = _config["GeminiSettings:BaseUrl"]   ?? "https://generativelanguage.googleapis.com/v1beta/models";
+            var apiEndpoint = $"{baseUrl}/{model}:generateContent";
+            var url         = $"{apiEndpoint}?key={apiKey}";
+            var prompt      = BuildPrompt(resumeText);
 
             _logger.LogInformation(
-                "Starting resume analysis with {Model} (max {Max} attempts).", Model, MaxRetries);
+                "Starting resume analysis with {Model} (max {Max} attempts).", model, MaxRetries);
 
             var rawText = await ExecuteWithExponentialBackoffAsync(
                 () => PostToGeminiAsync(url, prompt, cancellationToken),
@@ -229,9 +223,10 @@ namespace aabu_project.Services
                 },
                 generationConfig = new
                 {
-                    temperature     = 0.1,   // low = deterministic structured output
+                    temperature     = 0.1,
                     maxOutputTokens = 2048,
-                    topP            = 0.95
+                    topP            = 0.95,
+                    thinkingConfig  = new { thinkingBudget = 0 }
                 }
             };
 

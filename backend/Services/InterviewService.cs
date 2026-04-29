@@ -48,10 +48,8 @@ namespace aabu_project.Services
         private readonly HttpClient   _http;
         private readonly IMemoryCache _cache;
         private readonly string       _apiKey;
+        private readonly string       _geminiUrl;
         private readonly ILogger<InterviewService> _logger;
-
-        private const string GeminiUrl =
-            "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
 
         private const int MaxJobChars = 600; // keep prompts tight
 
@@ -68,6 +66,10 @@ namespace aabu_project.Services
             _logger  = logger;
             _cache   = cache;
             _apiKey  = configuration["GeminiSettings:ApiKey"] ?? string.Empty;
+
+            var model   = configuration["GeminiSettings:ModelName"] ?? "gemini-1.5-flash";
+            var baseUrl = configuration["GeminiSettings:BaseUrl"]   ?? "https://generativelanguage.googleapis.com/v1beta/models";
+            _geminiUrl  = $"{baseUrl}/{model}:generateContent";
         }
 
         // ── Start ─────────────────────────────────────────────────────────────
@@ -286,7 +288,7 @@ namespace aabu_project.Services
             var body = new
             {
                 contents = new[] { new { parts = new[] { new { text = prompt } } } },
-                generationConfig = new { temperature = 0.4, maxOutputTokens = 600 }
+                generationConfig = new { temperature = 0.4, maxOutputTokens = 1200, thinkingConfig = new { thinkingBudget = 0 } }
             };
 
             var content  = new StringContent(JsonSerializer.Serialize(body), Encoding.UTF8, "application/json");
@@ -295,7 +297,7 @@ namespace aabu_project.Services
             HttpResponseMessage response;
             try
             {
-                response = await _http.PostAsync($"{GeminiUrl}?key={_apiKey}", content, cts.Token);
+                response = await _http.PostAsync($"{_geminiUrl}?key={_apiKey}", content, cts.Token);
             }
             catch (TaskCanceledException)
             {

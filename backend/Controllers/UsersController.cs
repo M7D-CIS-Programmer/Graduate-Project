@@ -28,7 +28,8 @@ public class UsersController : ControllerBase
         u.Roles?.FirstOrDefault()?.RoleName ?? "Job Seeker",
         u.CreatedAt,
         u.Jobs?.Count(j => j.Status == "Active") ?? 0,
-        u.Industry
+        u.Industry,
+        u.ProfilePicture
     );
 
     [HttpPost("login")]
@@ -68,7 +69,8 @@ public class UsersController : ControllerBase
             Phone = user.Phone,
             Role = user.Roles?.FirstOrDefault()?.RoleName ?? "Job Seeker",
             Token = token,
-            CreatedAt = user.CreatedAt
+            CreatedAt = user.CreatedAt,
+            ProfilePicture = user.ProfilePicture
         };
 
         return Ok(response);
@@ -91,7 +93,7 @@ public class UsersController : ControllerBase
             .Include(u => u.Roles)
             .Include(u => u.Jobs)
             .FirstOrDefaultAsync(u => u.Id == id);
-            
+
         if (user == null) return NotFound();
 
         // Notify user if someone else viewed their profile
@@ -125,18 +127,18 @@ public class UsersController : ControllerBase
 
         var existingUser = await _context.Users
             .FirstOrDefaultAsync(u => u.Email == dto.Email);
-        
+
         if (existingUser != null)
             return BadRequest(new { message = "Email is already registered" });
 
         // Normalize RoleName for better consistency
         var normalizedRole = dto.RoleName.Trim();
-        if (string.Equals(normalizedRole, "Company", StringComparison.OrdinalIgnoreCase) || 
+        if (string.Equals(normalizedRole, "Company", StringComparison.OrdinalIgnoreCase) ||
             string.Equals(normalizedRole, "Employer", StringComparison.OrdinalIgnoreCase))
         {
             normalizedRole = "Employer";
         }
-        else if (string.Equals(normalizedRole, "Job Seeker", StringComparison.OrdinalIgnoreCase) || 
+        else if (string.Equals(normalizedRole, "Job Seeker", StringComparison.OrdinalIgnoreCase) ||
                  string.Equals(normalizedRole, "JobSeeker", StringComparison.OrdinalIgnoreCase))
         {
             normalizedRole = "Job Seeker";
@@ -176,7 +178,8 @@ public class UsersController : ControllerBase
             Phone = user.Phone,
             Role = user.Roles?.FirstOrDefault()?.RoleName ?? "Job Seeker",
             Token = token,
-            CreatedAt = user.CreatedAt
+            CreatedAt = user.CreatedAt,
+            ProfilePicture = user.ProfilePicture
         };
 
         return CreatedAtAction(nameof(GetUser), new { id = user.Id }, response);
@@ -206,7 +209,7 @@ public class UsersController : ControllerBase
 
         if (!string.IsNullOrEmpty(dto.Name)) user.Name = dto.Name;
         if (!string.IsNullOrEmpty(dto.Email)) user.Email = dto.Email;
-        
+
         user.Location = dto.Location;
         user.Website = dto.Website;
         user.Phone = dto.Phone;
@@ -240,5 +243,47 @@ public class UsersController : ControllerBase
         _context.Users.Remove(user);
         await _context.SaveChangesAsync();
         return Ok("Deleted");
+    }
+
+    [Authorize]
+    [HttpPost("{id}/upload-profile-picture")]
+    public async Task<IActionResult> UploadProfilePicture(int id, [FromForm] IFormFile image)
+    {
+        if (image == null || image.Length == 0)
+            return BadRequest(new { message = "No image uploaded" });
+
+        var callerIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (!int.TryParse(callerIdClaim, out int callerId) || callerId != id)
+            return Forbid();
+
+        var user = await _context.Users.FindAsync(id);
+
+        if (user == null)
+            return NotFound();
+
+        var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads/profiles");
+
+        if (!Directory.Exists(uploadsFolder))
+            Directory.CreateDirectory(uploadsFolder);
+
+        var fileName = Guid.NewGuid().ToString() + Path.GetExtension(image.FileName);
+
+        var filePath = Path.Combine(uploadsFolder, fileName);
+
+        using (var stream = new FileStream(filePath, FileMode.Create))
+        {
+            await image.CopyToAsync(stream);
+        }
+
+        user.ProfilePicture = "uploads/profiles/" + fileName;
+
+        await _context.SaveChangesAsync();
+
+        return Ok(new
+        {
+            message = "Profile picture uploaded successfully",
+            imagePath = user.ProfilePicture
+        });
     }
 }

@@ -18,6 +18,7 @@ namespace aabu_project.Data
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<ApplicationJob> ApplicationJobs { get; set; }
         public DbSet<Role> Roles { get; set; }
+        public DbSet<SavedJob> SavedJobs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -126,6 +127,24 @@ namespace aabu_project.Data
             modelBuilder.Entity<Job>()
                 .Property(j => j.SalaryMax)
                 .HasPrecision(18, 2);
+
+            modelBuilder.Entity<SavedJob>()
+                .HasOne(s => s.User)
+                .WithMany(u => u.SavedJobs)
+                .HasForeignKey(s => s.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<SavedJob>()
+                .HasOne(s => s.Job)
+                .WithMany(j => j.SavedJobs)
+                .HasForeignKey(s => s.JobId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Prevent the same user from saving the same job twice at the database level
+            modelBuilder.Entity<SavedJob>()
+                .HasIndex(s => new { s.UserId, s.JobId })
+                .IsUnique()
+                .HasDatabaseName("UX_SavedJobs_UserId_JobId");
         }
     }
 }
