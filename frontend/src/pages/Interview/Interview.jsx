@@ -11,31 +11,31 @@ import './Interview.css';
 import './VoiceInterview.css';
 
 // ── Mode selection screen ───────────────────────────────────────────────────
-const ModeSelect = ({ onSelect }) => (
+const ModeSelect = ({ onSelect, t }) => (
     <div className="iv-page">
         <div className="iv-header">
-            <div className="iv-header-icon"><MessageSquare size={26} /></div>
+            <div className="iv-header-icon"><Bot size={26} /></div>
             <div>
-                <h1 className="iv-title">AI Interview Simulator</h1>
-                <p className="iv-subtitle">Choose your preferred interview mode to begin</p>
+                <h1 className="iv-title">{t('interview')}</h1>
+                <p className="iv-subtitle">{t('interviewChooseMode')}</p>
             </div>
         </div>
         <div className="vi-mode-select">
-            <p className="vi-mode-lead">How would you like to answer the questions?</p>
+            <p className="vi-mode-lead">{t('interviewChooseModeDesc')}</p>
             <div className="vi-mode-cards">
                 <button className="vi-mode-card" onClick={() => onSelect('chat')}>
                     <div className="vi-mode-card-icon vi-mode-card-icon--chat">
                         <MessageSquare size={26} />
                     </div>
-                    <p className="vi-mode-card-title">Chat Interview</p>
-                    <p className="vi-mode-card-desc">Type your answers in a conversation-style interface</p>
+                    <p className="vi-mode-card-title">{t('interviewChatMode')}</p>
+                    <p className="vi-mode-card-desc">{t('interviewChatModeDesc')}</p>
                 </button>
                 <button className="vi-mode-card" onClick={() => onSelect('voice')}>
                     <div className="vi-mode-card-icon vi-mode-card-icon--voice">
                         <Mic size={26} />
                     </div>
-                    <p className="vi-mode-card-title">Voice Interview</p>
-                    <p className="vi-mode-card-desc">Speak your answers using your microphone</p>
+                    <p className="vi-mode-card-title">{t('interviewVoiceMode')}</p>
+                    <p className="vi-mode-card-desc">{t('interviewVoiceModeDesc')}</p>
                 </button>
             </div>
         </div>
@@ -53,20 +53,20 @@ const scoreColor = (v) => {
     return 'score-red';
 };
 
-const scoreLabel = (v) => {
+const scoreLabel = (v, t) => {
     const n = toInt(v);
-    if (n >= 70) return 'Strong';
-    if (n >= 45) return 'Moderate';
-    return 'Needs Work';
+    if (n >= 70) return t('strong');
+    if (n >= 45) return t('moderate');
+    return t('needsWork');
 };
 
 // ── sub-components ─────────────────────────────────────────────────────────────
 
-const QuestionBubble = ({ text, number, total }) => (
+const QuestionBubble = ({ text, number, total, t }) => (
     <div className="iv-bubble-row iv-bubble-row--ai">
         <div className="iv-avatar iv-avatar--ai"><Bot size={18} /></div>
         <div className="iv-bubble iv-bubble--ai">
-            <span className="iv-bubble-meta">Question {number}/{total}</span>
+            <span className="iv-bubble-meta">{t('interviewQuestion')} {number}/{total}</span>
             <p>{text}</p>
         </div>
     </div>
@@ -81,11 +81,11 @@ const AnswerBubble = ({ text }) => (
     </div>
 );
 
-const FeedbackBubble = ({ feedback, score }) => (
+const FeedbackBubble = ({ feedback, score, t }) => (
     <div className="iv-feedback-card">
         <div className="iv-feedback-header">
             <CheckCircle size={15} className="iv-icon-green" />
-            <span>Feedback</span>
+            <span>{t('feedback')}</span>
             <span className={`iv-score-pill ${scoreColor(score * 10)}`}>
                 {toInt(score)}/10
             </span>
@@ -213,7 +213,7 @@ const Interview = () => {
     };
 
     // ── mode routing (must come before any phase renders) ─────────────────────
-    if (!mode)              return <ModeSelect onSelect={setMode} />;
+    if (!mode)              return <ModeSelect onSelect={setMode} t={t} />;
     if (mode === 'voice')   return <VoiceInterview onBack={() => setMode(null)} />;
 
     // ── render: setup phase ────────────────────────────────────────────────────
@@ -221,7 +221,7 @@ const Interview = () => {
     if (phase === 'setup') return (
         <div className="iv-page" dir={dir}>
             <div className="iv-header">
-                <div className="iv-header-icon"><MessageSquare size={26} /></div>
+                <div className="iv-header-icon"><Bot size={26} /></div>
                 <div>
                     <h1 className="iv-title">{t('interview')}</h1>
                     <p className="iv-subtitle">{t('interviewSubtitle')}</p>
@@ -287,12 +287,12 @@ const Interview = () => {
     if (phase === 'results' && results) {
         const finalPct  = toInt(results.finalScore);
         const color     = scoreColor(finalPct);
-        const label     = scoreLabel(finalPct);
+        const label     = scoreLabel(finalPct, t);
 
         return (
             <div className="iv-page" dir={dir}>
                 <div className="iv-header">
-                    <div className="iv-header-icon"><MessageSquare size={26} /></div>
+                    <div className="iv-header-icon"><Bot size={26} /></div>
                     <div>
                         <h1 className="iv-title">{t('interviewComplete')}</h1>
                         <p className="iv-subtitle">{jobTitle}</p>
@@ -392,7 +392,7 @@ const Interview = () => {
     return (
         <div className="iv-page" dir={dir}>
             <div className="iv-header">
-                <div className="iv-header-icon"><MessageSquare size={26} /></div>
+                <div className="iv-header-icon"><Bot size={26} /></div>
                 <div>
                     <h1 className="iv-title">{t('interviewInProgress')}</h1>
                     <p className="iv-subtitle">{jobTitle}</p>
@@ -416,11 +416,11 @@ const Interview = () => {
             <div className="iv-chat-window">
                 {messages.map(msg => {
                     if (msg.type === 'question')
-                        return <QuestionBubble key={msg.id} text={msg.content} number={msg.qNum} total={qTotal} />;
+                        return <QuestionBubble key={msg.id} text={msg.content} number={msg.qNum} total={qTotal} t={t} />;
                     if (msg.type === 'answer')
                         return <AnswerBubble key={msg.id} text={msg.content} />;
                     if (msg.type === 'feedback')
-                        return <FeedbackBubble key={msg.id} feedback={msg.content} score={msg.score} />;
+                        return <FeedbackBubble key={msg.id} feedback={msg.content} score={msg.score} t={t} />;
                     return null;
                 })}
 
@@ -467,7 +467,7 @@ const Interview = () => {
                     }
                 </button>
             </div>
-            <p className="iv-hint">Ctrl + Enter to submit</p>
+            <p className="iv-hint">{t('ctrlEnterToSubmit')}</p>
         </div>
     );
 };

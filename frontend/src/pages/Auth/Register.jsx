@@ -139,8 +139,8 @@ const Register = () => {
                     />
                     {formData.role === 'company' && (
                         <Input
-                            label={t('industry') || 'Industry'}
-                            placeholder="e.g. Technology, Healthcare"
+                            label={t('industry')}
+                            placeholder={t('industryPlaceholder')}
                             icon={Building}
                             type="text"
                             value={formData.industry}
@@ -186,7 +186,7 @@ const Register = () => {
                         className="btn-full"
                         disabled={loading}
                     >
-                        {loading ? 'Registering...' : t('registerBtn')}
+                        {loading ? t('registering') : t('registerBtn')}
                     </Button>
                 </form>
 

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { useLanguage } from '../../context/LanguageContext';
 
 const SpeechRecognitionAPI =
     (typeof window !== 'undefined') &&
@@ -8,6 +9,7 @@ const synthSupported =
     typeof window !== 'undefined' && 'speechSynthesis' in window;
 
 export function useVoiceInterview() {
+    const { language, t } = useLanguage();
     const [isSupported]       = useState(Boolean(SpeechRecognitionAPI));
     const [isRecording,   setIsRecording]   = useState(false);
     const [transcript,    setTranscript]    = useState('');
@@ -25,16 +27,14 @@ export function useVoiceInterview() {
     const startRecording = useCallback(() => {
         if (!SpeechRecognitionAPI || isRecording) return;
 
-        // Always create a fresh instance — reusing an ended instance causes
-        // Chrome to silently fail or immediately fire no-speech.
         if (recognitionRef.current) {
             recognitionRef.current.abort();
         }
 
         const rec = new SpeechRecognitionAPI();
-        rec.continuous      = true;   // no forced timeout; stop() ends the session
+        rec.continuous      = true;
         rec.interimResults  = true;
-        rec.lang            = 'en-US';
+        rec.lang            = language === 'ar' ? 'ar-SA' : 'en-US';
         rec.maxAlternatives = 1;
 
         rec.onresult = (e) => {
@@ -50,15 +50,15 @@ export function useVoiceInterview() {
         };
 
         rec.onerror = (e) => {
-            if (e.error === 'aborted') return;  // user-initiated, not an error
+            if (e.error === 'aborted') return;
             setIsRecording(false);
             setInterim('');
             const MAP = {
-                'no-speech':   'No speech detected. Please try again.',
-                'not-allowed': 'Microphone access denied. Enable it in browser settings.',
-                'network':     'Network error during recognition. Check your connection.',
+                'no-speech':   t('interviewErrorNoSpeech'),
+                'not-allowed': t('interviewErrorMicDenied'),
+                'network':     t('actionFailed'),
             };
-            const msg = MAP[e.error] ?? `Speech recognition error: ${e.error}`;
+            const msg = MAP[e.error] ?? `${t('actionFailed')} (${e.error})`;
             if (msg) setVoiceError(msg);
         };
 
@@ -75,14 +75,13 @@ export function useVoiceInterview() {
             rec.start();
             setIsRecording(true);
         } catch {
-            setVoiceError('Could not start recording. Please try again.');
+            setVoiceError(t('actionFailed'));
         }
-    }, [isRecording]);
+    }, [isRecording, language, t]);
 
     const stopRecording = useCallback(() => {
         if (!isRecording) return;
         recognitionRef.current?.stop();
-        // isRecording → false is handled by the onend callback
     }, [isRecording]);
 
     const resetTranscript = useCallback(() => {
@@ -98,12 +97,12 @@ export function useVoiceInterview() {
         const utt   = new SpeechSynthesisUtterance(text);
         utt.rate    = opts.rate  ?? 1;
         utt.pitch   = opts.pitch ?? 1;
-        utt.lang    = opts.lang  ?? 'en-US';
+        utt.lang    = opts.lang  ?? (language === 'ar' ? 'ar-SA' : 'en-US');
         utt.onstart = () => setIsSpeaking(true);
         utt.onend   = () => setIsSpeaking(false);
         utt.onerror = () => setIsSpeaking(false);
         window.speechSynthesis.speak(utt);
-    }, []);
+    }, [language]);
 
     const stopSpeaking = useCallback(() => {
         if (!synthSupported) return;
