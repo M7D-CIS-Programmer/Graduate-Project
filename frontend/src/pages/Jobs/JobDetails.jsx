@@ -8,6 +8,7 @@ import Button from '../../components/ui/Button';
 import Spinner from '../../components/ui/Spinner';
 import { useJob } from '../../hooks/useJobs';
 import { useApplyForJob } from '../../hooks/useApplications';
+import { useSaveJob, useUnsaveJob, useCheckSavedJob } from '../../hooks/useSavedJobs';
 import { formatTimeAgo } from '../../utils/dateUtils';
 
 const JobDetails = () => {
@@ -20,10 +21,12 @@ const JobDetails = () => {
     const { data: job, isLoading, error } = useJob(id);
     const { mutate: applyForJob, isPending: isApplying } = useApplyForJob();
 
-    const isJobSaved = user?.savedJobs?.some(j => j.id === parseInt(id)) || false;
+    const { data: savedStatus, isLoading: isCheckLoading } = useCheckSavedJob(id);
+    const { mutate: saveJob, isPending: isSaving } = useSaveJob();
+    const { mutate: unsaveJob, isPending: isUnsaving } = useUnsaveJob();
+
     const isJobApplied = user?.appliedJobs?.some(j => j.id === parseInt(id)) || false;
 
-    const [isSaved, setIsSaved] = useState(isJobSaved);
     const [isApplied, setIsApplied] = useState(isJobApplied);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [formData, setFormData] = useState({
@@ -34,11 +37,12 @@ const JobDetails = () => {
         cv: ''
     });
 
+    const isSaved = savedStatus?.isSaved || false;
+
     React.useEffect(() => {
         if (!job) return;
-        setIsSaved(user?.savedJobs?.some(j => j.id === job.id) || false);
         setIsApplied(user?.appliedJobs?.some(j => j.id === job.id) || false);
-    }, [job, user?.savedJobs, user?.appliedJobs]);
+    }, [job, user?.appliedJobs]);
 
     if (isLoading) return <Spinner />;
     if (error || !job) {
@@ -60,12 +64,17 @@ const JobDetails = () => {
             return;
         }
 
-        const newSavedJobs = isSaved
-            ? user.savedJobs.filter(j => j.id !== job.id)
-            : [...(user.savedJobs || []), job];
-
-        updateUser({ savedJobs: newSavedJobs });
-        setIsSaved(!isSaved);
+        if (isSaved) {
+            unsaveJob(savedStatus.savedJobId, {
+                onSuccess: () => addToast(t('removedFromSaved') || 'Job removed from saved', 'info'),
+                onError: () => addToast(t('actionFailed') || 'Failed to unsave job', 'error')
+            });
+        } else {
+            saveJob(job.id, {
+                onSuccess: () => addToast(t('jobSaved') || 'Job saved successfully', 'success'),
+                onError: () => addToast(t('actionFailed') || 'Failed to save job', 'error')
+            });
+        }
     };
 
     const handleApplyClick = () => {

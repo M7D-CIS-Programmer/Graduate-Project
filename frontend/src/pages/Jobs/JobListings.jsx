@@ -13,6 +13,10 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useJobs } from '../../hooks/useJobs';
 import { useCategories } from '../../hooks/useCategories';
 import { useDebounce } from '../../hooks/useDebounce';
+import { useSavedJobs, useSaveJob, useUnsaveJob } from '../../hooks/useSavedJobs';
+import { useAuth } from '../../context/AuthContext';
+import { useToast } from '../../context/ToastContext';
+import { Bookmark } from 'lucide-react';
 import './Jobs.css';
 
 
@@ -42,6 +46,33 @@ const JobListings = () => {
         q: debouncedQuery,
         categoryId: selectedCategory
     });
+
+    const { user } = useAuth();
+    const { addToast } = useToast();
+    const { data: savedJobs = [] } = useSavedJobs();
+    const { mutate: saveJob } = useSaveJob();
+    const { mutate: unsaveJob } = useUnsaveJob();
+
+    const isSaved = (jobId) => savedJobs.some(s => s.jobId === jobId);
+    const getSavedId = (jobId) => savedJobs.find(s => s.jobId === jobId)?.id;
+
+    const handleSaveToggle = (e, job) => {
+        e.stopPropagation(); // Don't navigate to details
+        if (!user) {
+            addToast(t('signInToApply') || 'Please sign in to save jobs', 'error');
+            return;
+        }
+
+        if (isSaved(job.id)) {
+            unsaveJob(getSavedId(job.id), {
+                onSuccess: () => addToast(t('removedFromSaved') || 'Job removed from saved', 'info')
+            });
+        } else {
+            saveJob(job.id, {
+                onSuccess: () => addToast(t('jobSaved') || 'Job saved successfully', 'success')
+            });
+        }
+    };
 
     const jobTypeOptions = [
         { label: t('fullTime'), value: 'Full Time' },
@@ -225,9 +256,30 @@ const JobListings = () => {
                                     <div className="company-logo-placeholder">
                                         <Building size={24} color="var(--text-muted)" />
                                     </div>
-                                    <span className="job-type-badge">
-                                        {t(job.type) || job.type}
-                                    </span>
+                                    <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                                        <button 
+                                            className={`btn-icon-sm ${isSaved(job.id) ? 'saved' : ''}`}
+                                            onClick={(e) => handleSaveToggle(e, job)}
+                                            style={{
+                                                background: 'none',
+                                                border: 'none',
+                                                cursor: 'pointer',
+                                                color: isSaved(job.id) ? 'var(--primary)' : 'var(--text-muted)',
+                                                padding: '4px',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                borderRadius: '8px',
+                                                transition: 'all 0.2s'
+                                            }}
+                                            title={isSaved(job.id) ? t('saved') : t('saveJob')}
+                                        >
+                                            <Bookmark size={20} fill={isSaved(job.id) ? 'currentColor' : 'none'} />
+                                        </button>
+                                        <span className="job-type-badge">
+                                            {t(job.type) || job.type}
+                                        </span>
+                                    </div>
                                 </div>
                                 <h3 className="job-title">{t(job.title) || job.title}</h3>
                                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.5rem', fontSize: '0.875rem' }}>
