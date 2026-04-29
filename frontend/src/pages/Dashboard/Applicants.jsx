@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useApplications, useUpdateApplicationStatus } from '../../hooks/useApplications';
 import { useToast } from '../../context/ToastContext';
 import { useLanguage } from '../../context/LanguageContext';
+import { useAuth } from '../../context/AuthContext';
+import { useMyJobs } from '../../hooks/useJobs';
 import {
     Users,
     Search,
@@ -23,11 +25,16 @@ const Applicants = () => {
     const { t, dir, language } = useLanguage();
     const navigate = useNavigate();
     const { addToast } = useToast();
+    const { user } = useAuth();
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('All');
 
-    const { data: applications = [], isLoading, error } = useApplications();
+    const { data: applications = [], isLoading, error } = useApplications(user?.id);
+    const { data: myJobs = [] } = useMyJobs(user?.id);
     const { mutate: updateStatus } = useUpdateApplicationStatus();
+
+    // Only the set of job IDs that belong to the current employer
+    const myJobIds = useMemo(() => new Set(myJobs.map(j => j.id)), [myJobs]);
 
     const getStatusColor = (status) => {
         switch (status) {
@@ -67,6 +74,9 @@ const Applicants = () => {
 
     const filteredApplicants = useMemo(() => {
         return applications.filter(app => {
+            // Only show applications for jobs owned by the current employer
+            if (myJobIds.size > 0 && !myJobIds.has(app.jobId)) return false;
+
             const name = app.user?.name || '';
             const role = app.job?.title || '';
             const matchesSearch = name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -80,7 +90,7 @@ const Applicants = () => {
             
             return matchesSearch && matchesStatus;
         }).sort((a, b) => new Date(b.date) - new Date(a.date));
-    }, [applications, searchTerm, statusFilter]);
+    }, [applications, searchTerm, statusFilter, myJobIds]);
 
     return (
         <div className="dashboard-container">

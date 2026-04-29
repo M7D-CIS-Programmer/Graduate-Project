@@ -1,12 +1,13 @@
 using aabu_project.Data;
 using aabu_project.Models;
 using aabu_project.Dtos;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using SQLitePCL;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class ApplicationJobsController : ControllerBase
 {
     private readonly MyDbContext _context;
@@ -16,14 +17,24 @@ public class ApplicationJobsController : ControllerBase
         _context = context;
     }
 
+    /// <summary>
+    /// GET /api/ApplicationJobs?employerId={id}
+    /// Returns applications for the given employer's jobs only.
+    /// Omit employerId (admin use) to return all applications.
+    /// </summary>
     [HttpGet]
-    public async Task<IActionResult> Get()
+    public async Task<IActionResult> Get([FromQuery] int? employerId)
     {
-        return Ok(await _context.ApplicationJobs
+        var query = _context.ApplicationJobs
             .Include(a => a.Job)
-            .ThenInclude(j => j.User)
+                .ThenInclude(j => j.User)
             .Include(a => a.User)
-            .ToListAsync());
+            .AsQueryable();
+
+        if (employerId.HasValue)
+            query = query.Where(a => a.Job.UserId == employerId.Value);
+
+        return Ok(await query.ToListAsync());
     }
 
     [HttpPost]

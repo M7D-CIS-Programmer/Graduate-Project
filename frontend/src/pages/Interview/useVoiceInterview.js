@@ -7,23 +7,6 @@ const SpeechRecognitionAPI =
 const synthSupported =
     typeof window !== 'undefined' && 'speechSynthesis' in window;
 
-/**
- * Abstracts the Web Speech API (recognition + synthesis).
- * Falls back gracefully when the browser lacks support.
- *
- * Returns:
- *   isSupported      – true if SpeechRecognition is available
- *   isRecording      – mic is active
- *   transcript       – accumulated final text from current session
- *   interimTranscript – live partial text while speaking
- *   isSpeaking       – TTS is currently playing
- *   voiceError       – last error message (or '')
- *   startRecording() – begin STT
- *   stopRecording()  – end STT (finalises transcript)
- *   resetTranscript()– clear transcript + error
- *   speak(text, opts)– TTS; opts: { rate, pitch, lang }
- *   stopSpeaking()   – cancel TTS
- */
 export function useVoiceInterview() {
     const [isSupported]       = useState(Boolean(SpeechRecognitionAPI));
     const [isRecording,   setIsRecording]   = useState(false);
@@ -34,12 +17,22 @@ export function useVoiceInterview() {
 
     const recognitionRef = useRef(null);
 
-    // ── Initialise SpeechRecognition once ──────────────────────────────────
     useEffect(() => {
-        if (!SpeechRecognitionAPI) return;
+        return () => recognitionRef.current?.abort();
+    }, []);
+
+    // ── STT controls ────────────────────────────────────────────────────────
+    const startRecording = useCallback(() => {
+        if (!SpeechRecognitionAPI || isRecording) return;
+
+        // Always create a fresh instance — reusing an ended instance causes
+        // Chrome to silently fail or immediately fire no-speech.
+        if (recognitionRef.current) {
+            recognitionRef.current.abort();
+        }
 
         const rec = new SpeechRecognitionAPI();
-        rec.continuous      = false;   // single utterance per press
+        rec.continuous      = true;   // no forced timeout; stop() ends the session
         rec.interimResults  = true;
         rec.lang            = 'en-US';
         rec.maxAlternatives = 1;
@@ -57,13 +50,13 @@ export function useVoiceInterview() {
         };
 
         rec.onerror = (e) => {
+            if (e.error === 'aborted') return;  // user-initiated, not an error
             setIsRecording(false);
             setInterim('');
             const MAP = {
                 'no-speech':   'No speech detected. Please try again.',
                 'not-allowed': 'Microphone access denied. Enable it in browser settings.',
                 'network':     'Network error during recognition. Check your connection.',
-                'aborted':     '',   // user-initiated, not an error
             };
             const msg = MAP[e.error] ?? `Speech recognition error: ${e.error}`;
             if (msg) setVoiceError(msg);
@@ -75,16 +68,11 @@ export function useVoiceInterview() {
         };
 
         recognitionRef.current = rec;
-        return () => rec.abort();
-    }, []);   // stable — runs once
 
-    // ── STT controls ────────────────────────────────────────────────────────
-    const startRecording = useCallback(() => {
-        if (!SpeechRecognitionAPI || isRecording) return;
         setVoiceError('');
         setInterim('');
         try {
-            recognitionRef.current.start();
+            rec.start();
             setIsRecording(true);
         } catch {
             setVoiceError('Could not start recording. Please try again.');

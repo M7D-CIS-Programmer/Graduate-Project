@@ -46,7 +46,7 @@ const EmployerDashboard = () => {
     const navigate = useNavigate();
 
     const { data: allJobs = [], isLoading: jobsLoading } = useJobs();
-    const { data: allApplications = [], isLoading: appsLoading } = useApplications();
+    const { data: allApplications = [], isLoading: appsLoading } = useApplications(user?.id);
     const updateStatusMutation = useUpdateApplicationStatus();
 
     const employerJobs = useMemo(() => {
