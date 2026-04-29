@@ -17,7 +17,8 @@ const Register = () => {
         email: '', 
         password: '', 
         confirmPassword: '', 
-        role: 'seeker' 
+        role: 'seeker',
+        industry: '' 
     });
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
@@ -53,7 +54,8 @@ const Register = () => {
                 name: formData.fullName.trim(),
                 email: formData.email.trim().toLowerCase(),
                 pass: formData.password,
-                roleName: roleName
+                roleName: roleName,
+                industry: formData.role === 'company' ? formData.industry.trim() : ''
             });
 
             const dashboardPaths = {
@@ -135,6 +137,18 @@ const Register = () => {
                         error={errors.fullName}
                         disabled={loading}
                     />
+                    {formData.role === 'company' && (
+                        <Input
+                            label={t('industry') || 'Industry'}
+                            placeholder="e.g. Technology, Healthcare"
+                            icon={Building}
+                            type="text"
+                            value={formData.industry}
+                            onChange={(e) => setFormData({ ...formData, industry: e.target.value })}
+                            disabled={loading}
+                            required
+                        />
+                    )}
                     <Input
                         label={t('email')}
                         placeholder="example@mail.com"
