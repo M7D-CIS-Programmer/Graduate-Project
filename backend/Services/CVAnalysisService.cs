@@ -306,5 +306,467 @@ namespace aabu_project.Services
 
             return text;
         }
+
+        // ── Semantic Analysis ─────────────────────────────────────────────────────
+
+        // CV text is capped to keep Gemini costs predictable
+        private const int MaxCvCharsForSemantic  = 6_000;
+        private const int MaxJobCharsForSemantic  = 2_000;
+
+        public async Task<SemanticCVAnalysisResponseDto> SemanticAnalyzeCvAsync(
+            string cvText, string jobDescription)
+        {
+            if (string.IsNullOrWhiteSpace(_apiKey))
+                throw new InvalidOperationException(
+                    "Gemini API key is not configured. Set GeminiSettings:ApiKey in appsettings.json.");
+
+            var cacheKey = ComputeCacheKey(cvText, "semantic", jobDescription);
+
+            if (_cache.TryGetValue(cacheKey, out SemanticCVAnalysisResponseDto? cached) && cached is not null)
+            {
+                _logger.LogInformation("[CACHE HIT] semantic key={Key}", cacheKey);
+                return cached;
+            }
+
+            var truncatedCv  = cvText.Length  > MaxCvCharsForSemantic  ? cvText[..MaxCvCharsForSemantic]  : cvText;
+            var truncatedJob = jobDescription.Length > MaxJobCharsForSemantic ? jobDescription[..MaxJobCharsForSemantic] : jobDescription;
+
+            var prompt   = BuildSemanticPrompt(truncatedCv, truncatedJob);
+            var rawText  = await CallGeminiSemanticAsync(prompt);
+            var result   = ParseSemanticInsights(rawText);
+
+            _cache.Set(cacheKey, result, TimeSpan.FromHours(1));
+            _logger.LogInformation("[CACHE MISS] Semantic analysis complete. key={Key}", cacheKey);
+
+            return result;
+        }
+
+        private static string BuildSemanticPrompt(string cvText, string jobDescription) => $$"""
+            You are an expert AI CV Analyst inside a recruitment system.
+
+            Your task:
+            Analyze the candidate CV against the Job Description and extract ONLY deep semantic insights.
+
+            You are NOT allowed to:
+            - Perform simple keyword counting
+            - Do mathematical scoring based on skills (this is handled by system code)
+            - Guess missing information
+
+            Focus ONLY on:
+            - Semantic relevance (meaning, not keywords)
+            - Quality of experience descriptions
+            - Logical consistency of CV
+            - Red flags or suspicious content
+            - True suitability reasoning
+
+            Job Description:
+            {{jobDescription}}
+
+            Candidate CV:
+            {{cvText}}
+
+            Return ONLY valid JSON — no markdown fences, no extra text:
+            {
+              "semanticMatchAnalysis": "Explain how well the candidate fits the role in a meaningful way",
+              "keyMatchingAreas": ["..."],
+              "missingCriticalSkills": ["..."],
+              "experienceQuality": "low | medium | high",
+              "consistencyCheck": "pass | warning | fail",
+              "fraudIndicators": ["..."],
+              "overallInsight": "short professional conclusion"
+            }
+
+            RULES:
+            - Be strict and realistic
+            - Do not exaggerate candidate strengths
+            - Do not assume missing data
+            - Focus on logic and meaning, not keywords
+            - fraudIndicators must be an empty array [] if nothing suspicious is found
+            """;
+
+        private async Task<string> CallGeminiSemanticAsync(string prompt)
+        {
+            var body = new
+            {
+                contents = new[] { new { parts = new[] { new { text = prompt } } } },
+                generationConfig = new { temperature = 0.1, maxOutputTokens = 1_200, thinkingConfig = new { thinkingBudget = 0 } }
+            };
+
+            var content = new StringContent(
+                JsonSerializer.Serialize(body), Encoding.UTF8, "application/json");
+
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(45));
+            HttpResponseMessage response;
+
+            try
+            {
+                response = await _httpClient.PostAsync(
+                    $"{_geminiUrl}?key={_apiKey}", content, cts.Token);
+            }
+            catch (TaskCanceledException)
+            {
+                throw new TimeoutException("Gemini semantic analysis timed out after 45 seconds.");
+            }
+
+            var responseBody = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var code = (int)response.StatusCode;
+                _logger.LogError("Gemini semantic {StatusCode}: {Body}", code, responseBody);
+
+                throw code switch
+                {
+                    429 => new InvalidOperationException("QUOTA_EXCEEDED"),
+                    400 => new InvalidOperationException($"Gemini bad request: {responseBody}"),
+                    401 or 403 => new UnauthorizedAccessException("Invalid or missing Gemini API key."),
+                    _ => new InvalidOperationException($"Gemini returned {code}: {responseBody}")
+                };
+            }
+
+            return ExtractGeminiText(responseBody);
+        }
+
+        private static SemanticCVAnalysisResponseDto ParseSemanticInsights(string text)
+        {
+            var json = ExtractSemanticJson(text);
+            try
+            {
+                var opts = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                return JsonSerializer.Deserialize<SemanticCVAnalysisResponseDto>(json, opts)
+                    ?? FallbackSemantic();
+            }
+            catch (JsonException)
+            {
+                return FallbackSemantic();
+            }
+        }
+
+        private static SemanticCVAnalysisResponseDto FallbackSemantic() => new()
+        {
+            SemanticMatchAnalysis = "Analysis could not be completed. Please try again.",
+            KeyMatchingAreas      = [],
+            MissingCriticalSkills = [],
+            ExperienceQuality     = "medium",
+            ConsistencyCheck      = "pass",
+            FraudIndicators       = [],
+            OverallInsight        = "Unable to generate insight at this time."
+        };
+
+        private static string ExtractSemanticJson(string text)
+        {
+            text = text.Trim();
+
+            var fence = Regex.Match(text, @"```(?:json)?\s*([\s\S]*?)```", RegexOptions.IgnoreCase);
+            if (fence.Success)
+                return fence.Groups[1].Value.Trim();
+
+            var start = text.IndexOf('{');
+            var end   = text.LastIndexOf('}');
+            if (start >= 0 && end > start)
+                return text[start..(end + 1)];
+
+            return text;
+        }
+
+        // ── Fraud Detection ───────────────────────────────────────────────────────
+
+        private const int MaxCvCharsForFraud = 6_000;
+
+        public async Task<CVFraudDetectionResponseDto> DetectCvFraudAsync(string cvText)
+        {
+            if (string.IsNullOrWhiteSpace(_apiKey))
+                throw new InvalidOperationException(
+                    "Gemini API key is not configured. Set GeminiSettings:ApiKey in appsettings.json.");
+
+            var cacheKey = ComputeCacheKey(cvText, "fraud", string.Empty);
+
+            if (_cache.TryGetValue(cacheKey, out CVFraudDetectionResponseDto? cached) && cached is not null)
+            {
+                _logger.LogInformation("[CACHE HIT] fraud key={Key}", cacheKey);
+                return cached;
+            }
+
+            var truncatedCv = cvText.Length > MaxCvCharsForFraud ? cvText[..MaxCvCharsForFraud] : cvText;
+
+            var prompt  = BuildFraudPrompt(truncatedCv);
+            var rawText = await CallGeminiFraudAsync(prompt);
+            var result  = ParseFraudResponse(rawText);
+
+            _cache.Set(cacheKey, result, TimeSpan.FromHours(1));
+            _logger.LogInformation("[CACHE MISS] Fraud detection complete. key={Key}", cacheKey);
+
+            return result;
+        }
+
+        private static string BuildFraudPrompt(string cvText) => $$"""
+            You are a CV Integrity & Fraud Detection AI.
+
+            Your task is to detect inconsistencies or unrealistic claims in the CV below.
+
+            Check for:
+            - Unrealistic years of experience relative to age signals
+            - Impossible career progression (e.g. senior roles without junior history)
+            - Overstated skills without any supporting evidence in job descriptions
+            - Contradicting dates or overlapping roles
+            - Fake-sounding or vague job history
+            - Suspiciously generic descriptions with no specifics
+
+            CV TEXT:
+            {{cvText}}
+
+            Return ONLY valid JSON — no markdown fences, no extra text:
+            {
+              "isSuspicious": true,
+              "riskLevel": "low | medium | high",
+              "issuesFound": [
+                {
+                  "issue": "description of the issue",
+                  "reason": "why it is suspicious"
+                }
+              ],
+              "finalVerdict": "trusted | questionable | likely_fake"
+            }
+
+            RULES:
+            - Do not assume guilt without concrete evidence from the CV text
+            - Be analytical and logical — base every issue on text you can quote
+            - If nothing suspicious is found: isSuspicious=false, riskLevel="low", issuesFound=[], finalVerdict="trusted"
+            - Focus on consistency of timeline and the plausibility of skill claims
+            """;
+
+        private async Task<string> CallGeminiFraudAsync(string prompt)
+        {
+            var body = new
+            {
+                contents = new[] { new { parts = new[] { new { text = prompt } } } },
+                generationConfig = new { temperature = 0.1, maxOutputTokens = 1_000, thinkingConfig = new { thinkingBudget = 0 } }
+            };
+
+            var content = new StringContent(
+                JsonSerializer.Serialize(body), Encoding.UTF8, "application/json");
+
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(45));
+            HttpResponseMessage response;
+
+            try
+            {
+                response = await _httpClient.PostAsync(
+                    $"{_geminiUrl}?key={_apiKey}", content, cts.Token);
+            }
+            catch (TaskCanceledException)
+            {
+                throw new TimeoutException("Gemini fraud detection timed out after 45 seconds.");
+            }
+
+            var responseBody = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var code = (int)response.StatusCode;
+                _logger.LogError("Gemini fraud {StatusCode}: {Body}", code, responseBody);
+
+                throw code switch
+                {
+                    429 => new InvalidOperationException("QUOTA_EXCEEDED"),
+                    400 => new InvalidOperationException($"Gemini bad request: {responseBody}"),
+                    401 or 403 => new UnauthorizedAccessException("Invalid or missing Gemini API key."),
+                    _ => new InvalidOperationException($"Gemini returned {code}: {responseBody}")
+                };
+            }
+
+            return ExtractGeminiText(responseBody);
+        }
+
+        private static CVFraudDetectionResponseDto ParseFraudResponse(string text)
+        {
+            var json = StripJsonFences(text);
+            try
+            {
+                var opts = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                return JsonSerializer.Deserialize<CVFraudDetectionResponseDto>(json, opts)
+                    ?? FallbackFraud();
+            }
+            catch (JsonException)
+            {
+                return FallbackFraud();
+            }
+        }
+
+        private static CVFraudDetectionResponseDto FallbackFraud() => new()
+        {
+            IsSuspicious = false,
+            RiskLevel    = "low",
+            IssuesFound  = [],
+            FinalVerdict = "trusted"
+        };
+
+        private static string StripJsonFences(string text)
+        {
+            text = text.Trim();
+
+            var fence = Regex.Match(text, @"```(?:json)?\s*([\s\S]*?)```", RegexOptions.IgnoreCase);
+            if (fence.Success)
+                return fence.Groups[1].Value.Trim();
+
+            var start = text.IndexOf('{');
+            var end   = text.LastIndexOf('}');
+            if (start >= 0 && end > start)
+                return text[start..(end + 1)];
+
+            return text;
+        }
+
+        // ── Hiring Recommendation ─────────────────────────────────────────────────
+
+        public async Task<HiringRecommendationResponseDto> GenerateHiringRecommendationAsync(
+            HiringRecommendationRequestDto request)
+        {
+            if (string.IsNullOrWhiteSpace(_apiKey))
+                throw new InvalidOperationException(
+                    "Gemini API key is not configured. Set GeminiSettings:ApiKey in appsettings.json.");
+
+            // Cache key is derived from the three inputs serialised
+            var inputHash = ComputeCacheKey(
+                JsonSerializer.Serialize(request.SemanticAnalysis),
+                "hire",
+                $"{JsonSerializer.Serialize(request.FraudResult)}|{request.MatchScore}");
+
+            if (_cache.TryGetValue(inputHash, out HiringRecommendationResponseDto? cached) && cached is not null)
+            {
+                _logger.LogInformation("[CACHE HIT] hiring key={Key}", inputHash);
+                return cached;
+            }
+
+            var prompt  = BuildHiringPrompt(request);
+            var rawText = await CallGeminiHiringAsync(prompt);
+            var result  = ParseHiringResponse(rawText);
+
+            _cache.Set(inputHash, result, TimeSpan.FromHours(1));
+            _logger.LogInformation("[CACHE MISS] Hiring recommendation complete. key={Key}", inputHash);
+
+            return result;
+        }
+
+        private static string BuildHiringPrompt(HiringRecommendationRequestDto req)
+        {
+            var sem   = req.SemanticAnalysis;
+            var fraud = req.FraudResult;
+
+            var fraudSummary = fraud.IsSuspicious
+                ? $"SUSPICIOUS — {fraud.RiskLevel} risk. Verdict: {fraud.FinalVerdict}. " +
+                  $"Issues: {string.Join("; ", fraud.IssuesFound.Select(i => i.Issue))}"
+                : $"CLEAN — {fraud.FinalVerdict}. No issues found.";
+
+            var keyAreas  = sem.KeyMatchingAreas.Count  > 0 ? string.Join(", ", sem.KeyMatchingAreas)  : "none";
+            var missing   = sem.MissingCriticalSkills.Count > 0 ? string.Join(", ", sem.MissingCriticalSkills) : "none";
+            var fraudFlags = sem.FraudIndicators.Count > 0 ? string.Join(", ", sem.FraudIndicators) : "none";
+
+            return $$"""
+                You are a Senior Recruitment AI Advisor.
+
+                Combine the structured inputs below into a final hiring recommendation.
+
+                RULES:
+                - Trust the system match score for the numeric dimension
+                - Trust the AI modules ONLY for reasoning and risk signals
+                - Be objective and HR-like — no sentiment, no guessing
+                - finalScore must be a number between 0 and 100
+                - finalDecision must be exactly one of: strong_hire, hire, neutral, reject
+                - riskAssessment must be exactly one of: low, medium, high
+
+                INPUT DATA:
+
+                System Match Score: {{req.MatchScore}}/100
+
+                Semantic Analysis Summary:
+                  Match Analysis : {{sem.SemanticMatchAnalysis}}
+                  Key Matching Areas : {{keyAreas}}
+                  Missing Critical Skills : {{missing}}
+                  Experience Quality : {{sem.ExperienceQuality}}
+                  Consistency Check : {{sem.ConsistencyCheck}}
+                  Semantic Fraud Indicators : {{fraudFlags}}
+                  Overall Insight : {{sem.OverallInsight}}
+
+                Fraud Detection Summary:
+                  {{fraudSummary}}
+
+                Return ONLY valid JSON — no markdown fences, no extra text:
+                {
+                  "finalDecision": "strong_hire | hire | neutral | reject",
+                  "finalScore": <number 0-100>,
+                  "reasoning": "clear explanation combining all three factors",
+                  "riskAssessment": "low | medium | high",
+                  "recommendation": "specific actionable next step for the hiring team"
+                }
+                """;
+        }
+
+        private async Task<string> CallGeminiHiringAsync(string prompt)
+        {
+            var body = new
+            {
+                contents = new[] { new { parts = new[] { new { text = prompt } } } },
+                generationConfig = new { temperature = 0.1, maxOutputTokens = 800, thinkingConfig = new { thinkingBudget = 0 } }
+            };
+
+            var content = new StringContent(
+                JsonSerializer.Serialize(body), Encoding.UTF8, "application/json");
+
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
+            HttpResponseMessage response;
+
+            try
+            {
+                response = await _httpClient.PostAsync(
+                    $"{_geminiUrl}?key={_apiKey}", content, cts.Token);
+            }
+            catch (TaskCanceledException)
+            {
+                throw new TimeoutException("Gemini hiring recommendation timed out after 30 seconds.");
+            }
+
+            var responseBody = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var code = (int)response.StatusCode;
+                _logger.LogError("Gemini hiring {StatusCode}: {Body}", code, responseBody);
+
+                throw code switch
+                {
+                    429 => new InvalidOperationException("QUOTA_EXCEEDED"),
+                    400 => new InvalidOperationException($"Gemini bad request: {responseBody}"),
+                    401 or 403 => new UnauthorizedAccessException("Invalid or missing Gemini API key."),
+                    _ => new InvalidOperationException($"Gemini returned {code}: {responseBody}")
+                };
+            }
+
+            return ExtractGeminiText(responseBody);
+        }
+
+        private static HiringRecommendationResponseDto ParseHiringResponse(string text)
+        {
+            var json = StripJsonFences(text);
+            try
+            {
+                var opts = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                return JsonSerializer.Deserialize<HiringRecommendationResponseDto>(json, opts)
+                    ?? FallbackHiring();
+            }
+            catch (JsonException)
+            {
+                return FallbackHiring();
+            }
+        }
+
+        private static HiringRecommendationResponseDto FallbackHiring() => new()
+        {
+            FinalDecision  = "neutral",
+            FinalScore     = 50,
+            Reasoning      = "Recommendation could not be generated. Please review candidate manually.",
+            RiskAssessment = "medium",
+            Recommendation = "Conduct a manual review before making a hiring decision."
+        };
     }
 }

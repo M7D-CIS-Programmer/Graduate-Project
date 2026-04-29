@@ -96,8 +96,12 @@ export const api = {
     },
 
     // Applications
+<<<<<<< HEAD
     getApplications:          ()           => get(`${BASE_URL}/ApplicationJobs`),
     getApplicationsByCompany: (companyId)  => get(`${BASE_URL}/ApplicationJobs/company/${companyId}`),
+=======
+    getApplications:          (employerId) => get(`${BASE_URL}/ApplicationJobs${employerId ? `?employerId=${employerId}` : ''}`),
+>>>>>>> ef59694e8a3d51a937089b8182a240d2d3a820c7
     applyForJob:              (data)       => post(`${BASE_URL}/ApplicationJobs`, data),
     updateApplicationStatus:  (id, status) => {
         console.log(`Updating application ${id} status to: ${status}`);
