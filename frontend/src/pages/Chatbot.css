@@ -17,6 +17,16 @@
     left: 0;
 }
 
+/* RTL Support */
+.rtl .chatbot-page {
+    left: 0;
+    right: var(--sidebar-width);
+}
+
+.rtl .sidebar-closed .chatbot-page {
+    right: 0;
+}
+
 @media (max-width: 768px) {
     .chatbot-page,
     .sidebar-open .chatbot-page,
