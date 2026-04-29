@@ -4,7 +4,6 @@ import { useApplicationsByCompany, useUpdateApplicationStatus } from '../../hook
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import { useLanguage } from '../../context/LanguageContext';
-import { useAuth } from '../../context/AuthContext';
 import { useMyJobs } from '../../hooks/useJobs';
 import {
     Users,
@@ -27,16 +26,11 @@ const Applicants = () => {
     const navigate = useNavigate();
     const { user } = useAuth();
     const { addToast } = useToast();
-    const { user } = useAuth();
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('All');
 
-<<<<<<< HEAD
     const { data: applications = [], isLoading, error } = useApplicationsByCompany(user?.id);
-=======
-    const { data: applications = [], isLoading, error } = useApplications(user?.id);
     const { data: myJobs = [] } = useMyJobs(user?.id);
->>>>>>> ef59694e8a3d51a937089b8182a240d2d3a820c7
     const { mutate: updateStatus } = useUpdateApplicationStatus();
 
     // Only the set of job IDs that belong to the current employer
