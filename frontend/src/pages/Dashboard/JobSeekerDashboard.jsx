@@ -3,6 +3,7 @@ import { useLanguage } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { useApplications } from '../../hooks/useApplications';
+import { useSavedJobs } from '../../hooks/useSavedJobs';
 import Spinner from '../../components/ui/Spinner';
 import {
     Briefcase,
@@ -43,6 +44,7 @@ const JobSeekerDashboard = () => {
     const { t } = useLanguage();
     const { user } = useAuth();
     const { data: allApplications = [], isLoading } = useApplications();
+    const { data: savedJobs = [], isLoading: isLoadingSavedJobs } = useSavedJobs();
 
     const userApplications = useMemo(() => {
         return allApplications.filter(app => app.userId === user?.id);
@@ -52,7 +54,7 @@ const JobSeekerDashboard = () => {
         { label: t('appliedJobs'), value: userApplications.length, icon: <Briefcase />, color: '#6366f1' },
         { label: t('interviews'), value: userApplications.filter(a => a.candidateStatus === 'Shortlisted').length, icon: <CheckCircle />, color: '#10b981' },
         { label: t('pending'), value: userApplications.filter(a => a.candidateStatus === 'Applied').length, icon: <Clock />, color: '#f59e0b' },
-        { label: t('saved'), value: user?.savedJobs?.length || 0, icon: <Bookmark />, color: '#ec4899' },
+        { label: t('saved'), value: savedJobs.length || 0, icon: <Bookmark />, color: '#ec4899' },
     ];
 
     const chartData = useMemo(() => {
@@ -90,7 +92,7 @@ const JobSeekerDashboard = () => {
             }));
     }, [userApplications]);
 
-    if (isLoading) return <Spinner />;
+    if (isLoading || isLoadingSavedJobs) return <Spinner />;
 
     return (
         <div className="dashboard-container">
