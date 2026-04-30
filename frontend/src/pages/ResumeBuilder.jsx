@@ -1,4 +1,5 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import jsPDF from 'jspdf';
 import html2pdf from 'html2pdf.js';
 import {
     User,
@@ -22,7 +23,6 @@ import Button from '../components/ui/Button';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { api } from '../api/api';
-import { useEffect } from 'react';
 import './User.css';
 import './ResumeBuilder.css';
 
@@ -131,6 +131,18 @@ const ResumeBuilder = () => {
         }
     };
 
+    const months = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    ];
+    const years = Array.from({ length: 80 }, (_, i) => new Date().getFullYear() - i);
+
+    const parseMonthYear = (str) => {
+        if (!str || str === 'Present') return { month: '', year: '' };
+        const [y, m] = str.split('-');
+        return { month: parseInt(m) - 1, year: y };
+    };
+
     const steps = [
         { title: t('personalInfo'), icon: <User size={20} /> },
         { title: t('experience'), icon: <Briefcase size={20} /> },
@@ -184,17 +196,153 @@ const ResumeBuilder = () => {
         });
     };
 
+    const formatDate = (dateStr) => {
+        if (!dateStr) return '';
+        if (dateStr === 'Present') return t('present') || 'Present';
+        try {
+            const date = new Date(dateStr);
+            return date.toLocaleDateString(dir === 'rtl' ? 'ar-EG' : 'en-US', { 
+                month: 'short', 
+                year: 'numeric' 
+            });
+        } catch (e) {
+            return dateStr;
+        }
+    };
+
     const handleDownloadPDF = () => {
-        const element = resumeRef.current;
-        const opt = {
-            margin: 10,
-            filename: `${formData.personal.name || 'Resume'}.pdf`,
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2, useCORS: true },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        const doc = new jsPDF();
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const margin = 20;
+        let currentY = 20;
+
+        // Colors
+        const primaryColor = [37, 99, 235]; // #2563eb
+        const textColor = [31, 41, 55]; // #1f2937
+        const secondaryTextColor = [107, 114, 128]; // #6b7280
+
+        // Helper: Draw line
+        const drawSeparator = (y) => {
+            doc.setDrawColor(229, 231, 235);
+            doc.line(margin, y, pageWidth - margin, y);
         };
 
-        html2pdf().from(element).set(opt).save();
+        // Header: Name
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(24);
+        doc.setTextColor(...primaryColor);
+        doc.text(formData.personal.name || t('yourName'), margin, currentY);
+        currentY += 10;
+
+        // Contact Info
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(10);
+        doc.setTextColor(...secondaryTextColor);
+        const contactLine = [
+            formData.personal.email,
+            formData.personal.phone,
+            formData.personal.location
+        ].filter(Boolean).join(' | ');
+        doc.text(contactLine, margin, currentY);
+        currentY += 10;
+
+        drawSeparator(currentY);
+        currentY += 10;
+
+        // About Me
+        if (formData.personal.about) {
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(14);
+            doc.setTextColor(...primaryColor);
+            doc.text(t('aboutMe').toUpperCase(), margin, currentY);
+            currentY += 7;
+
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(10);
+            doc.setTextColor(...textColor);
+            const aboutLines = doc.splitTextToSize(formData.personal.about, pageWidth - 2 * margin);
+            doc.text(aboutLines, margin, currentY);
+            currentY += (aboutLines.length * 5) + 10;
+        }
+
+        // Experience Section
+        if (formData.experience.length > 0) {
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(14);
+            doc.setTextColor(...primaryColor);
+            doc.text(t('experience').toUpperCase(), margin, currentY);
+            currentY += 7;
+
+            formData.experience.forEach(exp => {
+                // Job Title & Dates
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(11);
+                doc.setTextColor(...textColor);
+                doc.text(exp.title || t('rolePlaceholder'), margin, currentY);
+                
+                const dates = `${formatDate(exp.start)} - ${formatDate(exp.end)}`;
+                const datesWidth = doc.getTextWidth(dates);
+                doc.text(dates, pageWidth - margin - datesWidth, currentY);
+                currentY += 5;
+
+                // Company
+                doc.setFont("helvetica", "italic");
+                doc.setFontSize(10);
+                doc.setTextColor(...secondaryTextColor);
+                doc.text(exp.company || t('companyPlaceholder'), margin, currentY);
+                currentY += 10;
+
+                // Description would go here if we had it
+            });
+            currentY += 5;
+        }
+
+        // Education Section
+        if (formData.education.length > 0) {
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(14);
+            doc.setTextColor(...primaryColor);
+            doc.text(t('education').toUpperCase(), margin, currentY);
+            currentY += 7;
+
+            formData.education.forEach(edu => {
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(11);
+                doc.setTextColor(...textColor);
+                doc.text(edu.degree || t('degree'), margin, currentY);
+                
+                const year = edu.year;
+                const yearWidth = doc.getTextWidth(year);
+                doc.text(year, pageWidth - margin - yearWidth, currentY);
+                currentY += 5;
+
+                doc.setFont("helvetica", "italic");
+                doc.setFontSize(10);
+                doc.setTextColor(...secondaryTextColor);
+                doc.text(edu.school || t('institution'), margin, currentY);
+                currentY += 10;
+            });
+            currentY += 5;
+        }
+
+        // Skills Section
+        if (formData.skills.length > 0) {
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(14);
+            doc.setTextColor(...primaryColor);
+            doc.text(t('skills').toUpperCase(), margin, currentY);
+            currentY += 7;
+
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(10);
+            doc.setTextColor(...textColor);
+            
+            const skillsText = formData.skills.join(', ');
+            const skillsLines = doc.splitTextToSize(skillsText, pageWidth - 2 * margin);
+            doc.text(skillsLines, margin, currentY);
+        }
+
+        doc.save(`${formData.personal.name || 'Resume'}.pdf`);
     };
 
     return (
@@ -292,16 +440,105 @@ const ResumeBuilder = () => {
                                                 newExp[idx].company = e.target.value;
                                                 setFormData({ ...formData, experience: newExp });
                                             }} />
-                                            <Input label={t('startDate')} placeholder={t('resumeDatePlaceholder')} type="text" value={exp.start} onChange={(e) => {
-                                                const newExp = [...formData.experience];
-                                                newExp[idx].start = e.target.value;
-                                                setFormData({ ...formData, experience: newExp });
-                                            }} />
-                                            <Input label={t('endDate')} placeholder={t('resumeDatePlaceholder')} type="text" value={exp.end} onChange={(e) => {
-                                                const newExp = [...formData.experience];
-                                                newExp[idx].end = e.target.value;
-                                                setFormData({ ...formData, experience: newExp });
-                                            }} />
+                                            <div className="input-group">
+                                                <label className="input-label">{t('startDate')}</label>
+                                                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                                    <select 
+                                                        className="resume-input custom-select" 
+                                                        style={{ flex: 2 }}
+                                                        value={parseMonthYear(exp.start).month}
+                                                        onChange={(e) => {
+                                                            const { year } = parseMonthYear(exp.start);
+                                                            const newMonth = e.target.value.padStart(2, '0');
+                                                            const newExp = [...formData.experience];
+                                                            newExp[idx].start = `${year || new Date().getFullYear()}-${parseInt(newMonth) + 1}`;
+                                                            setFormData({ ...formData, experience: newExp });
+                                                        }}
+                                                    >
+                                                        <option value="">{t('month') || 'Month'}</option>
+                                                        {months.map((m, i) => (
+                                                            <option key={m} value={i}>{t(m.toLowerCase()) || m}</option>
+                                                        ))}
+                                                    </select>
+                                                    <select 
+                                                        className="resume-input custom-select" 
+                                                        style={{ flex: 1 }}
+                                                        value={parseMonthYear(exp.start).year}
+                                                        onChange={(e) => {
+                                                            const { month } = parseMonthYear(exp.start);
+                                                            const newExp = [...formData.experience];
+                                                            newExp[idx].start = `${e.target.value}-${(month === '' ? 0 : month) + 1}`;
+                                                            setFormData({ ...formData, experience: newExp });
+                                                        }}
+                                                    >
+                                                        <option value="">{t('year') || 'Year'}</option>
+                                                        {years.map(y => (
+                                                            <option key={y} value={y}>{y}</option>
+                                                        ))}
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div className="input-group">
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                    <label className="input-label">{t('endDate')}</label>
+                                                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem', cursor: 'pointer' }}>
+                                                        <input 
+                                                            type="checkbox" 
+                                                            checked={exp.end === 'Present'}
+                                                            onChange={(e) => {
+                                                                const newExp = [...formData.experience];
+                                                                newExp[idx].end = e.target.checked ? 'Present' : '';
+                                                                setFormData({ ...formData, experience: newExp });
+                                                            }}
+                                                        />
+                                                        {t('currentlyWorkHere') || 'Present'}
+                                                    </label>
+                                                </div>
+                                                {exp.end !== 'Present' ? (
+                                                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                                        <select 
+                                                            className="resume-input custom-select" 
+                                                            style={{ flex: 2 }}
+                                                            value={parseMonthYear(exp.end).month}
+                                                            onChange={(e) => {
+                                                                const { year } = parseMonthYear(exp.end);
+                                                                const newMonth = e.target.value.padStart(2, '0');
+                                                                const newExp = [...formData.experience];
+                                                                newExp[idx].end = `${year || new Date().getFullYear()}-${parseInt(newMonth) + 1}`;
+                                                                setFormData({ ...formData, experience: newExp });
+                                                            }}
+                                                        >
+                                                            <option value="">{t('month') || 'Month'}</option>
+                                                            {months.map((m, i) => (
+                                                                <option key={m} value={i}>{t(m.toLowerCase()) || m}</option>
+                                                            ))}
+                                                        </select>
+                                                        <select 
+                                                            className="resume-input custom-select" 
+                                                            style={{ flex: 1 }}
+                                                            value={parseMonthYear(exp.end).year}
+                                                            onChange={(e) => {
+                                                                const { month } = parseMonthYear(exp.end);
+                                                                const newExp = [...formData.experience];
+                                                                newExp[idx].end = `${e.target.value}-${(month === '' ? 0 : month) + 1}`;
+                                                                setFormData({ ...formData, experience: newExp });
+                                                            }}
+                                                        >
+                                                            <option value="">{t('year') || 'Year'}</option>
+                                                            {years.map(y => (
+                                                                <option key={y} value={y}>{y}</option>
+                                                            ))}
+                                                        </select>
+                                                    </div>
+                                                ) : (
+                                                    <input 
+                                                        type="text" 
+                                                        className="resume-input" 
+                                                        value={t('present') || 'Present'} 
+                                                        disabled 
+                                                    />
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
                                 ))}
@@ -409,7 +646,7 @@ const ResumeBuilder = () => {
                                     <div key={exp.id} className="preview-entry">
                                         <div className="preview-entry-header">
                                             <span>{exp.title || t('rolePlaceholder')}</span>
-                                            <span style={{ color: 'var(--primary)' }}>{exp.start} - {exp.end || t('present')}</span>
+                                            <span style={{ color: 'var(--primary)' }}>{formatDate(exp.start)} - {formatDate(exp.end)}</span>
                                         </div>
                                         <p className="preview-entry-subtitle">{exp.company || t('companyPlaceholder')}</p>
                                     </div>
