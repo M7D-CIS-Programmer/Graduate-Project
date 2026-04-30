@@ -2,7 +2,7 @@ import React from 'react';
 import Spinner from '../../components/ui/Spinner';
 import { useLanguage } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
-import { Briefcase, Clock, CheckCircle, XCircle, Building2, MapPin, Calendar } from 'lucide-react';
+import { Briefcase, Clock, CheckCircle, XCircle, Building2, MapPin, Calendar, Eye } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useApplications } from '../../hooks/useApplications';
 import './Dashboard.css';
@@ -120,6 +120,28 @@ const AppliedJobs = () => {
                                             {getStatusIcon(app.candidateStatus)}
                                             {t(getStatusKey(app.candidateStatus))}
                                         </span>
+
+                                        {app.job && (
+                                            <button
+                                                onClick={() => navigate(`/jobs/${app.job.id}`)}
+                                                className="btn-outline"
+                                                style={{
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: '0.5rem',
+                                                    padding: '0.5rem 1rem',
+                                                    borderRadius: '12px',
+                                                    fontSize: '0.85rem',
+                                                    fontWeight: '600',
+                                                    width: '100%',
+                                                    justifyContent: 'center',
+                                                    marginTop: '0.5rem'
+                                                }}
+                                            >
+                                                <Eye size={16} />
+                                                {t('viewJob')}
+                                            </button>
+                                        )}
                                     </div>
                                 </div>
                             </div>
