@@ -145,6 +145,12 @@ namespace aabu_project.Data
                 .HasIndex(s => new { s.UserId, s.JobId })
                 .IsUnique()
                 .HasDatabaseName("UX_SavedJobs_UserId_JobId");
+
+            // Prevent the same user from applying to the same job twice at the database level
+            modelBuilder.Entity<ApplicationJob>()
+                .HasIndex(aj => new { aj.UserId, aj.JobId })
+                .IsUnique()
+                .HasDatabaseName("UX_ApplicationJobs_UserId_JobId");
         }
     }
 }

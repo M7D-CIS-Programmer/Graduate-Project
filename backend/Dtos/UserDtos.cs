@@ -69,6 +69,7 @@ public class AuthResponseDto
     public string Token { get; set; } = null!;
     public DateTimeOffset CreatedAt { get; set; }
     public string? ProfilePicture { get; set; }
+    public List<JobResponseDto>? AppliedJobs { get; set; }
 }
 
 public class AuthResultDto

@@ -34,7 +34,7 @@ public class ApplicationJobsController : ControllerBase
         if (employerId.HasValue)
             query = query.Where(a => a.Job.UserId == employerId.Value);
 
-        return Ok(await query.ToListAsync());
+        return Ok(await query.OrderByDescending(a => a.Date).ToListAsync());
     }
 
     /// <summary>
@@ -58,6 +58,20 @@ public class ApplicationJobsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Apply(ApplicationJobCreateDto dto)
     {
+        if (dto == null) 
+            return BadRequest(new { message = "Invalid application data." });
+
+        if (dto.JobId <= 0 || dto.UserId <= 0)
+            return BadRequest(new { message = $"Missing IDs. JobId: {dto.JobId}, UserId: {dto.UserId}" });
+
+        var existingApp = await _context.ApplicationJobs
+            .FirstOrDefaultAsync(a => a.JobId == dto.JobId && a.UserId == dto.UserId);
+
+        if (existingApp != null)
+        {
+            return BadRequest(new { message = "You have already applied for this job." });
+        }
+
         var app = new ApplicationJob
         {
             JobId = dto.JobId,

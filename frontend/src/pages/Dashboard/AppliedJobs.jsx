@@ -14,7 +14,12 @@ const AppliedJobs = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
     const { data: allApplications = [], isLoading } = useApplications();
-    const applications = user?.id ? allApplications.filter(app => app.userId === user.id) : allApplications;
+    
+    const applications = React.useMemo(() => {
+        return [...allApplications]
+            .filter(app => !user?.id || app.userId === user.id)
+            .sort((a, b) => new Date(b.date) - new Date(a.date));
+    }, [allApplications, user?.id]);
 
     const getStatusKey = (status) => {
         if (!status) return 'pending';

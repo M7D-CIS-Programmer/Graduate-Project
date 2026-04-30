@@ -44,6 +44,12 @@ public class UsersController : ControllerBase
 
         var user = await _context.Users
             .Include(u => u.Roles)
+            .Include(u => u.Applications)
+                .ThenInclude(a => a.Job)
+                    .ThenInclude(j => j.Category)
+            .Include(u => u.Applications)
+                .ThenInclude(a => a.Job)
+                    .ThenInclude(j => j.User)
             .FirstOrDefaultAsync(u => u.Email.ToLower() == normalizedEmail);
 
         if (user == null)
@@ -70,7 +76,49 @@ public class UsersController : ControllerBase
             Role = user.Roles?.FirstOrDefault()?.RoleName ?? "Job Seeker",
             Token = token,
             CreatedAt = user.CreatedAt,
-            ProfilePicture = user.ProfilePicture
+            ProfilePicture = user.ProfilePicture,
+            AppliedJobs = user.Applications.Select(a => new JobResponseDto
+            {
+                Id = a.Job.Id,
+                UserId = a.Job.UserId,
+                Title = a.Job.Title,
+                Description = a.Job.Description,
+                Type = a.Job.Type,
+                WorkMode = a.Job.WorkMode,
+                Responsibilities = a.Job.Responsibilities,
+                Requirements = a.Job.Requirements,
+                CategoryId = a.Job.CategoryId,
+                IsSalaryNegotiable = a.Job.IsSalaryNegotiable,
+                SalaryMin = a.Job.SalaryMin,
+                SalaryMax = a.Job.SalaryMax,
+                Features = a.Job.Features,
+                Status = a.Job.Status,
+                Location = a.Job.Location,
+                Company = a.Job.Company,
+                PostedDate = a.Job.PostedDate,
+                User = new UserDto(
+                    a.Job.User.Id,
+                    a.Job.User.Name,
+                    a.Job.User.Email,
+                    a.Job.User.Location,
+                    a.Job.User.Website,
+                    a.Job.User.Phone,
+                    a.Job.User.Description,
+                    a.Job.User.LinkedIn,
+                    a.Job.User.Github,
+                    a.Job.User.Status,
+                    a.Job.User.Roles.FirstOrDefault()?.RoleName,
+                    a.Job.User.CreatedAt,
+                    0,
+                    a.Job.User.Industry,
+                    a.Job.User.ProfilePicture
+                ),
+                Category = new CategoryResponseDto
+                {
+                    Id = a.Job.Category.Id,
+                    Name = a.Job.Category.Name
+                }
+            }).ToList()
         };
 
         return Ok(response);
@@ -179,7 +227,8 @@ public class UsersController : ControllerBase
             Role = user.Roles?.FirstOrDefault()?.RoleName ?? "Job Seeker",
             Token = token,
             CreatedAt = user.CreatedAt,
-            ProfilePicture = user.ProfilePicture
+            ProfilePicture = user.ProfilePicture,
+            AppliedJobs = new List<JobResponseDto>()
         };
 
         return CreatedAtAction(nameof(GetUser), new { id = user.Id }, response);
