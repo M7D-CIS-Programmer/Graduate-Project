@@ -13,7 +13,8 @@ const FAQ = () => {
         { q: t('faq3Q'), a: t('faq3A') },
         { q: t('faq4Q'), a: t('faq4A') },
         { q: t('faq5Q'), a: t('faq5A') },
-        { q: t('faq6Q'), a: t('faq6A') }
+        { q: t('faq6Q'), a: t('faq6A') },
+        { q: t('faq7Q'), a: t('faq7A') }
     ];
 
     const toggleAccordion = (index) => {

@@ -19,7 +19,7 @@
     width: 50px;
     height: 50px;
     border-radius: 14px;
-    background: linear-gradient(135deg, var(--primary-color, #6366f1), #8b5cf6);
+    background: linear-gradient(135deg, var(--primary, #6366f1), #8b5cf6);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -35,14 +35,13 @@
 }
 
 .iv-subtitle {
-    font-size: .9rem;
-    color: var(--text-muted, #64748b);
+    color: var(--text-muted);
     margin: 0;
 }
 
 /* ─── Card ────────────────────────────────────────────────────────────────── */
 .iv-card {
-    background: var(--card-bg, #fff);
+    background: var(--bg-card, #fff);
     border: 1px solid var(--border-color, #e2e8f0);
     border-radius: 16px;
     padding: 1.4rem;
@@ -50,7 +49,7 @@
 
 
 .vi-mode-card {
-    background-color: var(--bg-secondary) !important;
+    background-color: var(--bg-card) !important;
     box-shadow: 0 2px 8px rgba(99, 102, 241, .3);
     border: 1px solid var(--border-color, #e2e8f0);
     border-radius: 16px;
@@ -83,7 +82,7 @@
     gap: .35rem;
     font-size: .83rem;
     font-weight: 600;
-    color: var(--text-primary, #334155);
+    color: var(--text-main);
 }
 
 .iv-req {
@@ -96,10 +95,10 @@
     padding: .6rem .85rem;
     font-size: .9rem;
     font-family: inherit;
-    background: var(--input-bg, #f8fafc);
+    background: var(--bg-dark, #f8fafc);
     border: 1.5px solid var(--border-color, #e2e8f0);
     border-radius: 10px;
-    color: var(--text-primary, #1e293b);
+    color: var(--text-main, #1e293b);
     outline: none;
     transition: border-color .2s;
     box-sizing: border-box;
@@ -113,8 +112,8 @@
 
 .iv-input:focus,
 .iv-textarea:focus {
-    border-color: var(--primary-color, #6366f1);
-    background: var(--card-bg, #fff);
+    border-color: var(--primary, #6366f1);
+    background: var(--bg-card, #fff);
 }
 
 .iv-input:disabled,
@@ -140,6 +139,7 @@
 .iv-actions {
     display: flex;
     justify-content: flex-end;
+    gap: 1rem;
 }
 
 .iv-btn {
@@ -166,9 +166,9 @@
 }
 
 .iv-btn-primary {
-    background: linear-gradient(135deg, var(--primary-color, #6366f1), #8b5cf6);
+    background: linear-gradient(135deg, var(--primary, #6366f1), #8b5cf6);
     color: #fff;
-    box-shadow: 0 2px 8px rgba(99, 102, 241, .3);
+    box-shadow: var(--shadow-btn);
     padding: .7rem 2rem;
 }
 
@@ -177,12 +177,12 @@
 }
 
 .iv-btn-send {
-    background: linear-gradient(135deg, var(--primary-color, #6366f1), #8b5cf6);
+    background: linear-gradient(135deg, var(--primary, #6366f1), #8b5cf6);
     color: #fff;
     padding: .65rem .9rem;
     border-radius: 10px;
     align-self: flex-end;
-    box-shadow: 0 2px 6px rgba(99, 102, 241, .3);
+    box-shadow: var(--shadow-btn);
 }
 
 .iv-btn-send:not(:disabled):hover {
@@ -209,7 +209,7 @@
 .iv-progress-label {
     font-size: .82rem;
     font-weight: 600;
-    color: var(--text-muted, #64748b);
+    color: var(--text-muted);
 }
 
 .iv-progress-track {
@@ -222,7 +222,7 @@
 .iv-progress-fill {
     height: 100%;
     border-radius: 999px;
-    background: linear-gradient(90deg, var(--primary-color, #6366f1), #8b5cf6);
+    background: linear-gradient(90deg, var(--primary, #6366f1), #8b5cf6);
     transition: width .6s ease;
 }
 
@@ -231,7 +231,7 @@
     display: flex;
     flex-direction: column;
     gap: .9rem;
-    background: var(--card-bg, #fff);
+    background: var(--bg-card, #fff);
     border: 1px solid var(--border-color, #e2e8f0);
     border-radius: 16px;
     padding: 1.25rem;
@@ -274,8 +274,8 @@
 }
 
 .iv-avatar--user {
-    background: var(--border-color, #e2e8f0);
-    color: var(--text-muted, #64748b);
+    background: var(--bg-dark);
+    color: var(--text-muted);
 }
 
 .iv-bubble {
@@ -291,14 +291,15 @@
 }
 
 .iv-bubble--ai {
-    background: #f1f0ff;
-    border: 1px solid #c4b5fd;
-    color: var(--text-primary, #1e293b);
+    background: var(--bg-dark);
+    opacity: 0.9;
+    border: 1px solid var(--primary);
+    color: var(--text-main);
     border-top-left-radius: 4px;
 }
 
 .iv-bubble--user {
-    background: linear-gradient(135deg, var(--primary-color, #6366f1), #8b5cf6);
+    background: linear-gradient(135deg, var(--primary, #6366f1), #8b5cf6);
     color: #fff;
     border-top-right-radius: 4px;
 }
@@ -307,7 +308,7 @@
     display: block;
     font-size: .72rem;
     font-weight: 700;
-    color: #6366f1;
+    color: var(--primary);
     margin-bottom: .3rem;
     text-transform: uppercase;
     letter-spacing: .04em;
@@ -315,8 +316,8 @@
 
 /* ─── Feedback card ───────────────────────────────────────────────────────── */
 .iv-feedback-card {
-    background: #f0fdf4;
-    border: 1px solid #bbf7d0;
+    background: rgba(34, 197, 94, 0.1);
+    border: 1px solid rgba(34, 197, 94, 0.2);
     border-radius: 12px;
     padding: .8rem 1rem;
     margin-left: 3rem;
@@ -329,13 +330,13 @@
     gap: .5rem;
     font-size: .8rem;
     font-weight: 700;
-    color: #15803d;
+    color: #22c55e;
     margin-bottom: .4rem;
 }
 
 .iv-feedback-text {
     font-size: .85rem;
-    color: var(--text-secondary, #475569);
+    color: var(--text-main);
     margin: 0;
 }
 
@@ -345,8 +346,8 @@
     align-items: center;
     gap: .3rem;
     padding: .75rem 1rem;
-    background: #f1f0ff;
-    border: 1px solid #c4b5fd;
+    background: var(--bg-dark);
+    border: 1px solid var(--primary);
     border-radius: 14px;
     border-top-left-radius: 4px;
 }
@@ -355,7 +356,7 @@
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: #6366f1;
+    background: var(--primary);
     animation: iv-bounce .9s infinite;
 }
 
@@ -392,10 +393,10 @@
     padding: .75rem .9rem;
     font-size: .9rem;
     font-family: inherit;
-    background: var(--input-bg, #f8fafc);
+    background: var(--bg-dark, #f8fafc);
     border: 1.5px solid var(--border-color, #e2e8f0);
     border-radius: 12px;
-    color: var(--text-primary, #1e293b);
+    color: var(--text-main, #1e293b);
     outline: none;
     resize: none;
     line-height: 1.5;
@@ -403,8 +404,8 @@
 }
 
 .iv-answer-input:focus {
-    border-color: var(--primary-color, #6366f1);
-    background: var(--card-bg, #fff);
+    border-color: var(--primary, #6366f1);
+    background: var(--bg-card, #fff);
 }
 
 .iv-answer-input:disabled {
@@ -505,7 +506,7 @@
 
 .iv-summary {
     font-size: .875rem;
-    color: var(--text-secondary, #475569);
+    color: var(--text-main);
     margin: 0;
     line-height: 1.6;
 }
@@ -550,7 +551,7 @@
 .iv-card-header h3 {
     font-size: .92rem;
     font-weight: 600;
-    color: var(--text-primary, #1e293b);
+    color: var(--text-main);
     margin: 0;
 }
 
@@ -576,7 +577,7 @@
     padding-left: 1.1rem;
     position: relative;
     font-size: .85rem;
-    color: var(--text-secondary, #475569);
+    color: var(--text-main);
     line-height: 1.5;
 }
 
@@ -609,7 +610,7 @@
     cursor: pointer;
     font-size: .92rem;
     font-weight: 600;
-    color: var(--text-primary, #1e293b);
+    color: var(--text-main);
     padding: 0;
     margin-bottom: .75rem;
 }
@@ -624,8 +625,8 @@
 .iv-history-item {
     padding: .85rem;
     border-radius: 10px;
-    background: var(--input-bg, #f8fafc);
-    border: 1px solid var(--border-color, #e2e8f0);
+    background: var(--bg-dark);
+    border: 1px solid var(--border-color);
     display: flex;
     flex-direction: column;
     gap: .4rem;
@@ -634,7 +635,7 @@
 .iv-history-q,
 .iv-history-a {
     font-size: .84rem;
-    color: var(--text-secondary, #475569);
+    color: var(--text-main);
     margin: 0;
 }
 
@@ -721,4 +722,71 @@
         width: 100%;
         justify-content: center;
     }
+}
+
+/* ─── How It Works ────────────────────────────────────────────────────────── */
+.iv-how-it-works {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border-color, #e2e8f0);
+}
+
+.iv-section-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--text-main);
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.iv-steps-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1.5rem;
+}
+
+.iv-step-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color, #e2e8f0);
+    border-radius: 16px;
+    padding: 1.5rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.iv-step-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-hover);
+}
+
+.iv-step-num {
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, var(--primary, #6366f1), #8b5cf6);
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+    margin-bottom: 0.25rem;
+}
+
+.iv-step-card h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-main, #1e293b);
+    margin: 0;
+}
+
+.iv-step-card p {
+    font-size: 0.85rem;
+    color: var(--text-muted, #64748b);
+    margin: 0;
+    line-height: 1.5;
 }

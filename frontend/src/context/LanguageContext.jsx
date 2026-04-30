@@ -616,7 +616,18 @@ export const LanguageProvider = ({ children }) => {
             strong: "Strong",
             moderate: "Moderate",
             needsWork: "Needs Work",
-            ctrlEnterToSubmit: "Ctrl + Enter to submit"
+            ctrlEnterToSubmit: "Ctrl + Enter to submit",
+            howItWorks: "How It Works",
+            interviewStep1Title: "Setup",
+            interviewStep1Desc: "Enter the job title and description you're preparing for.",
+            interviewStep2Title: "Choose Mode",
+            interviewStep2Desc: "Pick between Chat-based or Voice-based interaction.",
+            interviewStep3Title: "Practice",
+            interviewStep3Desc: "Answer AI-generated questions tailored to the role.",
+            interviewStep4Title: "Get Feedback",
+            interviewStep4Desc: "Receive instant evaluation and performance scores.",
+            faq7Q: "How does the AI Interview Simulator work?",
+            faq7A: "The simulator uses advanced AI to analyze job descriptions and generate relevant interview questions. You can practice via text or voice, and the AI provides instant feedback on your answers, highlighting strengths and areas for improvement."
         },
         ar: {
             search: "ابحث...",
@@ -1216,7 +1227,18 @@ export const LanguageProvider = ({ children }) => {
             strong: "قوي",
             moderate: "متوسط",
             needsWork: "يحتاج إلى تطوير",
-            ctrlEnterToSubmit: "Ctrl + Enter للإرسال"
+            ctrlEnterToSubmit: "Ctrl + Enter للإرسال",
+            howItWorks: "كيف يعمل؟",
+            interviewStep1Title: "الإعداد",
+            interviewStep1Desc: "أدخل المسمى الوظيفي والوصف الوظيفي الذي تستعد له.",
+            interviewStep2Title: "اختر النمط",
+            interviewStep2Desc: "اختر بين المقابلة النصية (دردشة) أو المقابلة الصوتية.",
+            interviewStep3Title: "تدرب",
+            interviewStep3Desc: "أجب على أسئلة مولدة بالذكاء الاصطناعي مخصصة للدور الوظيفي.",
+            interviewStep4Title: "احصل على تقييم",
+            interviewStep4Desc: "تلقى تقييماً فورياً ودرجات أداء مفصلة لإجاباتك.",
+            faq7Q: "كيف يعمل محاكي المقابلات بالذكاء الاصطناعي؟",
+            faq7A: "يستخدم المحاكي ذكاءً اصطناعياً متقدماً لتحليل الأوصاف الوظيفية وتوليد أسئلة مقابلة ذات صلة. يمكنك التدرب عبر النص أو الصوت، ويقدم الذكاء الاصطناعي ملاحظات فورية على إجاباتك، مع تسليط الضوء على نقاط القوة ومجالات التحسين."
         }
     };
 

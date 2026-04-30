@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import {
     MessageSquare, Briefcase, FileText, Play, Send,
     Loader2, Star, TrendingUp, AlertTriangle, RotateCcw,
-    CheckCircle, ChevronDown, ChevronUp, Bot, User, Mic
+    CheckCircle, ChevronDown, ChevronUp, Bot, User, Mic, ArrowLeft
 } from 'lucide-react';
 import { api } from '../../api/api';
 import { useLanguage } from '../../context/LanguageContext';
@@ -37,6 +37,33 @@ const ModeSelect = ({ onSelect, t }) => (
                     <p className="vi-mode-card-title">{t('interviewVoiceMode')}</p>
                     <p className="vi-mode-card-desc">{t('interviewVoiceModeDesc')}</p>
                 </button>
+            </div>
+        </div>
+
+        {/* How It Works Section */}
+        <div className="iv-how-it-works">
+            <h2 className="iv-section-title">{t('howItWorks')}</h2>
+            <div className="iv-steps-grid">
+                <div className="iv-step-card">
+                    <div className="iv-step-num">1</div>
+                    <h3>{t('interviewStep1Title')}</h3>
+                    <p>{t('interviewStep1Desc')}</p>
+                </div>
+                <div className="iv-step-card">
+                    <div className="iv-step-num">2</div>
+                    <h3>{t('interviewStep2Title')}</h3>
+                    <p>{t('interviewStep2Desc')}</p>
+                </div>
+                <div className="iv-step-card">
+                    <div className="iv-step-num">3</div>
+                    <h3>{t('interviewStep3Title')}</h3>
+                    <p>{t('interviewStep3Desc')}</p>
+                </div>
+                <div className="iv-step-card">
+                    <div className="iv-step-num">4</div>
+                    <h3>{t('interviewStep4Title')}</h3>
+                    <p>{t('interviewStep4Desc')}</p>
+                </div>
             </div>
         </div>
     </div>
@@ -221,6 +248,9 @@ const Interview = () => {
     if (phase === 'setup') return (
         <div className="iv-page" dir={dir}>
             <div className="iv-header">
+                <button className="vi-back-btn" onClick={() => setMode(null)} title={t('interviewBackToMode')}>
+                    <ArrowLeft size={18} />
+                </button>
                 <div className="iv-header-icon"><Bot size={26} /></div>
                 <div>
                     <h1 className="iv-title">{t('interview')}</h1>
@@ -392,6 +422,9 @@ const Interview = () => {
     return (
         <div className="iv-page" dir={dir}>
             <div className="iv-header">
+                <button className="vi-back-btn" onClick={() => setMode(null)} title={t('interviewBackToMode')}>
+                    <ArrowLeft size={18} />
+                </button>
                 <div className="iv-header-icon"><Bot size={26} /></div>
                 <div>
                     <h1 className="iv-title">{t('interviewInProgress')}</h1>

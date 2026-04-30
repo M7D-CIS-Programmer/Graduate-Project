@@ -17,7 +17,7 @@
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    background: var(--input-bg, #f8fafc);
+    background: var(--bg-dark, #f8fafc);
     border: 1.5px solid var(--border-color, #e2e8f0);
     color: var(--text-muted, #64748b);
     cursor: pointer;
@@ -25,8 +25,8 @@
 }
 .vi-back-btn:hover {
     background: var(--border-color, #e2e8f0);
-    border-color: var(--primary-color, #6366f1);
-    color: var(--text-primary, #1e293b);
+    border-color: var(--primary, #6366f1);
+    color: var(--text-main, #1e293b);
 }
 
 /* ── AI Voice toggle pill ──────────────────────────────────────────── */
@@ -42,7 +42,7 @@
     font-weight: 600;
     cursor: pointer;
     border: 1.5px solid var(--border-color, #e2e8f0);
-    background: var(--card-bg, #fff);
+    background: var(--bg-card, #fff);
     color: var(--text-muted, #64748b);
     white-space: nowrap;
     transition: border-color 0.15s, background 0.15s, color 0.15s;
@@ -52,9 +52,9 @@
     color: #7c3aed;
 }
 .vi-voice-toggle--on {
-    background: #f5f3ff;
-    border-color: #8b5cf6;
-    color: #7c3aed;
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #fff;
 }
 
 /* ── Question card ─────────────────────────────────────────────────── */
@@ -78,8 +78,8 @@
     padding: 0.28rem 0.65rem;
     border-radius: 6px;
     border: 1px solid #fca5a5;
-    background: #fef2f2;
-    color: #dc2626;
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
     font-size: 0.76rem;
     font-weight: 600;
     cursor: pointer;
@@ -91,7 +91,7 @@
     font-size: 1.05rem;
     font-weight: 500;
     line-height: 1.75;
-    color: var(--text-primary, #1e293b);
+    color: var(--text-main, #1e293b);
     margin: 0;
     padding-left: 0.2rem;
 }
@@ -108,7 +108,7 @@
 
 /* ── Recorder card ─────────────────────────────────────────────────── */
 .vi-recorder-card {
-    background: var(--card-bg, #fff);
+    background: var(--bg-card, #fff);
     border: 1px solid var(--border-color, #e2e8f0);
     border-radius: 16px;
     padding: 2rem 1.5rem;
@@ -196,7 +196,7 @@
 /* ── Transcript box ────────────────────────────────────────────────── */
 .vi-transcript-box {
     width: 100%;
-    background: var(--input-bg, #f8fafc);
+    background: var(--bg-dark, #f8fafc);
     border: 1.5px solid var(--border-color, #e2e8f0);
     border-radius: 12px;
     padding: 1rem 1.1rem;
@@ -217,7 +217,7 @@
 .vi-transcript-text {
     font-size: 0.92rem;
     line-height: 1.65;
-    color: var(--text-primary, #1e293b);
+    color: var(--text-main, #1e293b);
     margin: 0;
     min-height: 1.4rem;
     white-space: pre-wrap;
@@ -245,7 +245,7 @@
     font-weight: 600;
     cursor: pointer;
     border: 1.5px solid var(--border-color, #e2e8f0);
-    background: var(--card-bg, #fff);
+    background: var(--bg-card, #fff);
     color: var(--text-muted, #64748b);
     transition: border-color 0.15s, color 0.15s;
 }
@@ -292,15 +292,15 @@
     padding: 2rem 1.4rem;
     border-radius: 18px;
     border: 2px solid var(--border-color, #e2e8f0);
-    background: var(--card-bg, #fff);
+    background: var(--bg-card, #fff);
     cursor: pointer;
     text-align: center;
     transition: border-color 0.18s, box-shadow 0.18s, transform 0.13s;
 }
 
 .vi-mode-card:hover {
-    border-color: var(--primary-color, #6366f1);
-    box-shadow: 0 4px 22px rgba(99, 102, 241, 0.14);
+    border-color: var(--primary, #6366f1);
+    box-shadow: var(--shadow-hover);
     transform: translateY(-3px);
 }
 
@@ -321,7 +321,7 @@
 .vi-mode-card-title {
     font-size: 1rem;
     font-weight: 700;
-    color: var(--text-primary, #1e293b);
+    color: var(--text-main, #1e293b);
     margin: 0;
 }
 
