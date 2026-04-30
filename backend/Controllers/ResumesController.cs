@@ -23,7 +23,24 @@ public class ResumesController(MyDbContext context) : ControllerBase
             Email = dto.Email,
             Phone = dto.Phone,
             Location = dto.Location,
-            Bio = dto.Bio
+            Bio = dto.Bio,
+            Experiences = dto.Experiences.Select(e => new Experience
+            {
+                JobName = e.JobName,
+                CompanyName = e.CompanyName,
+                StartDate = e.StartDate,
+                EndDate = e.EndDate
+            }).ToList(),
+            Educations = dto.Educations.Select(e => new Education
+            {
+                EducationLevel = e.EducationLevel,
+                Institution = e.Institution,
+                GraduationYear = e.GraduationYear
+            }).ToList(),
+            Skills = dto.Skills.Select(s => new Skill
+            {
+                Name = s.Name
+            }).ToList()
         };
         Context.Resumes.Add(resume);
         await Context.SaveChangesAsync();
@@ -33,20 +50,62 @@ public class ResumesController(MyDbContext context) : ControllerBase
     [HttpGet("{id}")]
     public async Task<IActionResult> GetResume(int id)
     {
-        var res = await Context.Resumes.FindAsync(id);
+        var res = await Context.Resumes
+            .Include(r => r.Experiences)
+            .Include(r => r.Educations)
+            .Include(r => r.Skills)
+            .FirstOrDefaultAsync(r => r.Id == id);
+            
         if (res == null) return NotFound();
         return Ok(res);
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateResume(int id, Resume updated)
+    public async Task<IActionResult> UpdateResume(int id, ResumeCreateDto dto)
     {
-        var res = await Context.Resumes.FindAsync(id);
+        var res = await Context.Resumes
+            .Include(r => r.Experiences)
+            .Include(r => r.Educations)
+            .Include(r => r.Skills)
+            .FirstOrDefaultAsync(r => r.Id == id);
+            
         if (res == null) return NotFound();
 
-        res.Name = updated.Name;
-        res.Email = updated.Email;
-        res.Phone = updated.Phone;
+        // Update Personal Info
+        res.Name = dto.Name;
+        res.Email = dto.Email;
+        res.Phone = dto.Phone;
+        res.Location = dto.Location;
+        res.Bio = dto.Bio;
+
+        // Update Experiences (Clear and Re-add for simplicity)
+        Context.Experiences.RemoveRange(res.Experiences);
+        res.Experiences = dto.Experiences.Select(e => new Experience
+        {
+            JobName = e.JobName,
+            CompanyName = e.CompanyName,
+            StartDate = e.StartDate,
+            EndDate = e.EndDate,
+            ResumeId = id
+        }).ToList();
+
+        // Update Educations
+        Context.Educations.RemoveRange(res.Educations);
+        res.Educations = dto.Educations.Select(e => new Education
+        {
+            EducationLevel = e.EducationLevel,
+            Institution = e.Institution,
+            GraduationYear = e.GraduationYear,
+            ResumeId = id
+        }).ToList();
+
+        // Update Skills
+        Context.Skills.RemoveRange(res.Skills);
+        res.Skills = dto.Skills.Select(s => new Skill
+        {
+            Name = s.Name,
+            ResumeId = id
+        }).ToList();
 
         await Context.SaveChangesAsync();
         return Ok(res);

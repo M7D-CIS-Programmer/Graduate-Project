@@ -19,6 +19,10 @@ import { useLanguage } from '../context/LanguageContext';
 import { useTheme } from '../context/ThemeContext';
 import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
+import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
+import { api } from '../api/api';
+import { useEffect } from 'react';
 import './User.css';
 import './ResumeBuilder.css';
 
@@ -27,12 +31,105 @@ const ResumeBuilder = () => {
     const { t, dir } = useLanguage();
     const resumeRef = useRef();
     const [activeStep, setActiveStep] = useState(0);
+    const { user } = useAuth();
+    const { addToast } = useToast();
+    const [resumeId, setResumeId] = useState(null);
+    const [isSaving, setIsSaving] = useState(false);
     const [formData, setFormData] = useState({
         personal: { name: '', email: '', phone: '', location: '', about: '' },
-        experience: [{ id: 1, title: '', company: '', start: '', end: '', description: '' }],
-        education: [{ id: 1, degree: '', school: '', year: '' }],
-        skills: ['React', 'JavaScript', 'Design']
+        experience: [{ id: Date.now(), title: '', company: '', start: '', end: '', description: '' }],
+        education: [{ id: Date.now(), degree: '', school: '', year: '' }],
+        skills: []
     });
+
+    useEffect(() => {
+        if (user?.id) {
+            fetchResume();
+        }
+    }, [user?.id]);
+
+    const fetchResume = async () => {
+        try {
+            const data = await api.getResumeByUserId(user.id);
+            if (data) {
+                setResumeId(data.id);
+                setFormData({
+                    personal: {
+                        name: data.name || '',
+                        email: data.email || '',
+                        phone: data.phone || '',
+                        location: data.location || '',
+                        about: data.bio || ''
+                    },
+                    experience: data.experiences.length > 0 
+                        ? data.experiences.map(e => ({
+                            id: e.id,
+                            title: e.jobName,
+                            company: e.companyName,
+                            start: e.startDate,
+                            end: e.endDate,
+                            description: '' // Backend doesn't have description yet, but we'll keep it for UI
+                        }))
+                        : [{ id: Date.now(), title: '', company: '', start: '', end: '', description: '' }],
+                    education: data.educations.length > 0
+                        ? data.educations.map(e => ({
+                            id: e.id,
+                            degree: e.educationLevel,
+                            school: e.institution,
+                            year: e.graduationYear.toString()
+                        }))
+                        : [{ id: Date.now(), degree: '', school: '', year: '' }],
+                    skills: data.skills.map(s => s.name)
+                });
+            }
+        } catch (err) {
+            // Ignore 404 as it just means the user hasn't created a resume yet
+            if (!err.message.includes("404") && !err.message.includes("Not Found")) {
+                console.error("Failed to fetch resume:", err);
+            }
+        }
+    };
+
+    const handleSave = async () => {
+        if (!user?.id) return;
+        setIsSaving(true);
+        try {
+            const payload = {
+                userId: user.id,
+                name: formData.personal.name,
+                email: formData.personal.email,
+                phone: formData.personal.phone,
+                location: formData.personal.location,
+                bio: formData.personal.about,
+                experiences: formData.experience.map(e => ({
+                    jobName: e.title,
+                    companyName: e.company,
+                    startDate: e.start,
+                    endDate: e.end
+                })),
+                educations: formData.education.map(e => ({
+                    educationLevel: e.degree,
+                    institution: e.school,
+                    graduationYear: parseInt(e.year) || 0
+                })),
+                skills: formData.skills.map(s => ({ name: s }))
+            };
+
+            if (resumeId) {
+                await api.updateResume(resumeId, payload);
+                addToast(t('resumeUpdated') || 'Resume updated successfully!', 'success');
+            } else {
+                const res = await api.createResume(payload);
+                setResumeId(res.id);
+                addToast(t('resumeSaved') || 'Resume saved successfully!', 'success');
+            }
+        } catch (err) {
+            console.error("Failed to save resume:", err);
+            addToast(t('saveFailed') || 'Failed to save resume.', 'error');
+        } finally {
+            setIsSaving(false);
+        }
+    };
 
     const steps = [
         { title: t('personalInfo'), icon: <User size={20} /> },
@@ -104,10 +201,15 @@ const ResumeBuilder = () => {
         <div className={`user-page-container ${dir}`}>
             <div className="dashboard-header">
                 <h1 className="dashboard-title">{t('resumeBuilder')}</h1>
-                <Button onClick={handleDownloadPDF}>
-                    <Download size={20} />
-                    {t('downloadPdf')}
-                </Button>
+                <div style={{ display: 'flex', gap: '1rem' }}>
+                    <Button variant="outline" onClick={handleSave} disabled={isSaving}>
+                        {isSaving ? t('saving') || 'Saving...' : t('saveResume') || 'Save Resume'}
+                    </Button>
+                    <Button onClick={handleDownloadPDF}>
+                        <Download size={20} />
+                        {t('downloadPdf')}
+                    </Button>
+                </div>
             </div>
 
             <div className="resume-builder-layout">

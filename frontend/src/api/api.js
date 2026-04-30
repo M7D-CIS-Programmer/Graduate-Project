@@ -113,6 +113,8 @@ export const api = {
 
     // Resumes
     getResumeByUserId: (userId, viewerId) => get(`${BASE_URL}/Resumes/user/${userId}${viewerId ? `?viewerId=${viewerId}` : ''}`),
+    createResume:      (data)           => post(`${BASE_URL}/Resumes`, data),
+    updateResume:      (id, data)       => put(`${BASE_URL}/Resumes/${id}`, data),
 
     // Notifications
     getNotificationsByUserId: (userId, receiver) => get(`${BASE_URL}/Notifications?userId=${userId}${receiver ? `&receiver=${receiver}` : ''}`),

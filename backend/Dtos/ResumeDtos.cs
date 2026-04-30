@@ -10,6 +10,9 @@ public class ResumeCreateDto
     public string? Phone { get; set; }
     public string? Location { get; set; }
     public string? Bio { get; set; }
+    public List<ExperienceCreateDto> Experiences { get; set; } = new();
+    public List<EducationCreateDto> Educations { get; set; } = new();
+    public List<SkillCreateDto> Skills { get; set; } = new();
 }
 
 public class ExperienceCreateDto
@@ -17,8 +20,8 @@ public class ExperienceCreateDto
     public int ResumeId { get; set; }
     public string JobName { get; set; } = null!;
     public string CompanyName { get; set; } = null!;
-    public DateTime StartDate { get; set; }
-    public DateTime? EndDate { get; set; }
+    public string StartDate { get; set; } = null!;
+    public string? EndDate { get; set; }
 }
 
 public class EducationCreateDto
@@ -55,8 +58,8 @@ public class ExperienceViewDto
     public int Id { get; set; }
     public string JobName { get; set; } = null!;
     public string CompanyName { get; set; } = null!;
-    public DateTime StartDate { get; set; }
-    public DateTime? EndDate { get; set; }
+    public string StartDate { get; set; } = null!;
+    public string? EndDate { get; set; }
 }
 
 public class EducationViewDto

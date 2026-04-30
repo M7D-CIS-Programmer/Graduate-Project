@@ -70,10 +70,10 @@ namespace aabu_project.Data
 
             // Seed Experiences
             modelBuilder.Entity<Experience>().HasData(
-                new Experience { Id = 1, ResumeId = 1, JobName = "Senior Software Engineer", CompanyName = "Dubai Tech Solutions", StartDate = new DateTime(2020, 3, 1), EndDate = null },
-                new Experience { Id = 2, ResumeId = 1, JobName = "Software Developer", CompanyName = "Gulf Digital Agency", StartDate = new DateTime(2017, 6, 1), EndDate = new DateTime(2020, 2, 28) },
-                new Experience { Id = 3, ResumeId = 2, JobName = "UI/UX Designer", CompanyName = "Creative Studio UAE", StartDate = new DateTime(2021, 1, 1), EndDate = null },
-                new Experience { Id = 4, ResumeId = 3, JobName = "Digital Marketing Specialist", CompanyName = "Growth Agency", StartDate = new DateTime(2019, 8, 1), EndDate = null }
+                new Experience { Id = 1, ResumeId = 1, JobName = "Senior Software Engineer", CompanyName = "Dubai Tech Solutions", StartDate = "2020-03-01", EndDate = null },
+                new Experience { Id = 2, ResumeId = 1, JobName = "Software Developer", CompanyName = "Gulf Digital Agency", StartDate = "2017-06-01", EndDate = "2020-02-28" },
+                new Experience { Id = 3, ResumeId = 2, JobName = "UI/UX Designer", CompanyName = "Creative Studio UAE", StartDate = "2021-01-01", EndDate = null },
+                new Experience { Id = 4, ResumeId = 3, JobName = "Digital Marketing Specialist", CompanyName = "Growth Agency", StartDate = "2019-08-01", EndDate = null }
             );
 
             // Seed Educations
