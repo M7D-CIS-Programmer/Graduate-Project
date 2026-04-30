@@ -34,11 +34,13 @@ const Profile = () => {
 
     useEffect(() => {
         const fetchUserData = async () => {
+            if (!id && !currentUser) return; // Wait for currentUser if viewing own profile
+            
             setIsLoading(true);
             try {
                 if (isOwnProfile && currentUser) {
                     setUserData(currentUser);
-                } else {
+                } else if (id && id !== 'undefined') {
                     const fetchedUser = await api.getUser(id, currentUser?.id);
                     setUserData(fetchedUser);
                 }

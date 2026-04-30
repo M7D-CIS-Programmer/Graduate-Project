@@ -83,7 +83,6 @@ const Sidebar = ({ isOpen }) => {
         ...getRoleItems(),
         ...(['employer', 'company', 'admin'].includes(userRole) ? [] : baseItems),
         ...(user ? [
-            { name: t('notifications'), icon: <Bell size={20} />, path: '/notifications' },
             { name: t('profile'), icon: <UserIcon size={20} />, path: '/profile' }
         ] : [
             { name: t('aboutUs'), icon: <FileText size={20} />, path: '/about' },

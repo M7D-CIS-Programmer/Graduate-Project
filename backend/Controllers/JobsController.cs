@@ -226,10 +226,24 @@ public class JobsController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteJob(int id)
     {
-        var job = await _context.Jobs.FindAsync(id);
+        var job = await _context.Jobs
+            .Include(j => j.SavedJobs)
+            .Include(j => j.Applications)
+            .FirstOrDefaultAsync(j => j.Id == id);
 
         if (job == null)
             return NotFound();
+
+        // Remove related records first to avoid foreign key constraint violations
+        if (job.SavedJobs.Any())
+        {
+            _context.SavedJobs.RemoveRange(job.SavedJobs);
+        }
+
+        if (job.Applications.Any())
+        {
+            _context.ApplicationJobs.RemoveRange(job.Applications);
+        }
 
         _context.Jobs.Remove(job);
         await _context.SaveChangesAsync();

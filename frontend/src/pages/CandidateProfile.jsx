@@ -30,7 +30,8 @@ const CandidateProfile = () => {
 
     const { data: candidate, isLoading, error } = useQuery({
         queryKey: ['candidate', id],
-        queryFn: () => api.getUser(id)
+        queryFn: () => api.getUser(id),
+        enabled: !!id && id !== 'undefined'
     });
 
     if (isLoading) return <Spinner />;

@@ -4,6 +4,8 @@ import { useLanguage } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
 import { useMyJobs, useDeleteJob } from '../../hooks/useJobs';
 import Spinner from '../../components/ui/Spinner';
+import Modal from '../../components/ui/Modal';
+import Button from '../../components/ui/Button';
 import {
     Briefcase,
     Calendar,
@@ -12,7 +14,8 @@ import {
     Trash2,
     Users,
     Search,
-    ExternalLink
+    ExternalLink,
+    AlertTriangle
 } from 'lucide-react';
 import './Dashboard.css';
 import { formatFriendlyDate } from '../../utils/dateUtils';
@@ -22,6 +25,8 @@ const MyJobs = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState('');
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [jobToDelete, setJobToDelete] = useState(null);
     const { data: jobs = [], isLoading } = useMyJobs(user?.id);
     const deleteJobMutation = useDeleteJob();
 
@@ -33,13 +38,19 @@ const MyJobs = () => {
         return status === 'Active' ? '#10b981' : '#f59e0b';
     };
 
-    const handleDelete = async (id) => {
-        if (window.confirm(t('confirmDelete') || 'Are you sure you want to delete this job?')) {
-            try {
-                await deleteJobMutation.mutateAsync(id);
-            } catch (error) {
-                console.error('Failed to delete job', error);
-            }
+    const handleDeleteClick = (job) => {
+        setJobToDelete(job);
+        setIsDeleteModalOpen(true);
+    };
+
+    const confirmDelete = async () => {
+        if (!jobToDelete) return;
+        try {
+            await deleteJobMutation.mutateAsync(jobToDelete.id);
+            setIsDeleteModalOpen(false);
+            setJobToDelete(null);
+        } catch (error) {
+            console.error('Failed to delete job', error);
         }
     };
 
@@ -125,7 +136,7 @@ const MyJobs = () => {
                                         <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
                                             <button className="btn-icon" title={t('edit')} onClick={() => navigate(`/jobs/post?editId=${job.id}`)}><Edit size={18} /></button>
                                             <button className="btn-icon" title={t('viewJob')} onClick={() => navigate(`/jobs/${job.id}`)}><ExternalLink size={18} /></button>
-                                            <button className="btn-icon" title={t('delete')} style={{ color: '#ef4444' }} onClick={() => handleDelete(job.id)}><Trash2 size={18} /></button>
+                                            <button className="btn-icon" title={t('delete')} style={{ color: '#ef4444' }} onClick={() => handleDeleteClick(job)}><Trash2 size={18} /></button>
                                         </div>
                                     </td>
                                 </tr>
@@ -134,6 +145,52 @@ const MyJobs = () => {
                     </tbody>
                 </table>
             </div>
+
+            {/* Delete Confirmation Modal */}
+            <Modal
+                isOpen={isDeleteModalOpen}
+                onClose={() => setIsDeleteModalOpen(false)}
+                title={t('confirmDelete') || 'Confirm Delete'}
+                type="danger"
+                footer={(
+                    <>
+                        <Button variant="secondary" onClick={() => setIsDeleteModalOpen(false)}>
+                            {t('cancel')}
+                        </Button>
+                        <Button 
+                            style={{ background: '#ef4444' }} 
+                            onClick={confirmDelete}
+                            loading={deleteJobMutation.isLoading}
+                        >
+                            {t('delete')}
+                        </Button>
+                    </>
+                )}
+            >
+                <div style={{ textAlign: 'center', padding: '1rem 0' }}>
+                    <div style={{ 
+                        width: '64px', 
+                        height: '64px', 
+                        borderRadius: '50%', 
+                        background: 'rgba(239, 68, 68, 0.1)', 
+                        color: '#ef4444', 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        justifyContent: 'center',
+                        margin: '0 auto 1.5rem'
+                    }}>
+                        <AlertTriangle size={32} />
+                    </div>
+                    <p style={{ fontSize: '1.1rem', color: 'var(--text-main)', marginBottom: '0.5rem' }}>
+                        {t('confirmDeleteJob') || 'Are you sure you want to delete this job?'}
+                    </p>
+                    <p style={{ color: 'var(--text-muted)' }}>
+                        <strong>{jobToDelete?.title}</strong>
+                        <br />
+                        {t('actionCannotBeUndone') || 'This action cannot be undone.'}
+                    </p>
+                </div>
+            </Modal>
         </div>
     );
 };
