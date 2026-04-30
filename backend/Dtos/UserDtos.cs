@@ -65,6 +65,11 @@ public class AuthResponseDto
     public string Email { get; set; } = null!;
     public string? Location { get; set; }
     public string? Phone { get; set; }
+    public string? Website { get; set; }
+    public string? Description { get; set; }
+    public string? LinkedIn { get; set; }
+    public string? Github { get; set; }
+    public string? Industry { get; set; }
     public string? Role { get; set; }
     public string Token { get; set; } = null!;
     public DateTimeOffset CreatedAt { get; set; }

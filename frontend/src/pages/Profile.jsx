@@ -42,7 +42,8 @@ const Profile = () => {
         github: '',
         phone: '',
         photo: null,
-        role: ''
+        role: '',
+        industry: ''
     });
 
     const [isLoading, setIsLoading] = useState(false);
@@ -60,7 +61,8 @@ const Profile = () => {
                     github: currentUser?.github || '',
                     phone: currentUser?.phone || '',
                     photo: getImageUrl(currentUser?.profilePicture || currentUser?.photo) || null,
-                    role: currentUser?.role || ''
+                    role: currentUser?.role || '',
+                    industry: currentUser?.industry || ''
                 });
             } else {
                 setIsLoading(true);
@@ -76,7 +78,8 @@ const Profile = () => {
                         github: fetchedUser.github || '',
                         phone: fetchedUser.phone || '',
                         photo: getImageUrl(fetchedUser.profilePicture) || null,
-                        role: fetchedUser.role || ''
+                        role: fetchedUser.role || '',
+                        industry: fetchedUser.industry || ''
                     });
                 } catch (error) {
                     console.error("Error fetching user profile:", error);
@@ -122,6 +125,7 @@ const Profile = () => {
                 description: formData.bio,
                 linkedIn: formData.linkedin,
                 github: formData.github,
+                industry: formData.industry,
             };
 
             const updatedUser = await updateUser(payload);
@@ -136,6 +140,7 @@ const Profile = () => {
                 linkedin: updatedUser.linkedIn  ?? prev.linkedin,
                 github:   updatedUser.github   ?? prev.github,
                 phone:    updatedUser.phone    ?? prev.phone,
+                industry: updatedUser.industry ?? prev.industry,
             }));
 
             addToast(t('profileUpdated'), 'success');
@@ -204,6 +209,26 @@ const Profile = () => {
                             icon={Mail}
                             type="email"
                         />
+                        {(formData.role === 'Employer' || formData.role === 'Company') && (
+                            <div className="input-group">
+                                <label className="input-label" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                                    <Briefcase size={16} /> {t('industry') || 'Industry'}
+                                </label>
+                                <select
+                                    value={formData.industry}
+                                    onChange={(e) => setFormData({ ...formData, industry: e.target.value })}
+                                >
+                                    <option value="">{t('selectIndustry') || 'Select Industry'}</option>
+                                    {[
+                                        'Technology', 'Healthcare', 'Finance', 'Education', 
+                                        'Manufacturing', 'Retail', 'Real Estate', 'Transportation', 
+                                        'Hospitality', 'Construction', 'Marketing', 'Media', 'Other'
+                                    ].map(ind => (
+                                        <option key={ind} value={ind}>{t(ind.toLowerCase().replace(' ', '')) || ind}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        )}
                         <div className="input-group">
                             <label className="input-label" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
                                 <MapPin size={16} /> {t('locationPlaceholder')}

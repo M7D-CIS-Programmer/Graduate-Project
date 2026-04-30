@@ -9,14 +9,15 @@ import {
     Clock
 } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { useJobs } from '../../hooks/useJobs';
 import { useCategories } from '../../hooks/useCategories';
 import { useDebounce } from '../../hooks/useDebounce';
 import { useSavedJobs, useSaveJob, useUnsaveJob } from '../../hooks/useSavedJobs';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
-import { Bookmark } from 'lucide-react';
+import { Bookmark, X } from 'lucide-react';
+import Button from '../../components/ui/Button';
 import './Jobs.css';
 
 
@@ -24,21 +25,52 @@ import './Jobs.css';
 const JobListings = () => {
     const { t, dir } = useLanguage();
     const navigate = useNavigate();
-    const location = useLocation();
-    const queryParams = new URLSearchParams(location.search);
-    const initialSearch = queryParams.get('q') || '';
+    const [searchParams, setSearchParams] = useSearchParams();
 
-    const [searchQuery, setSearchQuery] = React.useState(initialSearch);
-    const [selectedTypes, setSelectedTypes] = React.useState([]);
-    const [selectedWorkModes, setSelectedWorkModes] = React.useState([]);
-    const [selectedSalaries, setSelectedSalaries] = React.useState([]);
-    const [selectedCategory, setSelectedCategory] = React.useState('');
+    // Helper to get initial state from URL or localStorage
+    const getInitial = (key, urlParam, defaultValue = '') => {
+        const fromUrl = searchParams.get(urlParam);
+        if (fromUrl !== null) return fromUrl;
+        return localStorage.getItem(`job_filter_${key}`) || defaultValue;
+    };
 
-    // Debounced value — only updates 400 ms after the user stops typing.
-    // This is what gets forwarded to the API so we don't fire a request on every keystroke.
+    const getInitialArray = (key, urlParam) => {
+        const fromUrl = searchParams.get(urlParam);
+        if (fromUrl !== null) return fromUrl.split(',').filter(Boolean);
+        const fromStorage = localStorage.getItem(`job_filter_${key}`);
+        return fromStorage ? fromStorage.split(',').filter(Boolean) : [];
+    };
+
+    // Initialize state
+    const [searchQuery, setSearchQuery] = React.useState(() => getInitial('q', 'q'));
+    const [selectedTypes, setSelectedTypes] = React.useState(() => getInitialArray('types', 'types'));
+    const [selectedWorkModes, setSelectedWorkModes] = React.useState(() => getInitialArray('modes', 'modes'));
+    const [selectedSalaries, setSelectedSalaries] = React.useState(() => getInitialArray('salaries', 'salaries'));
+    const [selectedCategory, setSelectedCategory] = React.useState(() => getInitial('category', 'category'));
+
+    // Debounced value for search
     const debouncedQuery = useDebounce(searchQuery, 400);
 
     const { data: categories = [] } = useCategories();
+
+    // Sync state to URL and localStorage
+    React.useEffect(() => {
+        const params = new URLSearchParams();
+        if (debouncedQuery) params.set('q', debouncedQuery);
+        if (selectedTypes.length > 0) params.set('types', selectedTypes.join(','));
+        if (selectedWorkModes.length > 0) params.set('modes', selectedWorkModes.join(','));
+        if (selectedSalaries.length > 0) params.set('salaries', selectedSalaries.join(','));
+        if (selectedCategory) params.set('category', selectedCategory);
+        
+        setSearchParams(params, { replace: true });
+
+        // Save to localStorage
+        localStorage.setItem('job_filter_q', debouncedQuery);
+        localStorage.setItem('job_filter_types', selectedTypes.join(','));
+        localStorage.setItem('job_filter_modes', selectedWorkModes.join(','));
+        localStorage.setItem('job_filter_salaries', selectedSalaries.join(','));
+        localStorage.setItem('job_filter_category', selectedCategory);
+    }, [debouncedQuery, selectedTypes, selectedWorkModes, selectedSalaries, selectedCategory, setSearchParams]);
 
     const { data: jobs = [], isLoading, error } = useJobs({
         type: selectedTypes.join(','),
@@ -92,10 +124,6 @@ const JobListings = () => {
         { label: '$120k+', min: 120000, max: Infinity },
     ];
 
-    React.useEffect(() => {
-        setSearchQuery(queryParams.get('q') || '');
-    }, [location.search]);
-
     const toggleType = (value) =>
         setSelectedTypes(prev => prev.includes(value) ? prev.filter(v => v !== value) : [...prev, value]);
 
@@ -104,6 +132,22 @@ const JobListings = () => {
 
     const toggleSalary = (label) =>
         setSelectedSalaries(prev => prev.includes(label) ? prev.filter(l => l !== label) : [...prev, label]);
+
+    const handleResetFilters = () => {
+        setSearchQuery('');
+        setSelectedTypes([]);
+        setSelectedWorkModes([]);
+        setSelectedSalaries([]);
+        setSelectedCategory('');
+        setSearchParams({});
+        
+        // Clear localStorage
+        localStorage.removeItem('job_filter_q');
+        localStorage.removeItem('job_filter_types');
+        localStorage.removeItem('job_filter_modes');
+        localStorage.removeItem('job_filter_salaries');
+        localStorage.removeItem('job_filter_category');
+    };
 
     // Salary filtering is still client-side for now as it's complex to pass ranges to API without better DTO
     const filteredJobs = jobs.filter(job => {
@@ -121,11 +165,7 @@ const JobListings = () => {
 
     const handleSearch = (e) => {
         e.preventDefault();
-        if (searchQuery.trim()) {
-            navigate(`/jobs?q=${encodeURIComponent(searchQuery.trim())}`);
-        } else {
-            navigate('/jobs');
-        }
+        // search is already handled by debouncedQuery and useEffect
     };
 
     if (error) return <div style={{ padding: '2rem', textAlign: 'center', color: 'red' }}>Error: {error.message}</div>;
@@ -138,9 +178,22 @@ const JobListings = () => {
 
             <div className="jobs-layout">
                 <aside className="filters-sidebar">
-                    <div className="filter-header" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '2rem' }}>
-                        <Filter size={20} className="text-primary" />
-                        <h2 style={{ fontSize: '1.25rem' }}>{t('filters')}</h2>
+                    <div className="filter-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                            <Filter size={20} className="text-primary" />
+                            <h2 style={{ fontSize: '1.25rem' }}>{t('filters')}</h2>
+                        </div>
+                        {(searchQuery || selectedTypes.length > 0 || selectedWorkModes.length > 0 || selectedSalaries.length > 0 || selectedCategory) && (
+                            <Button 
+                                variant="secondary"
+                                size="sm"
+                                onClick={handleResetFilters}
+                                style={{ gap: '0.25rem', padding: '0.35rem 0.65rem' }}
+                            >
+                                <X size={14} />
+                                {t('reset') || 'Reset'}
+                            </Button>
+                        )}
                     </div>
 
                     <div className="filter-section">
@@ -295,7 +348,14 @@ const JobListings = () => {
                             </div>
                         )) : (
                             <div style={{ textAlign: 'center', padding: '3rem', width: '100%' }}>
-                                <p style={{ color: 'var(--text-muted)' }}>No jobs found matching your criteria.</p>
+                                <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>{t('noJobsFound') || 'No jobs found matching your criteria.'}</p>
+                                <Button 
+                                    variant="primary"
+                                    onClick={handleResetFilters}
+                                    style={{ padding: '0.5rem 1.5rem', fontSize: '0.9rem' }}
+                                >
+                                    {t('clearAllFilters') || 'Clear all filters'}
+                                </Button>
                             </div>
                         )}
                     </div>

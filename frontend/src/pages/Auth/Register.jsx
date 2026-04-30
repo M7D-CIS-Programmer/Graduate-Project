@@ -138,16 +138,31 @@ const Register = () => {
                         disabled={loading}
                     />
                     {formData.role === 'company' && (
-                        <Input
-                            label={t('industry')}
-                            placeholder={t('industryPlaceholder')}
-                            icon={Building}
-                            type="text"
-                            value={formData.industry}
-                            onChange={(e) => setFormData({ ...formData, industry: e.target.value })}
-                            disabled={loading}
-                            required
-                        />
+                        <div className="input-group">
+                            <label className="input-label">{t('industry')}</label>
+                            <div className="input-wrapper has-icon">
+                                <Building className="input-icon" size={20} />
+                                <select 
+                                    className="input-field" 
+                                    value={formData.industry}
+                                    onChange={(e) => setFormData({ ...formData, industry: e.target.value })}
+                                    disabled={loading}
+                                    required
+                                    style={{ appearance: 'none', background: 'transparent' }}
+                                >
+                                    <option value="" disabled>{t('selectIndustry')}</option>
+                                    {[
+                                        'Technology', 'Healthcare', 'Finance', 'Education', 
+                                        'Manufacturing', 'Retail', 'Real Estate', 'Transportation', 
+                                        'Hospitality', 'Construction', 'Marketing', 'Media', 'Other'
+                                    ].map(ind => (
+                                        <option key={ind} value={ind} style={{ background: 'var(--bg-card)', color: 'var(--text-main)' }}>
+                                            {t(ind.toLowerCase().replace(' ', '')) || ind}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
                     )}
                     <Input
                         label={t('email')}
