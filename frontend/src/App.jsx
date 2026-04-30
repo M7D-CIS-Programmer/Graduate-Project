@@ -44,6 +44,7 @@ import TermsOfService from './pages/TermsOfService';
 import Chatbot from './pages/Chatbot';
 import CVAnalyzer from './pages/CVAnalyzer/CVAnalyzer';
 import Interview from './pages/Interview/Interview';
+import AICandidateInsights from './pages/Dashboard/AICandidateInsights';
 import Spinner from './components/ui/Spinner';
 
 const ConditionalHome = () => {
@@ -113,6 +114,7 @@ function App() {
                   <Route path="/dashboard/employer" element={<EmployerDashboard />} />
                   <Route path="/dashboard/employer/applicants" element={<Applicants />} />
                   <Route path="/dashboard/employer/jobs" element={<MyJobs />} />
+                  <Route path="/dashboard/employer/insights" element={<AICandidateInsights />} />
                   <Route path="/dashboard/admin" element={<AdminDashboard />} />
                   <Route path="/dashboard/admin/users" element={<ManageUsers />} />
                   <Route path="/dashboard/admin/jobs" element={<ManageJobs />} />

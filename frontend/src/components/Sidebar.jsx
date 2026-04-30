@@ -16,7 +16,8 @@ import {
     ScanText,
     MessageSquare,
     Heart,
-    FileEdit
+    FileEdit,
+    Brain
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -61,6 +62,7 @@ const Sidebar = ({ isOpen }) => {
                 { name: t('myJobs'), icon: <Briefcase size={20} />, path: '/dashboard/employer/jobs' },
                 { name: t('postAJob'), icon: <PlusCircle size={20} />, path: '/jobs/post' },
                 { name: t('candidates'), icon: <Users size={20} />, path: '/dashboard/employer/applicants' },
+                { name: t('aiCandidateInsights'), icon: <Brain size={20} />, path: '/dashboard/employer/insights' },
             ];
         }
 

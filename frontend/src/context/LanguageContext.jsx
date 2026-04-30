@@ -685,7 +685,20 @@ export const LanguageProvider = ({ children }) => {
             viewJobs: "View Jobs",
             unfollow: "Unfollow",
             viewProfile: "View Profile",
-            back: "Back"
+            back: "Back",
+            aiCandidateInsights: "AI Candidate Insights",
+            aiScore: "AI Score",
+            aiRecommendation: "AI Recommendation",
+            topCandidates: "Top Candidates",
+            candidateComparison: "Candidate Comparison",
+            avgScore: "Avg. Score",
+            hiringPotential: "Hiring Potential",
+            insightsSummary: "Insights Summary",
+            candidateInsightsDesc: "AI-powered analysis of your current applicants based on job requirements.",
+            matchFound: "Match Found",
+            highPotential: "High Potential",
+            missingSkills: "Missing Skills",
+            yearsExp: "years exp"
         },
         ar: {
             search: "ابحث...",
@@ -1353,7 +1366,20 @@ export const LanguageProvider = ({ children }) => {
             viewJobs: "عرض الوظائف",
             unfollow: "إلغاء المتابعة",
             viewProfile: "عرض الملف الشخصي",
-            back: "رجوع"
+            back: "رجوع",
+            aiCandidateInsights: "رؤى المرشحين بالذكاء الاصطناعي",
+            aiScore: "تقييم الذكاء الاصطناعي",
+            aiRecommendation: "توصية الذكاء الاصطناعي",
+            topCandidates: "أفضل المرشحين",
+            candidateComparison: "مقارنة المرشحين",
+            avgScore: "متوسط التقييم",
+            hiringPotential: "إمكانية التوظيف",
+            insightsSummary: "ملخص الرؤى",
+            candidateInsightsDesc: "تحليل مدعوم بالذكاء الاصطناعي للمتقدمين الحاليين بناءً على متطلبات الوظيفة.",
+            matchFound: "تم العثور على تطابق",
+            highPotential: "إمكانية عالية",
+            missingSkills: "مهارات مفقودة",
+            yearsExp: "سنوات خبرة"
         }
     };
 
