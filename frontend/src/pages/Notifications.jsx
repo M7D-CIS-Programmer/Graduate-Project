@@ -10,8 +10,7 @@ import {
     Trash2,
     Check,
     Users,
-    User as UserIcon,
-    ArrowRight
+    User as UserIcon
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
@@ -193,20 +192,19 @@ const Notifications = () => {
                             <div className="notification-content">
                                 <h4>{notif.title}</h4>
                                 <p>{notif.message}</p>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginTop: '0.5rem' }}>
-                                    <span className="notification-date">{notif.time}</span>
-                                    {notif.relatedId && (
-                                        <button 
-                                            className="notif-action-link"
-                                            onClick={(e) => handleViewProfile(e, notif)}
-                                        >
-                                            {t('viewProfile')}
-                                            <ArrowRight size={14} className={dir === 'rtl' ? 'rotate-180' : ''} />
-                                        </button>
-                                    )}
-                                </div>
+                                <span className="notification-date">{notif.time}</span>
                             </div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                {notif.relatedId && (
+                                    <Button 
+                                        variant="outline" 
+                                        size="sm" 
+                                        onClick={(e) => handleViewProfile(e, notif)}
+                                        style={{ height: '32px', fontSize: '0.8rem', padding: '0 0.75rem' }}
+                                    >
+                                        {t('viewProfile')}
+                                    </Button>
+                                )}
                                 {notif.unread && <div className="notification-unread-dot"></div>}
                                 <button 
                                     className="delete-notif-btn" 
