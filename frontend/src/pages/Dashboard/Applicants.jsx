@@ -5,6 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { useMyJobs } from '../../hooks/useJobs';
+import { getImageUrl } from '../../api/api';
 import {
     Users,
     Search,
@@ -151,10 +152,31 @@ const Applicants = () => {
                         {filteredApplicants.map(applicant => (
                             <tr key={applicant.id} style={{ borderBottom: '1px solid var(--border-color)' }}>
                                 <td style={{ padding: '1.25rem 1rem' }}>
-                                    <div>
-                                        <div style={{ fontWeight: '600', marginBottom: '0.25rem' }}>{applicant.user?.name || 'Unknown'}</div>
-                                        <div style={{ display: 'flex', gap: '1rem', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                                            <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}><Mail size={12} /> {applicant.user?.email}</span>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                        <div className="applicant-avatar-container">
+                                            {applicant.user?.profilePicture ? (
+                                                <img 
+                                                    src={getImageUrl(applicant.user.profilePicture)} 
+                                                    alt={applicant.user.name} 
+                                                    className="applicant-avatar"
+                                                    onError={(e) => {
+                                                        e.target.onerror = null;
+                                                        e.target.style.display = 'none';
+                                                        e.target.nextSibling.style.display = 'flex';
+                                                    }}
+                                                />
+                                            ) : null}
+                                            <div className="applicant-avatar-fallback" style={{ 
+                                                display: applicant.user?.profilePicture ? 'none' : 'flex' 
+                                            }}>
+                                                {applicant.user?.name?.charAt(0) || '?'}
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div style={{ fontWeight: '600', marginBottom: '0.25rem' }}>{applicant.user?.name || 'Unknown'}</div>
+                                            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                                                <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}><Mail size={12} /> {applicant.user?.email}</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </td>

@@ -293,6 +293,30 @@ public class UsersController : ControllerBase
         return Ok(ToDto(user));
     }
 
+    [Authorize]
+    [HttpPost("{id}/change-password")]
+    public async Task<IActionResult> ChangePassword(int id, [FromBody] ChangePasswordDto dto)
+    {
+        var callerIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!int.TryParse(callerIdClaim, out int callerId) || callerId != id)
+            return Forbid();
+
+        var user = await _context.Users.FindAsync(id);
+        if (user == null) return NotFound();
+
+        // Verify current password
+        if (!_authService.VerifyPassword(dto.CurrentPassword, user.Pass))
+        {
+            return BadRequest(new { message = "Invalid current password" });
+        }
+
+        // Hash and update new password
+        user.Pass = _authService.HashPassword(dto.NewPassword);
+        await _context.SaveChangesAsync();
+
+        return Ok(new { message = "Password updated successfully" });
+    }
+
     [HttpPut("{id}/status")]
     public async Task<IActionResult> UpdateUserStatus(int id, [FromBody] string status)
     {

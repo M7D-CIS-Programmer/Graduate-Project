@@ -86,3 +86,13 @@ public class AuthResultDto
     public string? Token { get; set; }
 }
 
+
+public class ChangePasswordDto
+{
+    [Required]
+    public string CurrentPassword { get; set; } = null!;
+
+    [Required]
+    [MinLength(6)]
+    public string NewPassword { get; set; } = null!;
+}

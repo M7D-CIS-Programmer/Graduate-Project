@@ -37,10 +37,41 @@ const Settings = () => {
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
 
-    const handleSaveSecurity = (e) => {
+    const [isSavingSecurity, setIsSavingSecurity] = useState(false);
+
+    const handleSaveSecurity = async (e) => {
         e.preventDefault();
-        addToast(t('saveChanges') + '!', 'success');
-        setPasswordData({ current: '', new: '', confirm: '' });
+        
+        // Validation
+        if (!passwordData.current || !passwordData.new || !passwordData.confirm) {
+            addToast(t('allFieldsRequired') || 'All fields are required', 'error');
+            return;
+        }
+
+        if (passwordData.new !== passwordData.confirm) {
+            addToast(t('passwordsDontMatch') || 'Passwords do not match', 'error');
+            return;
+        }
+
+        if (passwordData.new.length < 6) {
+            addToast(t('passwordTooShort') || 'Password must be at least 6 characters', 'error');
+            return;
+        }
+
+        setIsSavingSecurity(true);
+        try {
+            await api.changePassword(user.id, {
+                currentPassword: passwordData.current,
+                newPassword: passwordData.new
+            });
+            addToast(t('passwordUpdatedSuccess') || 'Password updated successfully', 'success');
+            setPasswordData({ current: '', new: '', confirm: '' });
+        } catch (error) {
+            console.error('Failed to update password', error);
+            addToast(error.message || t('actionFailed'), 'error');
+        } finally {
+            setIsSavingSecurity(false);
+        }
     };
 
     const handleDeleteAccount = async () => {
@@ -102,7 +133,7 @@ const Settings = () => {
                                     onChange={(e) => setPasswordData({ ...passwordData, confirm: e.target.value })}
                                 />
                             </div>
-                            <Button type="submit" style={{ marginTop: '1.5rem' }}>
+                            <Button type="submit" style={{ marginTop: '1.5rem' }} loading={isSavingSecurity}>
                                 <Save size={18} />
                                 {t('saveChanges')}
                             </Button>

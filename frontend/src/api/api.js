@@ -79,6 +79,7 @@ export const api = {
     updateUser:          (id, data)   => put(`${BASE_URL}/Users/${id}`, data),
     updateUserStatus:    (id, status) => put(`${BASE_URL}/Users/${id}/status`, status),
     deleteUser:          (id)         => del(`${BASE_URL}/Users/${id}`),
+    changePassword:      (id, data)   => post(`${BASE_URL}/Users/${id}/change-password`, data),
 
     // Saved Jobs
     getSavedJobs:   ()          => get(`${BASE_URL}/SavedJobs`),
