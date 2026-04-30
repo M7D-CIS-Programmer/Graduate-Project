@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
     Bell,
     Briefcase,
@@ -8,7 +9,9 @@ import {
     MessageSquare,
     Trash2,
     Check,
-    Users
+    Users,
+    User as UserIcon,
+    ArrowRight
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
@@ -21,6 +24,7 @@ import './User.css';
 const Notifications = () => {
     const { t, dir } = useLanguage();
     const { user } = useAuth();
+    const navigate = useNavigate();
     const { setUnreadCount } = useNotifications();
     const [notifications, setNotifications] = useState([]);
 
@@ -35,6 +39,7 @@ const Notifications = () => {
                 let icon = <Bell />;
                 let title = notif.title;
                 let message = notif.message;
+                const type = notif.type?.toLowerCase();
                 
                 // Simple regex mapping for backend English strings
                 if (message.includes("Your application for '") && message.includes("' has been updated to: ")) {
@@ -58,12 +63,15 @@ const Notifications = () => {
                 } else if (message.includes("An employer viewed your profile")) {
                     title = t('applicationViewed');
                     message = t('employerViewedProfileMsg');
+                } else if (type === 'follow') {
+                    title = t('newFollower') || "New Follower";
                 }
                 
                 if (notif.type === 'Application') icon = <Users />;
                 else if (notif.type === 'StatusUpdate') icon = <CheckCircle />;
                 else if (notif.type === 'ProfileView') icon = <Building2 />;
                 else if (notif.type === 'ResumeView') icon = <Briefcase />;
+                else if (notif.type === 'Follow') icon = <UserIcon />;
                 
                 return {
                     id: notif.id,
@@ -72,7 +80,8 @@ const Notifications = () => {
                     time: formatTimeAgo(notif.createdAt, t, dir === 'rtl' ? 'ar' : 'en'),
                     unread: !notif.isRead,
                     icon: icon,
-                    type: notif.type?.toLowerCase()
+                    type: type,
+                    relatedId: notif.relatedId
                 };
             });
 
@@ -133,6 +142,20 @@ const Notifications = () => {
         }
     };
 
+    const handleViewProfile = (e, notif) => {
+        e.stopPropagation();
+        if (!notif.unread) markAsRead(notif.id);
+        
+        let path = `/candidate/${notif.relatedId}`;
+        const isSeeker = user.role === 'Job Seeker' || user.role === 'JobSeeker';
+        
+        if (isSeeker && (notif.type === 'profileview' || notif.type === 'resumeview')) {
+            path = `/companies/${notif.relatedId}`;
+        }
+        
+        navigate(path);
+    };
+
     return (
         <div className={`user-page-container ${dir}`}>
             <div className="dashboard-header">
@@ -170,7 +193,18 @@ const Notifications = () => {
                             <div className="notification-content">
                                 <h4>{notif.title}</h4>
                                 <p>{notif.message}</p>
-                                <span className="notification-date">{notif.time}</span>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginTop: '0.5rem' }}>
+                                    <span className="notification-date">{notif.time}</span>
+                                    {notif.relatedId && (
+                                        <button 
+                                            className="notif-action-link"
+                                            onClick={(e) => handleViewProfile(e, notif)}
+                                        >
+                                            {t('viewProfile')}
+                                            <ArrowRight size={14} className={dir === 'rtl' ? 'rotate-180' : ''} />
+                                        </button>
+                                    )}
+                                </div>
                             </div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                                 {notif.unread && <div className="notification-unread-dot"></div>}

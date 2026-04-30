@@ -29,7 +29,8 @@ public class UsersController : ControllerBase
         u.CreatedAt,
         u.Jobs?.Count(j => j.Status == "Active") ?? 0,
         u.Industry,
-        u.ProfilePicture
+        u.ProfilePicture,
+        u.Followers?.Count ?? 0
     );
 
     [HttpPost("login")]
@@ -44,12 +45,14 @@ public class UsersController : ControllerBase
 
         var user = await _context.Users
             .Include(u => u.Roles)
+            .Include(u => u.Followers)
             .Include(u => u.Applications)
                 .ThenInclude(a => a.Job)
                     .ThenInclude(j => j.Category)
             .Include(u => u.Applications)
                 .ThenInclude(a => a.Job)
                     .ThenInclude(j => j.User)
+                        .ThenInclude(u => u.Followers)
             .FirstOrDefaultAsync(u => u.Email.ToLower() == normalizedEmail);
 
         if (user == null)
@@ -82,6 +85,7 @@ public class UsersController : ControllerBase
             Token = token,
             CreatedAt = user.CreatedAt,
             ProfilePicture = user.ProfilePicture,
+            FollowerCount = user.Followers?.Count ?? 0,
             AppliedJobs = user.Applications.Select(a => new JobResponseDto
             {
                 Id = a.Job.Id,
@@ -116,7 +120,8 @@ public class UsersController : ControllerBase
                     a.Job.User.CreatedAt,
                     0,
                     a.Job.User.Industry,
-                    a.Job.User.ProfilePicture
+                    a.Job.User.ProfilePicture,
+                    a.Job.User.Followers?.Count ?? 0
                 ),
                 Category = new CategoryResponseDto
                 {
@@ -135,6 +140,7 @@ public class UsersController : ControllerBase
         var users = await _context.Users
             .Include(u => u.Roles)
             .Include(u => u.Jobs)
+            .Include(u => u.Followers)
             .ToListAsync();
         return Ok(users.Select(ToDto));
     }
@@ -145,6 +151,7 @@ public class UsersController : ControllerBase
         var user = await _context.Users
             .Include(u => u.Roles)
             .Include(u => u.Jobs)
+            .Include(u => u.Followers)
             .FirstOrDefaultAsync(u => u.Id == id);
 
         if (user == null) return NotFound();
@@ -153,13 +160,16 @@ public class UsersController : ControllerBase
         if (viewerId.HasValue && viewerId.Value != id)
         {
             var viewer = await _context.Users.FindAsync(viewerId.Value);
+            var userRole = user.Roles?.FirstOrDefault()?.RoleName ?? "Job Seeker";
             var notification = new Notification
             {
                 UserId = id,
                 Title = "Profile Viewed",
                 Message = $"{(viewer?.Name ?? "Someone")} viewed your profile.",
                 Type = "ProfileView",
-                IsRead = false
+                IsRead = false,
+                Receiver = userRole,
+                RelatedId = viewerId
             };
             _context.Notifications.Add(notification);
             await _context.SaveChangesAsync();
@@ -238,6 +248,7 @@ public class UsersController : ControllerBase
             Token = token,
             CreatedAt = user.CreatedAt,
             ProfilePicture = user.ProfilePicture,
+            FollowerCount = 0,
             AppliedJobs = new List<JobResponseDto>()
         };
 
@@ -255,7 +266,7 @@ public class UsersController : ControllerBase
         if (!int.TryParse(callerIdClaim, out int callerId) || callerId != id)
             return Forbid(); // 403 — prevent cross-user updates
 
-        var user = await _context.Users.Include(u => u.Roles).FirstOrDefaultAsync(u => u.Id == id);
+        var user = await _context.Users.Include(u => u.Roles).Include(u => u.Followers).FirstOrDefaultAsync(u => u.Id == id);
         if (user == null) return NotFound();
 
         // Security: Job Seekers cannot update Employer/Company profiles

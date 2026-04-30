@@ -49,6 +49,21 @@ public class FollowsController : ControllerBase
         };
 
         _context.FollowCompanies.Add(follow);
+
+        var follower = await _context.Users.FindAsync(userId);
+        var notification = new Notification
+        {
+            UserId = companyId,
+            Title = "New Follower",
+            Message = $"{follower?.Name ?? "A user"} is now following your company.",
+            Type = "Follow",
+            IsRead = false,
+            Receiver = companyRole,
+            RelatedId = userId,
+            CreatedAt = DateTimeOffset.UtcNow
+        };
+        _context.Notifications.Add(notification);
+
         await _context.SaveChangesAsync();
 
         return Ok(new { message = "Company followed successfully." });
@@ -85,6 +100,7 @@ public class FollowsController : ControllerBase
         var followedCompanies = await _context.FollowCompanies
             .Where(f => f.UserId == userId)
             .Include(f => f.Company)
+                .ThenInclude(c => c.Followers)
             .Select(f => new UserDto(
                 f.Company.Id,
                 f.Company.Name,
@@ -100,7 +116,8 @@ public class FollowsController : ControllerBase
                 f.Company.CreatedAt,
                 0,
                 f.Company.Industry,
-                f.Company.ProfilePicture
+                f.Company.ProfilePicture,
+                f.Company.Followers.Count
             ))
             .ToListAsync();
 

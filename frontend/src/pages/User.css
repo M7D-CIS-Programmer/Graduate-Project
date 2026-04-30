@@ -151,6 +151,37 @@
     inset-inline-end: 1.25rem;
 }
 
+.notif-action-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--primary);
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.notif-action-link:hover {
+    color: #818cf8;
+    text-decoration: underline;
+}
+
+.notif-action-link svg {
+    transition: transform 0.2s ease;
+}
+
+.notif-action-link:hover svg {
+    transform: translateX(3px);
+}
+
+[dir="rtl"] .notif-action-link:hover svg {
+    transform: translateX(-3px);
+}
+
 /* Empty States */
 .empty-state {
     text-align: center;

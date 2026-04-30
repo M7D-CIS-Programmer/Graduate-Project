@@ -96,7 +96,8 @@ public class ApplicationJobsController : ControllerBase
                 Message = $"{seeker?.Name ?? "A candidate"} applied for your job: {job.Title}",
                 Type = "Application",
                 IsRead = false,
-                Receiver = "Employer"
+                Receiver = "Employer",
+                RelatedId = dto.UserId
             };
             _context.Notifications.Add(notification);
 

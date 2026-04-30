@@ -62,12 +62,14 @@ namespace aabu_project.Services
         public AuthResultDto Login(LoginDto dto)
         {
             var user = _context.Users
+                .Include(u => u.Followers)
                 .Include(u => u.Applications)
                     .ThenInclude(a => a.Job)
                         .ThenInclude(j => j.Category)
                 .Include(u => u.Applications)
                     .ThenInclude(a => a.Job)
                         .ThenInclude(j => j.User)
+                            .ThenInclude(u => u.Followers)
                 .Include(u => u.Roles)
                 .FirstOrDefault(x => x.Email == dto.Email);
 
@@ -105,6 +107,7 @@ namespace aabu_project.Services
                     Email = user.Email,
                     Role = user.Roles.FirstOrDefault()?.RoleName,
                     ProfilePicture = user.ProfilePicture,
+                    FollowerCount = user.Followers?.Count ?? 0,
                     CreatedAt = user.CreatedAt,
                     Token = token,
                     AppliedJobs = user.Applications.Select(a => new JobResponseDto
@@ -141,7 +144,8 @@ namespace aabu_project.Services
                             a.Job.User.CreatedAt,
                             0,
                             a.Job.User.Industry,
-                            a.Job.User.ProfilePicture
+                            a.Job.User.ProfilePicture,
+                            a.Job.User.Followers?.Count ?? 0
                         ),
                         Category = new CategoryResponseDto
                         {

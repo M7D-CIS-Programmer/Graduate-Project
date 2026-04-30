@@ -168,6 +168,11 @@ const CompanyProfileView = () => {
                             </div>
                             <div className="cv-stat-divider" />
                             <div className="cv-stat">
+                                <span className="cv-stat-num">{company.followerCount || 0}</span>
+                                <span className="cv-stat-lbl">{t('followers') || 'Followers'}</span>
+                            </div>
+                            <div className="cv-stat-divider" />
+                            <div className="cv-stat">
                                 <span className="cv-stat-num">{company.createdAt ? new Date(company.createdAt).getFullYear() : '—'}</span>
                                 <span className="cv-stat-lbl">{t('founded') || 'Since'}</span>
                             </div>

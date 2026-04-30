@@ -63,6 +63,7 @@ const EmployerDashboard = () => {
         { label: t('totalPostings'), value: employerJobs.length, icon: <FileText />, color: '#6366f1' },
         { label: t('totalApplicants'), value: employerApplications.length, icon: <Users />, color: '#10b981' },
         { label: t('activeJobs'), value: employerJobs.filter(j => j.status === 'Active').length, icon: <TrendingUp />, color: '#f59e0b' },
+        { label: t('followers'), value: user?.followerCount || 0, icon: <Users />, color: '#ec4899' },
     ];
 
     const handleAction = async (actionType, applicant) => {

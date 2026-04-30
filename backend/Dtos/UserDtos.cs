@@ -45,7 +45,7 @@ public record UserDto(
     int Id, string Name, string Email,
     string? Location, string? Website, string? Phone,
     string? Description, string? LinkedIn, string? Github, string? Status,
-    string? Role, DateTimeOffset CreatedAt, int ActiveJobsCount = 0, string? Industry = null, string? ProfilePicture = null
+    string? Role, DateTimeOffset CreatedAt, int ActiveJobsCount = 0, string? Industry = null, string? ProfilePicture = null, int FollowerCount = 0
 );
 
 public class LoginDto
@@ -74,6 +74,7 @@ public class AuthResponseDto
     public string Token { get; set; } = null!;
     public DateTimeOffset CreatedAt { get; set; }
     public string? ProfilePicture { get; set; }
+    public int FollowerCount { get; set; }
     public List<JobResponseDto>? AppliedJobs { get; set; }
 }
 

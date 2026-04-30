@@ -41,7 +41,9 @@ public class JobsController : ControllerBase
             job.User.Roles?.FirstOrDefault()?.RoleName,
             job.User.CreatedAt,
             job.User.Jobs?.Count(j => j.Status == "Active") ?? 0,
-            job.User.Industry
+            job.User.Industry,
+            job.User.ProfilePicture,
+            job.User.Followers?.Count ?? 0
         ) : null!,
         Category = job.Category != null ? new CategoryResponseDto { Id = job.Category.Id, Name = job.Category.Name, JobCount = job.Category.Jobs?.Count ?? 0 } : null!,
         ApplicantsCount = job.Applications?.Count ?? 0,
@@ -60,6 +62,8 @@ public class JobsController : ControllerBase
         var query = _context.Jobs
             .Include(j => j.User)
                 .ThenInclude(u => u.Roles)
+            .Include(j => j.User)
+                .ThenInclude(u => u.Followers)
             .Include(j => j.Category)
                 .ThenInclude(c => c.Jobs)
             .Include(j => j.Applications)
@@ -121,6 +125,8 @@ public class JobsController : ControllerBase
         var jobs = await _context.Jobs
             .Include(j => j.User)
                 .ThenInclude(u => u.Roles)
+            .Include(j => j.User)
+                .ThenInclude(u => u.Followers)
             .Include(j => j.Category)
                 .ThenInclude(c => c.Jobs)
             .Include(j => j.Applications)
@@ -135,6 +141,8 @@ public class JobsController : ControllerBase
         var job = await _context.Jobs
             .Include(j => j.User)
                 .ThenInclude(u => u.Roles)
+            .Include(j => j.User)
+                .ThenInclude(u => u.Followers)
             .Include(j => j.Category)
                 .ThenInclude(c => c.Jobs)
             .Include(j => j.Applications)

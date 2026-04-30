@@ -142,7 +142,9 @@ public class ResumesController(MyDbContext context) : ControllerBase
                 Title = "Resume Viewed",
                 Message = $"{(viewer?.Name ?? "An employer")} viewed your resume.",
                 Type = "ResumeView",
-                IsRead = false
+                IsRead = false,
+                Receiver = "Job Seeker",
+                RelatedId = viewerId
             };
             Context.Notifications.Add(notification);
             await Context.SaveChangesAsync();
