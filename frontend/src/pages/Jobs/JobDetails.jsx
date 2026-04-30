@@ -44,6 +44,17 @@ const JobDetails = () => {
         setIsApplied(user?.appliedJobs?.some(j => j.id === job.id) || false);
     }, [job, user?.appliedJobs]);
 
+    useEffect(() => {
+        if (isModalOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'unset';
+        }
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, [isModalOpen]);
+
     if (isLoading) return <Spinner />;
     if (error || !job) {
         return (
@@ -244,59 +255,61 @@ const JobDetails = () => {
                             </button>
                         </div>
                         <form onSubmit={handleApplySubmit} className="application-form">
-                            <div className="form-group">
-                                <label>{t('fullName') || 'Full Name'}</label>
-                                <input 
-                                    type="text" 
-                                    name="name" 
-                                    value={formData.name} 
-                                    onChange={handleFormChange} 
-                                    required 
-                                    className="form-input"
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label>{t('email') || 'Email'}</label>
-                                <input 
-                                    type="email" 
-                                    name="email" 
-                                    value={formData.email} 
-                                    onChange={handleFormChange} 
-                                    required 
-                                    className="form-input"
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label>{t('phone') || 'Phone Number'}</label>
-                                <input 
-                                    type="tel" 
-                                    name="phone" 
-                                    value={formData.phone} 
-                                    onChange={handleFormChange} 
-                                    required 
-                                    className="form-input"
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label>{t('coverLetter') || 'Cover Letter'}</label>
-                                <textarea 
-                                    name="coverLetter" 
-                                    value={formData.coverLetter} 
-                                    onChange={handleFormChange} 
-                                    rows="4" 
-                                    className="form-input"
-                                ></textarea>
-                            </div>
-                            <div className="form-group">
-                                <label>{t('resumeLink') || 'Resume Link / URL'}</label>
-                                <input 
-                                    type="url" 
-                                    name="cv" 
-                                    value={formData.cv} 
-                                    onChange={handleFormChange} 
-                                    placeholder="https://example.com/your-resume.pdf"
-                                    className="form-input"
-                                />
+                            <div className="modal-body">
+                                <div className="form-group">
+                                    <label>{t('fullName') || 'Full Name'}</label>
+                                    <input 
+                                        type="text" 
+                                        name="name" 
+                                        value={formData.name} 
+                                        onChange={handleFormChange} 
+                                        required 
+                                        className="form-input"
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>{t('email') || 'Email'}</label>
+                                    <input 
+                                        type="email" 
+                                        name="email" 
+                                        value={formData.email} 
+                                        onChange={handleFormChange} 
+                                        required 
+                                        className="form-input"
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>{t('phone') || 'Phone Number'}</label>
+                                    <input 
+                                        type="tel" 
+                                        name="phone" 
+                                        value={formData.phone} 
+                                        onChange={handleFormChange} 
+                                        required 
+                                        className="form-input"
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>{t('coverLetter') || 'Cover Letter'}</label>
+                                    <textarea 
+                                        name="coverLetter" 
+                                        value={formData.coverLetter} 
+                                        onChange={handleFormChange} 
+                                        rows="4" 
+                                        className="form-input"
+                                    ></textarea>
+                                </div>
+                                <div className="form-group">
+                                    <label>{t('resumeLink') || 'Resume Link / URL'}</label>
+                                    <input 
+                                        type="url" 
+                                        name="cv" 
+                                        value={formData.cv} 
+                                        onChange={handleFormChange} 
+                                        placeholder="https://example.com/your-resume.pdf"
+                                        className="form-input"
+                                    />
+                                </div>
                             </div>
                             <div className="form-actions">
                                 <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>

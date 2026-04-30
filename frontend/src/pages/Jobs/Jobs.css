@@ -261,13 +261,42 @@
     width: 90%;
     max-width: 500px;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    padding: 0; /* Remove padding to allow header/footer to be flush */
+}
+
+.modal-body {
+    padding: 2rem;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.modal-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
 }
 
 .modal-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1.5rem;
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid var(--border-color);
+    background: var(--bg-card);
 }
 
 .modal-header h3 {
@@ -320,12 +349,20 @@
     background: rgba(255, 255, 255, 0.08);
 }
 
+.application-form {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+}
+
 .application-form .form-actions {
     display: flex;
     justify-content: flex-end;
     gap: 1rem;
-    margin-top: 2rem;
-
+    padding: 1.5rem 2rem;
+    background: var(--bg-card);
+    border-top: 1px solid var(--border-color);
 }
 
 /* Candidate Action Buttons */
