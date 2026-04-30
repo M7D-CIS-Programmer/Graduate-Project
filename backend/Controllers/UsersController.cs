@@ -304,15 +304,73 @@ public class UsersController : ControllerBase
         return Ok(ToDto(user));
     }
 
+    [Authorize]
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteUser(int id)
     {
-        var user = await _context.Users.FindAsync(id);
+        var callerIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var callerRoleClaim = User.FindFirstValue(ClaimTypes.Role);
+
+        if (!int.TryParse(callerIdClaim, out int callerId))
+            return Unauthorized();
+
+        // Only allow user to delete themselves or an admin to delete anyone
+        if (callerId != id && callerRoleClaim != "Admin")
+            return Forbid();
+
+        var user = await _context.Users
+            .Include(u => u.Roles)
+            .Include(u => u.Jobs)
+                .ThenInclude(j => j.SavedJobs)
+            .Include(u => u.Jobs)
+                .ThenInclude(j => j.Applications)
+            .Include(u => u.Applications)
+            .Include(u => u.SavedJobs)
+            .Include(u => u.FollowedCompanies)
+            .Include(u => u.Followers)
+            .Include(u => u.Notifications)
+            .FirstOrDefaultAsync(u => u.Id == id);
+
         if (user == null) return NotFound();
+
+        // 1. Cleanup Employer-related data if they have jobs
+        foreach (var job in user.Jobs)
+        {
+            if (job.SavedJobs.Any())
+                _context.SavedJobs.RemoveRange(job.SavedJobs);
+            
+            if (job.Applications.Any())
+                _context.ApplicationJobs.RemoveRange(job.Applications);
+            
+            _context.Jobs.Remove(job);
+        }
+
+        // 2. Cleanup Candidate-related data
+        if (user.Applications.Any())
+            _context.ApplicationJobs.RemoveRange(user.Applications);
+        
+        if (user.SavedJobs.Any())
+            _context.SavedJobs.RemoveRange(user.SavedJobs);
+
+        // 3. Cleanup Follows
+        if (user.FollowedCompanies.Any())
+            _context.FollowCompanies.RemoveRange(user.FollowedCompanies);
+        
+        if (user.Followers.Any())
+            _context.FollowCompanies.RemoveRange(user.Followers);
+
+        // 4. Cleanup Notifications
+        if (user.Notifications.Any())
+            _context.Notifications.RemoveRange(user.Notifications);
+
+        // 5. Cleanup Roles
+        if (user.Roles.Any())
+            _context.Roles.RemoveRange(user.Roles);
 
         _context.Users.Remove(user);
         await _context.SaveChangesAsync();
-        return Ok("Deleted");
+        
+        return Ok(new { message = "Account deleted successfully" });
     }
 
     [Authorize]
