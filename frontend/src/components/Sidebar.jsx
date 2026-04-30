@@ -12,10 +12,11 @@ import {
     Bookmark,
     Bell,
     User as UserIcon,
-    FileEdit,
     Mail,
     ScanText,
-    MessageSquare
+    MessageSquare,
+    Heart,
+    FileEdit
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';

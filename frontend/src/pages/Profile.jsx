@@ -1,163 +1,90 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { api, getImageUrl } from '../api/api';
 import {
     User,
     Mail,
     MapPin,
     Briefcase,
-    Camera,
     Globe,
     Github,
     Linkedin,
-    Save,
-    Phone
+    Phone,
+    Edit,
+    Calendar,
+    ExternalLink
 } from 'lucide-react';
-import { useRef } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
-import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
+import Spinner from '../components/ui/Spinner';
 import './User.css';
 
 const Profile = () => {
     const { id } = useParams();
-    const { t } = useLanguage();
-    const { user: currentUser, updateUser } = useAuth();
+    const { t, dir } = useLanguage();
+    const { user: currentUser } = useAuth();
     const { addToast } = useToast();
-    const fileInputRef = useRef(null);
+    const navigate = useNavigate();
 
     const isOwnProfile = !id || id === currentUser?.id?.toString();
-    // Stable ID used as effect dependency — avoids re-running after save when currentUser object reference changes
-    const currentUserId = currentUser?.id;
-
-    const [formData, setFormData] = useState({
-        name: '',
-        email: '',
-        location: '',
-        bio: '',
-        website: '',
-        linkedin: '',
-        github: '',
-        phone: '',
-        photo: null,
-        role: '',
-        industry: ''
-    });
-
-    const [isLoading, setIsLoading] = useState(false);
+    const [userData, setUserData] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         const fetchUserData = async () => {
-            if (isOwnProfile) {
-                setFormData({
-                    name: currentUser?.name || '',
-                    email: currentUser?.email || '',
-                    location: currentUser?.location || '',
-                    bio: currentUser?.description || '',
-                    website: currentUser?.website || '',
-                    linkedin: currentUser?.linkedIn || '',
-                    github: currentUser?.github || '',
-                    phone: currentUser?.phone || '',
-                    photo: getImageUrl(currentUser?.profilePicture || currentUser?.photo) || null,
-                    role: currentUser?.role || '',
-                    industry: currentUser?.industry || ''
-                });
-            } else {
-                setIsLoading(true);
-                try {
+            setIsLoading(true);
+            try {
+                if (isOwnProfile && currentUser) {
+                    setUserData(currentUser);
+                } else {
                     const fetchedUser = await api.getUser(id, currentUser?.id);
-                    setFormData({
-                        name: fetchedUser.name || '',
-                        email: fetchedUser.email || '',
-                        location: fetchedUser.location || '',
-                        bio: fetchedUser.description || '',
-                        website: fetchedUser.website || '',
-                        linkedin: fetchedUser.linkedIn || '',
-                        github: fetchedUser.github || '',
-                        phone: fetchedUser.phone || '',
-                        photo: getImageUrl(fetchedUser.profilePicture) || null,
-                        role: fetchedUser.role || '',
-                        industry: fetchedUser.industry || ''
-                    });
-                } catch (error) {
-                    console.error("Error fetching user profile:", error);
-                    addToast(t('actionFailed') || 'Failed to load user profile.', 'error');
-                } finally {
-                    setIsLoading(false);
+                    setUserData(fetchedUser);
                 }
+            } catch (error) {
+                console.error("Error fetching user profile:", error);
+                addToast(t('actionFailed'), 'error');
+            } finally {
+                setIsLoading(false);
             }
         };
 
         fetchUserData();
-    }, [id, currentUserId]); // intentionally omit full currentUser object — avoids overwriting form after save
+    }, [id, isOwnProfile, currentUser]);
 
-    const handlePhotoChange = async (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
+    if (isLoading) return <Spinner />;
+    if (!userData) return <div className="user-page-container">{t('userNotFound')}</div>;
 
-        // Show a local preview immediately while upload is in progress
-        const reader = new FileReader();
-        reader.onloadend = () => setFormData(prev => ({ ...prev, photo: reader.result }));
-        reader.readAsDataURL(file);
-
-        try {
-            const result = await api.uploadProfilePicture(currentUser.id, file);
-            const fullUrl = getImageUrl(result.imagePath);
-            setFormData(prev => ({ ...prev, photo: fullUrl }));
-            // Keep the auth context in sync so the avatar in the navbar updates too
-            updateUser({ profilePicture: result.imagePath });
-            addToast(t('profileUpdated') || 'Profile picture updated!', 'success');
-        } catch (error) {
-            addToast(t('actionFailed') || 'Failed to upload profile picture.', 'error');
-        }
-    };
-
-    const handleSave = async () => {
-        try {
-            const payload = {
-                name: formData.name,
-                email: formData.email,
-                location: formData.location,
-                website: formData.website,
-                phone: formData.phone,
-                description: formData.bio,
-                linkedIn: formData.linkedin,
-                github: formData.github,
-                industry: formData.industry,
-            };
-
-            const updatedUser = await updateUser(payload);
-
-            setFormData(prev => ({
-                ...prev,
-                name:     updatedUser.name     || prev.name,
-                email:    updatedUser.email    || prev.email,
-                location: updatedUser.location ?? prev.location,
-                bio:      updatedUser.description ?? prev.bio,
-                website:  updatedUser.website  ?? prev.website,
-                linkedin: updatedUser.linkedIn  ?? prev.linkedin,
-                github:   updatedUser.github   ?? prev.github,
-                phone:    updatedUser.phone    ?? prev.phone,
-                industry: updatedUser.industry ?? prev.industry,
-            }));
-
-            addToast(t('profileUpdated'), 'success');
-        } catch (error) {
-            addToast(t('actionFailed') || 'Failed to update profile. Please try again.', 'error');
-        }
-    };
+    const profilePhoto = getImageUrl(userData.profilePicture || userData.photo);
+    const isEmployer = userData.role === 'Employer' || userData.role === 'Company';
 
     return (
-        <div className="user-page-container">
+        <div className="user-page-container" dir={dir}>
             <div className="dashboard-header">
-                <h1 className="dashboard-title">{isOwnProfile ? t('profile') : t('userProfile')}</h1>
+                <div>
+                    <h1 className="dashboard-title">{isOwnProfile ? t('myProfile') || 'My Profile' : t('userProfile')}</h1>
+                    <p style={{ color: 'var(--text-muted)' }}>
+                        {isEmployer ? t('employerProfile') || 'Employer Account' : t('jobSeekerProfile') || 'Job Seeker Account'}
+                    </p>
+                </div>
                 {isOwnProfile && (
-                    <Button onClick={handleSave}>
-                        <Save size={20} />
-                        {t('saveProfile')}
-                    </Button>
+                    <div style={{ display: 'flex', gap: '1rem' }}>
+                        {!isEmployer && (
+                            <Button 
+                                variant="outline" 
+                                onClick={() => navigate('/dashboard/seeker/following')}
+                                style={{ background: 'rgba(255, 255, 255, 0.05)', border: '1px solid var(--border-color)', color: 'var(--text-main)' }}
+                            >
+                                <Briefcase size={18} />
+                                {t('followingCompanies') || 'Following'}
+                            </Button>
+                        )}
+                        <Button onClick={() => navigate('/profile/edit')}>
+                            <Edit size={18} />
+                            {t('editProfile') || 'Edit Profile'}
+                        </Button>
+                    </div>
                 )}
             </div>
 
@@ -165,134 +92,112 @@ const Profile = () => {
                 <aside className="profile-card-left">
                     <div className="profile-avatar-wrapper">
                         <div className="profile-avatar-large">
-                            {formData.photo ? (
-                                <img src={formData.photo} alt={formData.name} />
+                            {profilePhoto ? (
+                                <img src={profilePhoto} alt={userData.name} />
                             ) : (
-                                formData.name.charAt(0)
+                                userData.name?.charAt(0) || <User size={48} />
                             )}
                         </div>
-                        {isOwnProfile && (
-                            <div className="avatar-overlay" onClick={() => fileInputRef.current.click()}>
-                                <Camera size={24} />
+                    </div>
+                    <h2 style={{ fontSize: '1.5rem', marginBottom: '0.25rem' }}>{userData.name}</h2>
+                    <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem', fontSize: '0.9rem' }}>
+                        {userData.email}
+                    </p>
+
+                    <div className="profile-social-links">
+                        {userData.linkedIn && (
+                            <a href={userData.linkedIn} target="_blank" rel="noopener noreferrer" className="social-icon-btn">
+                                <Linkedin size={20} />
+                            </a>
+                        )}
+                        {userData.github && (
+                            <a href={userData.github} target="_blank" rel="noopener noreferrer" className="social-icon-btn">
+                                <Github size={20} />
+                            </a>
+                        )}
+                        {userData.website && (
+                            <a href={userData.website} target="_blank" rel="noopener noreferrer" className="social-icon-btn">
+                                <Globe size={20} />
+                            </a>
+                        )}
+                    </div>
+
+                    <div className="profile-meta-info">
+                        <div className="meta-item">
+                            <Calendar size={16} />
+                            <span>{t('memberSince') || 'Member since'}: {new Date(userData.createdAt).getFullYear()}</span>
+                        </div>
+                        {userData.location && (
+                            <div className="meta-item">
+                                <MapPin size={16} />
+                                <span>{userData.location}</span>
                             </div>
                         )}
-                        <input
-                            type="file"
-                            ref={fileInputRef}
-                            onChange={handlePhotoChange}
-                            accept="image/*"
-                            style={{ display: 'none' }}
-                        />
-                    </div>
-                    <h2 style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>{formData.name}</h2>
-                    <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>{formData.role === 'Employer' || formData.role === 'Company' ? t('employer') : t('jobSeeker')}</p>
-
-                    <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem' }}>
-                        <Button variant="secondary" style={{ padding: '0.5rem' }}><Linkedin size={20} /></Button>
-                        <Button variant="secondary" style={{ padding: '0.5rem' }}><Github size={20} /></Button>
-                        <Button variant="secondary" style={{ padding: '0.5rem' }}><Globe size={20} /></Button>
                     </div>
                 </aside>
 
-                <div className="dashboard-section" style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
-                        <Input
-                            label={t('fullName')}
-                            value={formData.name}
-                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                            icon={User}
-                        />
-                        <Input
-                            label={t('email')}
-                            value={formData.email}
-                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                            icon={Mail}
-                            type="email"
-                        />
-                        {(formData.role === 'Employer' || formData.role === 'Company') && (
-                            <div className="input-group">
-                                <label className="input-label" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                                    <Briefcase size={16} /> {t('industry') || 'Industry'}
-                                </label>
-                                <select
-                                    value={formData.industry}
-                                    onChange={(e) => setFormData({ ...formData, industry: e.target.value })}
-                                >
-                                    <option value="">{t('selectIndustry') || 'Select Industry'}</option>
-                                    {[
-                                        'Technology', 'Healthcare', 'Finance', 'Education', 
-                                        'Manufacturing', 'Retail', 'Real Estate', 'Transportation', 
-                                        'Hospitality', 'Construction', 'Marketing', 'Media', 'Other'
-                                    ].map(ind => (
-                                        <option key={ind} value={ind}>{t(ind.toLowerCase().replace(' ', '')) || ind}</option>
-                                    ))}
-                                </select>
+                <div className="profile-content-main">
+                    {/* About Section */}
+                    <div className="dashboard-section">
+                        <h3 className="section-title">
+                            <User size={20} />
+                            {isEmployer ? t('aboutCompany') || 'About Company' : t('aboutMe')}
+                        </h3>
+                        <p className="profile-bio-text">
+                            {userData.description || userData.bio || t('noDescriptionProvided') || 'No description provided yet.'}
+                        </p>
+                    </div>
+
+                    {/* Details Grid */}
+                    <div className="profile-details-grid">
+                        <div className="dashboard-section">
+                            <h3 className="section-title">
+                                <Briefcase size={20} />
+                                {t('professionalDetails') || 'Professional Details'}
+                            </h3>
+                            <div className="info-list">
+                                <div className="info-row">
+                                    <span className="info-label">{t('role') || 'Role'}:</span>
+                                    <span className="info-value">{userData.role}</span>
+                                </div>
+                                {isEmployer && userData.industry && (
+                                    <div className="info-row">
+                                        <span className="info-label">{t('industry') || 'Industry'}:</span>
+                                        <span className="info-value">{t(userData.industry.toLowerCase().replace(' ', '')) || userData.industry}</span>
+                                    </div>
+                                )}
+                                <div className="info-row">
+                                    <span className="info-label">{t('location') || 'Location'}:</span>
+                                    <span className="info-value">{userData.location || t('notSpecified') || 'Not specified'}</span>
+                                </div>
                             </div>
-                        )}
-                        <div className="input-group">
-                            <label className="input-label" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                                <MapPin size={16} /> {t('locationPlaceholder')}
-                            </label>
-                            <select
-                                value={formData.location}
-                                onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                            >
-                                <option value="">{t('selectLocation') || 'Select Location'}</option>
-                                {['Amman', 'Irbid', 'Zarqa', 'Balqa', 'Madaba', 'Karak', 'Tafilah', 'Ma\'an', 'Aqaba', 'Mafraq', 'Jerash', 'Ajloun'].map(city => (
-                                    <option key={city} value={city}>{t(city.toLowerCase().replace("'", ''))}</option>
-                                ))}
-                            </select>
                         </div>
-                        <Input
-                            label={t('website')}
-                            value={formData.website}
-                            onChange={(e) => setFormData({ ...formData, website: e.target.value })}
-                            icon={Globe}
-                        />
-                        <Input
-                            label={t('phone')}
-                            value={formData.phone}
-                            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                            icon={Phone}
-                            type="tel"
-                            disabled={!isOwnProfile}
-                        />
-                    </div>
 
-                    <div className="input-group">
-                        <label className="input-label">{t('aboutMe')}</label>
-                        <textarea
-                            style={{
-                                width: '100%',
-                                minHeight: '150px',
-                                background: 'rgba(255, 255, 255, 0.05)',
-                                border: '1px solid var(--border-color)',
-                                borderRadius: '12px',
-                                padding: '1rem',
-                                color: 'var(--text-primary)',
-                                outline: 'none',
-                                fontFamily: 'inherit',
-                                transition: 'var(--transition)'
-                            }}
-                            className="focus:border-primary"
-                            value={formData.bio}
-                            onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
-                        ></textarea>
-                    </div>
-
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
-                        <Input
-                            label={t('linkedin')}
-                            value={formData.linkedin}
-                            onChange={(e) => setFormData({ ...formData, linkedin: e.target.value })}
-                            icon={Linkedin}
-                        />
-                        <Input
-                            label={t('github')}
-                            value={formData.github}
-                            onChange={(e) => setFormData({ ...formData, github: e.target.value })}
-                            icon={Github}
-                        />
+                        <div className="dashboard-section">
+                            <h3 className="section-title">
+                                <Mail size={20} />
+                                {t('contactInformation') || 'Contact Information'}
+                            </h3>
+                            <div className="info-list">
+                                <div className="info-row">
+                                    <span className="info-label">{t('email') || 'Email'}:</span>
+                                    <span className="info-value">{userData.email}</span>
+                                </div>
+                                <div className="info-row">
+                                    <span className="info-label">{t('phone') || 'Phone'}:</span>
+                                    <span className="info-value">{userData.phone || t('notSpecified') || 'Not specified'}</span>
+                                </div>
+                                {userData.website && (
+                                    <div className="info-row">
+                                        <span className="info-label">{t('website') || 'Website'}:</span>
+                                        <a href={userData.website} target="_blank" rel="noopener noreferrer" className="info-value link">
+                                            {userData.website.replace(/^https?:\/\//, '')}
+                                            <ExternalLink size={12} />
+                                        </a>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

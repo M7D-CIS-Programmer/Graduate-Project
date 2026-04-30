@@ -111,6 +111,11 @@ export const api = {
     // Categories
     getCategories: () => get(`${BASE_URL}/Categories`),
 
+    // Follows
+    followCompany:        (userId, companyId) => post(`${BASE_URL}/Follows/${userId}/follow/${companyId}`),
+    unfollowCompany:      (userId, companyId) => del(`${BASE_URL}/Follows/${userId}/unfollow/${companyId}`),
+    getFollowedCompanies: (userId)            => get(`${BASE_URL}/Follows/${userId}/following`),
+
     // Resumes
     getResumeByUserId: (userId, viewerId) => get(`${BASE_URL}/Resumes/user/${userId}${viewerId ? `?viewerId=${viewerId}` : ''}`),
     createResume:      (data)           => post(`${BASE_URL}/Resumes`, data),

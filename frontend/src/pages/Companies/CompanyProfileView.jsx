@@ -17,6 +17,7 @@ import { api } from '../../api/api';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { useToast } from '../../context/ToastContext';
+import { useFollowedCompanies, useFollowCompany, useUnfollowCompany } from '../../hooks/useFollows';
 import Button from '../../components/ui/Button';
 import Spinner from '../../components/ui/Spinner';
 import './CompanyProfileView.css';
@@ -27,7 +28,10 @@ const CompanyProfileView = () => {
     const { user: currentUser } = useAuth();
     const { t, dir } = useLanguage();
     const { addToast } = useToast();
-    const [isFollowed, setIsFollowed] = useState(false);
+    const [isLocalFollowed, setIsLocalFollowed] = useState(false); // To handle optimistic UI
+    const { data: followedCompanies } = useFollowedCompanies();
+    const { mutate: followCompany } = useFollowCompany();
+    const { mutate: unfollowCompany } = useUnfollowCompany();
 
     // Fetch company data
     const { data: company, isLoading, error } = useQuery({
@@ -64,18 +68,21 @@ const CompanyProfileView = () => {
         staleTime: 30_000,
     });
 
+    const isFollowed = followedCompanies?.some(c => c.id.toString() === id) || isLocalFollowed;
+
     const handleFollow = () => {
         if (!currentUser) {
             addToast(t('loginRequired') || 'Please log in to follow companies.', 'info');
             return;
         }
-        setIsFollowed(prev => !prev);
-        addToast(
-            isFollowed
-                ? t('unfollowedCompany') || 'Unfollowed company'
-                : t('followedCompany') || 'Company followed!',
-            'success'
-        );
+
+        if (isFollowed) {
+            unfollowCompany(id);
+            setIsLocalFollowed(false); // Optimistic UI update
+        } else {
+            followCompany(id);
+            setIsLocalFollowed(true); // Optimistic UI update
+        }
     };
 
     const handleShare = () => {

@@ -13,6 +13,7 @@ import Login from './pages/Auth/Login';
 import Register from './pages/Auth/Register';
 import JobSeekerDashboard from './pages/Dashboard/JobSeekerDashboard';
 import AppliedJobs from './pages/Dashboard/AppliedJobs';
+import FollowingCompanies from './pages/Dashboard/FollowingCompanies';
 import EmployerDashboard from './pages/Dashboard/EmployerDashboard';
 import Applicants from './pages/Dashboard/Applicants';
 import MyJobs from './pages/Dashboard/MyJobs';
@@ -25,6 +26,7 @@ import JobListings from './pages/Jobs/JobListings';
 import JobDetails from './pages/Jobs/JobDetails';
 import SavedJobs from './pages/SavedJobs';
 import Profile from './pages/Profile';
+import EditProfile from './pages/EditProfile';
 import Notifications from './pages/Notifications';
 import ResumeBuilder from './pages/ResumeBuilder';
 import JobPost from './pages/JobPost';
@@ -107,6 +109,7 @@ function App() {
                   {/* Dashboards */}
                   <Route path="/dashboard/seeker" element={<JobSeekerDashboard />} />
                   <Route path="/dashboard/seeker/applications" element={<AppliedJobs />} />
+                  <Route path="/dashboard/seeker/following" element={<FollowingCompanies />} />
                   <Route path="/dashboard/employer" element={<EmployerDashboard />} />
                   <Route path="/dashboard/employer/applicants" element={<Applicants />} />
                   <Route path="/dashboard/employer/jobs" element={<MyJobs />} />
@@ -124,6 +127,7 @@ function App() {
 
                   {/* User Features */}
                   <Route path="/profile/:id?" element={<Profile />} />
+                  <Route path="/profile/edit" element={<EditProfile />} />
                   <Route path="/candidate/:id" element={<CandidateProfile />} />
                   <Route path="/notifications" element={<Notifications />} />
                   <Route path="/resume-builder" element={<ResumeBuilder />} />

@@ -19,6 +19,7 @@ namespace aabu_project.Data
         public DbSet<ApplicationJob> ApplicationJobs { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<SavedJob> SavedJobs { get; set; }
+        public DbSet<FollowCompany> FollowCompanies { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -151,6 +152,25 @@ namespace aabu_project.Data
                 .HasIndex(aj => new { aj.UserId, aj.JobId })
                 .IsUnique()
                 .HasDatabaseName("UX_ApplicationJobs_UserId_JobId");
+
+            // Configure FollowCompany relationships
+            modelBuilder.Entity<FollowCompany>()
+                .HasOne(f => f.User)
+                .WithMany(u => u.FollowedCompanies)
+                .HasForeignKey(f => f.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<FollowCompany>()
+                .HasOne(f => f.Company)
+                .WithMany(u => u.Followers)
+                .HasForeignKey(f => f.CompanyId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Prevent duplicate follows
+            modelBuilder.Entity<FollowCompany>()
+                .HasIndex(f => new { f.UserId, f.CompanyId })
+                .IsUnique()
+                .HasDatabaseName("UX_FollowCompany_UserId_CompanyId");
         }
     }
 }
