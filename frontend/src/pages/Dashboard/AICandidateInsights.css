@@ -28,10 +28,18 @@
 
 /* Summary Cards */
 .summary-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
     gap: 1.5rem;
     margin-bottom: 2.5rem;
+    padding-bottom: 0.5rem;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.summary-grid::-webkit-scrollbar {
+    display: none;
 }
 
 .summary-card {
@@ -40,6 +48,7 @@
     align-items: center;
     gap: 1.25rem;
     transition: transform 0.3s ease;
+    flex: 1 0 240px;
 }
 
 .summary-card:hover {
@@ -61,12 +70,14 @@
     margin-bottom: 0.25rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
+    white-space: nowrap;
 }
 
 .summary-info .value {
     font-size: 1.5rem;
     font-weight: 700;
     color: var(--text-main);
+    white-space: nowrap;
 }
 
 /* Filter Bar */
