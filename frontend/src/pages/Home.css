@@ -116,17 +116,9 @@
 }
 
 .stats-grid {
-    display: flex;
-    flex-wrap: nowrap;
-    overflow-x: auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 1.5rem;
-    padding-bottom: 0.5rem;
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-}
-
-.stats-grid::-webkit-scrollbar {
-    display: none;
 }
 
 .stat-card {
@@ -146,13 +138,11 @@
 .stat-value {
     font-size: 1.5rem;
     color: #f8fafc;
-    white-space: nowrap;
 }
 
 .stat-label {
     color: #f8fafc;
     font-size: 0.875rem;
-    white-space: nowrap;
 }
 
 .featured-header {
