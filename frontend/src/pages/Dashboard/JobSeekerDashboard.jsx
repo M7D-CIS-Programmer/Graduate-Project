@@ -2,8 +2,10 @@ import React, { useMemo } from 'react';
 import { useLanguage } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
+import { useNavigate } from 'react-router-dom';
 import { useApplications } from '../../hooks/useApplications';
 import { useSavedJobs } from '../../hooks/useSavedJobs';
+import { useFollowedCompanies } from '../../hooks/useFollows';
 import Spinner from '../../components/ui/Spinner';
 import {
     Briefcase,
@@ -12,7 +14,8 @@ import {
     Bookmark,
     Bell,
     Star,
-    TrendingUp
+    TrendingUp,
+    Building
 } from 'lucide-react';
 import {
     Chart as ChartJS,
@@ -43,8 +46,10 @@ const JobSeekerDashboard = () => {
     const { theme } = useTheme();
     const { t } = useLanguage();
     const { user } = useAuth();
+    const navigate = useNavigate();
     const { data: allApplications = [], isLoading } = useApplications();
     const { data: savedJobs = [], isLoading: isLoadingSavedJobs } = useSavedJobs();
+    const { data: followedCompanies = [] } = useFollowedCompanies();
 
     const userApplications = useMemo(() => {
         return allApplications.filter(app => app.userId === user?.id);
@@ -55,6 +60,7 @@ const JobSeekerDashboard = () => {
         { label: t('interviews'), value: userApplications.filter(a => a.candidateStatus === 'Shortlisted').length, icon: <CheckCircle />, color: '#10b981' },
         { label: t('pending'), value: userApplications.filter(a => a.candidateStatus === 'Applied').length, icon: <Clock />, color: '#f59e0b' },
         { label: t('saved'), value: savedJobs.length || 0, icon: <Bookmark />, color: '#ec4899' },
+        { label: 'Following', value: followedCompanies.length, icon: <Building />, color: '#06b6d4', link: '/dashboard/seeker/following' },
     ];
 
     const chartData = useMemo(() => {
@@ -105,7 +111,12 @@ const JobSeekerDashboard = () => {
 
             <div className="stats-grid">
                 {stats.map((stat, index) => (
-                    <div key={index} className="stat-card glass">
+                    <div
+                        key={index}
+                        className="stat-card glass"
+                        onClick={stat.link ? () => navigate(stat.link) : undefined}
+                        style={stat.link ? { cursor: 'pointer' } : undefined}
+                    >
                         <div className="stat-icon" style={{ backgroundColor: `${stat.color}15`, color: stat.color }}>
                             {stat.icon}
                         </div>

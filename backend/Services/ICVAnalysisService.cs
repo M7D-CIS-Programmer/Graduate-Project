@@ -28,5 +28,19 @@ namespace aabu_project.Services
         /// </summary>
         Task<HiringRecommendationResponseDto> GenerateHiringRecommendationAsync(
             HiringRecommendationRequestDto request);
+
+        /// <summary>
+        /// Fast local-only text matching — no Gemini call, no PDF required.
+        /// Used for bulk candidate scoring in the Smart Hiring Dashboard.
+        /// </summary>
+        LocalAnalysisResult LocalAnalyzeText(string cvText, string jobTitle, string jobDescription);
+
+        /// <summary>
+        /// Unified Job Matching Engine — single Gemini call that processes CV and job
+        /// description together with semantic understanding, synonym handling, and
+        /// structured extraction of matched/missing skills and an advisor summary.
+        /// Replaces the fragmented analyze + semantic-analyze two-call pattern.
+        /// </summary>
+        Task<JobMatchResponseDto> MatchCvToJobAsync(string cvText, string jobTitle, string jobDescription);
     }
 }

@@ -60,7 +60,6 @@ public class UsersController : ControllerBase
 
         // Verify password
         bool isValid = _authService.VerifyPassword(dto.Password, user.Pass);
-        Console.WriteLine($"[Login Debug] User found: {user.Email}, Password valid: {isValid}");
 
         if (!isValid)
             return Unauthorized(new { message = "Invalid email or password" });

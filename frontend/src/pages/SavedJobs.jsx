@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Navigate } from 'react-router-dom';
 import { Briefcase, MapPin, Trash2, Building, DollarSign, Loader } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
@@ -24,10 +24,7 @@ const SavedJobs = () => {
     const { data: savedJobs = [], isLoading, isError } = useSavedJobs();
     const { mutate: unsave, isPending: isRemoving } = useUnsaveJob();
 
-    if (!user) {
-        navigate('/login');
-        return null;
-    }
+    if (!user) return <Navigate to="/login" replace />;
 
     if (isLoading) {
         return (

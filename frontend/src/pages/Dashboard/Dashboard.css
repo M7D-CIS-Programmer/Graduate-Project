@@ -289,35 +289,60 @@
     border-color: var(--primary);
 }
 
-/* Applicant Avatar */
-.applicant-avatar-container {
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-    overflow: hidden;
-    background: var(--bg-hover);
-    display: flex;
+/* Spinner used by Smart Hiring Dashboard loader icons */
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Candidate action buttons */
+.btn-candidate-action {
+    display: inline-flex;
     align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
+    gap: 0.35rem;
+    padding: 0.38rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 500;
     border: 1px solid var(--border-color);
-    position: relative;
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.18s;
+    white-space: nowrap;
 }
 
-.applicant-avatar {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+.btn-candidate-action:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-main);
 }
 
-.applicant-avatar-fallback {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    font-size: 1.1rem;
-    color: var(--primary);
-    text-transform: uppercase;
+.btn-candidate-action.success:hover {
+    background: rgba(16, 185, 129, 0.12);
+    color: #10b981;
+    border-color: rgba(16, 185, 129, 0.35);
+}
+
+.btn-candidate-action.warning:hover {
+    background: rgba(245, 158, 11, 0.12);
+    color: #f59e0b;
+    border-color: rgba(245, 158, 11, 0.35);
+}
+
+.btn-candidate-action.danger:hover {
+    background: rgba(239, 68, 68, 0.12);
+    color: #ef4444;
+    border-color: rgba(239, 68, 68, 0.35);
+}
+
+/* Smart Hiring Dashboard — 4-col summary grid responsive */
+@media (max-width: 900px) {
+    .smart-summary-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+
+@media (max-width: 540px) {
+    .smart-summary-grid {
+        grid-template-columns: 1fr !important;
+    }
 }

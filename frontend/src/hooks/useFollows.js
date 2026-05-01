@@ -6,7 +6,7 @@ import { useLanguage } from '../context/LanguageContext';
 
 export const useFollowedCompanies = () => {
     const { user } = useAuth();
-    
+
     return useQuery({
         queryKey: ['followedCompanies', user?.id],
         queryFn: () => api.getFollowedCompanies(user.id),
@@ -22,8 +22,10 @@ export const useFollowCompany = () => {
 
     return useMutation({
         mutationFn: (companyId) => api.followCompany(user.id, companyId),
-        onSuccess: () => {
-            queryClient.invalidateQueries(['followedCompanies', user?.id]);
+        onSuccess: (_, companyId) => {
+            queryClient.invalidateQueries({ queryKey: ['followedCompanies', user?.id] });
+            // Refresh the company profile so its follower count updates immediately
+            queryClient.invalidateQueries({ queryKey: ['company', String(companyId)] });
             addToast(t('companyFollowed') || 'Company followed successfully', 'success');
         },
         onError: (error) => {
@@ -40,8 +42,10 @@ export const useUnfollowCompany = () => {
 
     return useMutation({
         mutationFn: (companyId) => api.unfollowCompany(user.id, companyId),
-        onSuccess: () => {
-            queryClient.invalidateQueries(['followedCompanies', user?.id]);
+        onSuccess: (_, companyId) => {
+            queryClient.invalidateQueries({ queryKey: ['followedCompanies', user?.id] });
+            // Refresh the company profile so its follower count updates immediately
+            queryClient.invalidateQueries({ queryKey: ['company', String(companyId)] });
             addToast(t('companyUnfollowed') || 'Company unfollowed successfully', 'success');
         },
         onError: (error) => {

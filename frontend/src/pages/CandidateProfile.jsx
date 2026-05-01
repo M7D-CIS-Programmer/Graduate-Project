@@ -4,6 +4,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { useTheme } from '../context/ThemeContext';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '../api/api';
+import { useAuth } from '../context/AuthContext';
 import Spinner from '../components/ui/Spinner';
 import Button from '../components/ui/Button';
 import {
@@ -18,7 +19,8 @@ import {
     Calendar,
     ChevronLeft,
     FileText,
-    ExternalLink
+    ExternalLink,
+    MessageSquare
 } from 'lucide-react';
 import './User.css';
 
@@ -27,12 +29,28 @@ const CandidateProfile = () => {
     const { t, dir } = useLanguage();
     const { theme } = useTheme();
     const navigate = useNavigate();
+    const { user: currentUser } = useAuth();
+
+    const isEmployer = currentUser &&
+        (currentUser.role?.toLowerCase() === 'employer' || currentUser.role?.toLowerCase() === 'company');
 
     const { data: candidate, isLoading, error } = useQuery({
         queryKey: ['candidate', id],
         queryFn: () => api.getUser(id),
         enabled: !!id && id !== 'undefined'
     });
+
+    // Employer: find an existing application from this candidate to any of the employer's jobs
+    const { data: employerApplications = [] } = useQuery({
+        queryKey: ['employer-applications-for-candidate', currentUser?.id, id],
+        queryFn: () => api.getApplicationsByCompany(currentUser.id),
+        enabled: isEmployer && !!currentUser?.id,
+        staleTime: 60_000,
+    });
+
+    const applicationWithCandidate = isEmployer
+        ? employerApplications.find(a => a.userId === Number(id))
+        : null;
 
     if (isLoading) return <Spinner />;
 
@@ -60,6 +78,16 @@ const CandidateProfile = () => {
                     <h1 className="dashboard-title">{t('candidateProfile') || 'Candidate Profile'}</h1>
                 </div>
 
+                {/* Message button — only shown when the logged-in employer has an application from this candidate */}
+                {applicationWithCandidate && (
+                    <Button
+                        onClick={() => navigate(`/messages?applicationId=${applicationWithCandidate.id}`)}
+                        style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+                    >
+                        <MessageSquare size={16} />
+                        Message
+                    </Button>
+                )}
             </div>
 
             <div className="profile-layout">

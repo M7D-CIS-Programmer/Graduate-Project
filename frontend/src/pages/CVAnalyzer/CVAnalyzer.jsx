@@ -2,10 +2,12 @@ import React, { useState, useRef } from 'react';
 import {
     ScanText, Upload, X, Loader2,
     AlertTriangle, Zap, TrendingUp,
-    FileText, Briefcase, Lightbulb, Target
+    FileText, Briefcase, Lightbulb, Target,
+    CheckCircle, MessageSquare
 } from 'lucide-react';
 import { api } from '../../api/api';
 import { useLanguage } from '../../context/LanguageContext';
+import { useFormCache } from '../../hooks/useFormCache';
 import './CVAnalyzer.css';
 
 const MAX_FILE_MB = 10;
@@ -53,12 +55,12 @@ const CVAnalyzer = () => {
     const { t, dir } = useLanguage();
     const fileInputRef = useRef(null);
 
-    const [file, setFile]         = useState(null);
-    const [jobTitle, setJobTitle] = useState('');
-    const [jobDesc, setJobDesc]   = useState('');
-    const [loading, setLoading]   = useState(false);
-    const [result, setResult]     = useState(null);
-    const [error, setError]       = useState('');
+    const [file, setFile]           = useState(null);
+    const [jobTitle, setJobTitle]   = useFormCache('cva_jobTitle');
+    const [jobDesc,  setJobDesc]    = useFormCache('cva_jobDesc');
+    const [loading, setLoading]     = useState(false);
+    const [result, setResult]       = useState(null);
+    const [error, setError]         = useState('');
 
     // ── File handling ──────────────────────────────────────────────────────────
 
@@ -109,7 +111,7 @@ const CVAnalyzer = () => {
         setLoading(true);
 
         try {
-            const data = await api.analyzeCv(file, jobTitle.trim(), jobDesc.trim());
+            const data = await api.matchCvToJob(file, jobTitle.trim(), jobDesc.trim());
             setResult(data);
         } catch (err) {
             const msg = err.message || '';
@@ -275,6 +277,34 @@ const CVAnalyzer = () => {
                             <ScoreBar value={result.matchScore} />
                         </div>
 
+                        {/* AI Summary — new unified output */}
+                        {result.summary && (
+                            <div className="cva-card cva-result-card">
+                                <div className="cva-card-header">
+                                    <MessageSquare size={18} className="cva-icon-purple" />
+                                    <h3>{t('cvSummary') || 'AI Summary'}</h3>
+                                </div>
+                                <p className="cva-summary-text">{result.summary}</p>
+                            </div>
+                        )}
+
+                        {/* Matched Skills — new unified output */}
+                        <div className="cva-card cva-result-card">
+                            <div className="cva-card-header">
+                                <CheckCircle size={18} className="cva-icon-green" />
+                                <h3>{t('cvMatchedSkills') || 'Matched Skills'}</h3>
+                            </div>
+                            {result.matchedSkills?.length > 0 ? (
+                                <div className="cva-tags">
+                                    {result.matchedSkills.map((s, i) => (
+                                        <span key={i} className="cva-tag cva-tag-matched">{s}</span>
+                                    ))}
+                                </div>
+                            ) : (
+                                <p className="cva-empty-note">No matched skills detected.</p>
+                            )}
+                        </div>
+
                         {/* Missing Skills */}
                         <div className="cva-card cva-result-card">
                             <div className="cva-card-header">
@@ -293,48 +323,50 @@ const CVAnalyzer = () => {
                         </div>
 
                         {/* Keyword Gaps */}
-                        <div className="cva-card cva-result-card">
-                            <div className="cva-card-header">
-                                <AlertTriangle size={18} className="cva-icon-orange" />
-                                <h3>{t('keywordGaps')}</h3>
-                            </div>
-                            {result.keywordGaps?.length > 0 ? (
+                        {result.keywordGaps?.length > 0 && (
+                            <div className="cva-card cva-result-card">
+                                <div className="cva-card-header">
+                                    <AlertTriangle size={18} className="cva-icon-orange" />
+                                    <h3>{t('keywordGaps')}</h3>
+                                </div>
                                 <div className="cva-tags">
                                     {result.keywordGaps.map((k, i) => (
                                         <span key={i} className="cva-tag cva-tag-gap">{k}</span>
                                     ))}
                                 </div>
-                            ) : (
-                                <p className="cva-empty-note">✅ Keywords look good.</p>
-                            )}
-                        </div>
+                            </div>
+                        )}
 
                         {/* Weak Sections */}
-                        <div className="cva-card cva-result-card">
-                            <div className="cva-card-header">
-                                <TrendingUp size={18} className="cva-icon-orange" />
-                                <h3>{t('cvWeakSections')}</h3>
+                        {result.weakSections?.length > 0 && (
+                            <div className="cva-card cva-result-card">
+                                <div className="cva-card-header">
+                                    <TrendingUp size={18} className="cva-icon-orange" />
+                                    <h3>{t('cvWeakSections')}</h3>
+                                </div>
+                                <ul className="cva-list cva-list-orange">
+                                    {result.weakSections.map((s, i) => <li key={i}>{s}</li>)}
+                                </ul>
                             </div>
-                            <ul className="cva-list cva-list-orange">
-                                {result.weakSections?.map((s, i) => <li key={i}>{s}</li>)}
-                            </ul>
-                        </div>
+                        )}
 
-                        {/* Improvement Suggestions — full width, most important */}
-                        <div className="cva-card cva-result-card cva-full-width cva-suggestions-card">
-                            <div className="cva-card-header">
-                                <Lightbulb size={18} className="cva-icon-green" />
-                                <h3>{t('cvImprovementSuggestions')}</h3>
+                        {/* Improvement Suggestions — full width */}
+                        {result.improvementSuggestions?.length > 0 && (
+                            <div className="cva-card cva-result-card cva-full-width cva-suggestions-card">
+                                <div className="cva-card-header">
+                                    <Lightbulb size={18} className="cva-icon-green" />
+                                    <h3>{t('cvImprovementSuggestions')}</h3>
+                                </div>
+                                <ul className="cva-list cva-list-suggestions">
+                                    {result.improvementSuggestions.map((s, i) => (
+                                        <li key={i}>
+                                            <span className="cva-suggestion-num">{i + 1}</span>
+                                            {s}
+                                        </li>
+                                    ))}
+                                </ul>
                             </div>
-                            <ul className="cva-list cva-list-suggestions">
-                                {result.improvementSuggestions?.map((s, i) => (
-                                    <li key={i}>
-                                        <span className="cva-suggestion-num">{i + 1}</span>
-                                        {s}
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
+                        )}
 
                     </div>
                 </div>

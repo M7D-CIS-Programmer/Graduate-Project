@@ -15,6 +15,17 @@ namespace aabu_project.Services
         public List<string> ImprovementSuggestions { get; set; } = new();
     }
 
+    // Internal DTO — deserialises the unified match Gemini response
+    internal sealed class GeminiMatchResultDto
+    {
+        public int           MatchScore             { get; set; }
+        public List<string>  MatchedSkills          { get; set; } = new();
+        public List<string>  MissingSkills          { get; set; } = new();
+        public string        Summary                { get; set; } = string.Empty;
+        public List<string>  WeakSections           { get; set; } = new();
+        public List<string>  ImprovementSuggestions { get; set; } = new();
+    }
+
     public sealed class CVAnalysisService : ICVAnalysisService
     {
         private readonly HttpClient        _httpClient;
@@ -305,6 +316,17 @@ namespace aabu_project.Services
                 .Replace("\"improvement_suggestions\"",  "\"improvementSuggestions\"");
 
             return text;
+        }
+
+        // ── Local-only text analysis (no Gemini) ─────────────────────────────────
+
+        public LocalAnalysisResult LocalAnalyzeText(
+            string cvText, string jobTitle, string jobDescription)
+        {
+            if (string.IsNullOrWhiteSpace(cvText))
+                return new LocalAnalysisResult();
+
+            return _localAnalyzer.Analyze(cvText, jobTitle, jobDescription);
         }
 
         // ── Semantic Analysis ─────────────────────────────────────────────────────
@@ -767,6 +789,237 @@ namespace aabu_project.Services
             Reasoning      = "Recommendation could not be generated. Please review candidate manually.",
             RiskAssessment = "medium",
             Recommendation = "Conduct a manual review before making a hiring decision."
+        };
+
+        // ── Unified Job Matching Engine ───────────────────────────────────────────
+        //
+        // Single Gemini call that:
+        //   1. Receives both CV and job description together
+        //   2. Understands both semantically (not just keyword-counting)
+        //   3. Handles tech synonyms (JS = JavaScript, .NET = ASP.NET, etc.)
+        //   4. Produces match score, skill diff, summary, and advisor guidance
+        //
+        // Local pre-analysis runs first at zero AI cost and feeds keyword hints
+        // into the prompt so Gemini can focus on semantic reasoning.
+
+        private const int MaxCvCharsForMatch  = 6_000;
+        private const int MaxJobCharsForMatch = 2_000;
+
+        public async Task<JobMatchResponseDto> MatchCvToJobAsync(
+            string cvText, string jobTitle, string jobDescription)
+        {
+            if (string.IsNullOrWhiteSpace(_apiKey))
+                throw new InvalidOperationException(
+                    "Gemini API key is not configured. Set GeminiSettings:ApiKey in appsettings.json.");
+
+            // ── 1. Cache check ────────────────────────────────────────────────────
+            var cacheKey = ComputeCacheKey(cvText, "match|" + jobTitle, jobDescription);
+
+            if (_cache.TryGetValue(cacheKey, out JobMatchResponseDto? cached) && cached is not null)
+            {
+                _logger.LogInformation("[CACHE HIT] unified-match key={Key}", cacheKey);
+                return cached;
+            }
+
+            // ── 2. Local pre-analysis (free — used as semantic hints for Gemini) ──
+            var local = _localAnalyzer.Analyze(cvText, jobTitle, jobDescription);
+
+            // ── 3. Truncate inputs to stay in optimal Gemini context window ────────
+            var truncCv  = cvText.Length        > MaxCvCharsForMatch  ? cvText[..MaxCvCharsForMatch]        : cvText;
+            var truncJob = jobDescription.Length > MaxJobCharsForMatch ? jobDescription[..MaxJobCharsForMatch] : jobDescription;
+
+            // ── 4. Single unified Gemini call ─────────────────────────────────────
+            var prompt  = BuildUnifiedMatchPrompt(jobTitle, truncJob, truncCv,
+                                                  local.MatchedSkills, local.MissingSkills);
+            var rawText = await CallGeminiUnifiedAsync(prompt);
+            var result  = ParseMatchResult(rawText);
+
+            // ── 5. Safety anchor — prevent falsely high scores on zero skill match ─
+            //    If the local keyword pass found zero overlapping skills, halve Gemini's
+            //    score. This guards against prompt-injected CVs or generic CVs that
+            //    describe adjacent roles in convincing prose.
+            if (local.MatchPercentage == 0 && result.MatchScore > 40)
+                result.MatchScore = Math.Round(result.MatchScore * 0.5, 1);
+
+            // ── 6. Supplement empty skill lists from local analysis ────────────────
+            if (result.MatchedSkills.Count == 0 && local.MatchedSkills.Count > 0)
+                result.MatchedSkills = local.MatchedSkills.Take(10).ToList();
+
+            if (result.MissingSkills.Count == 0 && local.MissingSkills.Count > 0)
+                result.MissingSkills = local.MissingSkills.Take(10).ToList();
+
+            // ── 7. Always populate KeywordGaps from local analysis (no AI cost) ────
+            result.KeywordGaps = local.KeywordMissing.Take(8).ToList();
+
+            // ── 8. Cache for 1 hour ───────────────────────────────────────────────
+            _cache.Set(cacheKey, result, TimeSpan.FromHours(1));
+            _logger.LogInformation(
+                "[CACHE MISS] Unified match complete. Score={Score} key={Key}",
+                result.MatchScore, cacheKey);
+
+            return result;
+        }
+
+        private static string BuildUnifiedMatchPrompt(
+            string jobTitle,
+            string jobDescription,
+            string cvText,
+            List<string> localMatched,
+            List<string> localMissing)
+        {
+            var hintMatched = localMatched.Count > 0 ? string.Join(", ", localMatched) : "none detected";
+            var hintMissing = localMissing.Count > 0 ? string.Join(", ", localMissing) : "none detected";
+
+            return $$"""
+                You are an AI Job Matching Engine. Your task is to analyze the candidate CV and the Job Description TOGETHER in a single unified flow — not separately.
+
+                SYNONYM EQUIVALENCE — treat each group as the same technology:
+                - JavaScript / JS / ECMAScript / Node.js / NodeJS
+                - TypeScript / TS
+                - C# / .NET / ASP.NET / ASP.NET Core / Microsoft .NET
+                - React / ReactJS / React.js
+                - Vue / VueJS / Vue.js / Vue3
+                - Angular / AngularJS
+                - Python / py
+                - Machine Learning / ML / Artificial Intelligence / AI / Deep Learning
+                - Kubernetes / K8s / container orchestration
+                - Docker / containerization / containers
+                - SQL Server / MSSQL / Microsoft SQL / T-SQL
+                - PostgreSQL / Postgres / PG
+                - MongoDB / Mongo / NoSQL document store
+                - REST / RESTful / REST API / Web API / HTTP API
+                - Git / GitHub / GitLab / version control
+                - CI/CD / DevOps / GitHub Actions / Azure DevOps / Jenkins
+
+                System keyword pre-analysis (use as starting hints — override with your semantic judgment):
+                Keyword-matched skills : {{hintMatched}}
+                Keyword-missing skills : {{hintMissing}}
+
+                Job Title: {{jobTitle}}
+
+                Job Description:
+                {{jobDescription}}
+
+                Candidate CV:
+                {{cvText}}
+
+                Return ONLY valid JSON — no markdown fences, no extra text:
+                {
+                  "matchScore": <integer 0-100>,
+                  "matchedSkills": ["skill1", "skill2"],
+                  "missingSkills": ["skill3"],
+                  "summary": "2-3 sentence objective assessment of candidate fit",
+                  "weakSections": [
+                    "Section name + why it is weak (e.g., Experience section lacks measurable achievements)"
+                  ],
+                  "improvementSuggestions": [
+                    "Specific actionable step (e.g., Add Docker to Skills section)"
+                  ]
+                }
+
+                Scoring guide:
+                90-100 : Exceptional — candidate clearly exceeds requirements
+                75-89  : Strong — candidate fits most requirements well
+                55-74  : Partial — meets core requirements, notable gaps exist
+                35-54  : Weak — significant skill or experience gaps
+                0-34   : Poor — profile does not align with the role
+
+                Output rules:
+                - matchScore: integer 0-100 based on semantic understanding, not keyword counting
+                - matchedSkills: use canonical skill names (e.g. "JavaScript" not "JS"); include all synonymous matches
+                - missingSkills: only list skills the role clearly requires that are genuinely absent from the CV
+                - summary: objective 2-3 sentences; base conclusions only on evidence present in the CV text
+                - weakSections: 2-4 items; name the section and explain the weakness concisely
+                - improvementSuggestions: 2-4 items; start each with an action verb (Add, Include, Quantify, Remove)
+                - Never invent information not present in the CV
+                - Never penalise the candidate for skills the job did not require
+                """;
+        }
+
+        private async Task<string> CallGeminiUnifiedAsync(string prompt)
+        {
+            var body = new
+            {
+                contents         = new[] { new { parts = new[] { new { text = prompt } } } },
+                generationConfig = new
+                {
+                    temperature     = 0.1,
+                    maxOutputTokens = 1_200,
+                    thinkingConfig  = new { thinkingBudget = 0 }
+                }
+            };
+
+            var content = new StringContent(
+                JsonSerializer.Serialize(body), Encoding.UTF8, "application/json");
+
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(45));
+            HttpResponseMessage response;
+
+            try
+            {
+                response = await _httpClient.PostAsync(
+                    $"{_geminiUrl}?key={_apiKey}", content, cts.Token);
+            }
+            catch (TaskCanceledException)
+            {
+                throw new TimeoutException("Unified match analysis timed out after 45 seconds.");
+            }
+
+            var responseBody = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var code = (int)response.StatusCode;
+                _logger.LogError("Gemini unified match {StatusCode}: {Body}", code, responseBody);
+
+                throw code switch
+                {
+                    429       => new InvalidOperationException("QUOTA_EXCEEDED"),
+                    400       => new InvalidOperationException($"Gemini bad request: {responseBody}"),
+                    401 or 403 => new UnauthorizedAccessException("Invalid or missing Gemini API key."),
+                    _         => new InvalidOperationException($"Gemini returned {code}: {responseBody}")
+                };
+            }
+
+            return ExtractGeminiText(responseBody);
+        }
+
+        private static JobMatchResponseDto ParseMatchResult(string text)
+        {
+            var json = StripJsonFences(text);
+            try
+            {
+                var opts = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var dto  = JsonSerializer.Deserialize<GeminiMatchResultDto>(json, opts);
+
+                if (dto is null) return FallbackMatchResult();
+
+                return new JobMatchResponseDto
+                {
+                    MatchScore             = Math.Clamp(dto.MatchScore, 0, 100),
+                    MatchedSkills          = dto.MatchedSkills          ?? [],
+                    MissingSkills          = dto.MissingSkills          ?? [],
+                    Summary                = string.IsNullOrWhiteSpace(dto.Summary)
+                                                ? "Analysis complete. Review matched and missing skills for details."
+                                                : dto.Summary,
+                    WeakSections           = dto.WeakSections           ?? [],
+                    ImprovementSuggestions = dto.ImprovementSuggestions ?? [],
+                };
+            }
+            catch (JsonException)
+            {
+                return FallbackMatchResult();
+            }
+        }
+
+        private static JobMatchResponseDto FallbackMatchResult() => new()
+        {
+            MatchScore             = 0,
+            MatchedSkills          = [],
+            MissingSkills          = [],
+            Summary                = "Analysis could not be completed. Please try again.",
+            WeakSections           = [],
+            ImprovementSuggestions = []
         };
     }
 }

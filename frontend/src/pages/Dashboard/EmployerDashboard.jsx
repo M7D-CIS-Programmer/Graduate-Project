@@ -5,6 +5,8 @@ import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
 import { useJobs } from '../../hooks/useJobs';
 import { useApplications, useUpdateApplicationStatus } from '../../hooks/useApplications';
+import { useQuery } from '@tanstack/react-query';
+import { api } from '../../api/api';
 import Spinner from '../../components/ui/Spinner';
 import { Link, useNavigate } from 'react-router-dom';
 import {
@@ -49,6 +51,16 @@ const EmployerDashboard = () => {
     const { data: allApplications = [], isLoading: appsLoading } = useApplications(user?.id);
     const updateStatusMutation = useUpdateApplicationStatus();
 
+    // Fetch live profile so followerCount is always up-to-date.
+    // Uses the same cache key ['company', id] that useFollowCompany invalidates,
+    // so the count refreshes the moment someone follows/unfollows this company.
+    const { data: liveProfile } = useQuery({
+        queryKey: ['company', String(user?.id)],
+        queryFn: () => api.getUser(user.id),
+        enabled: !!user?.id,
+        staleTime: 0,
+    });
+
     const employerJobs = useMemo(() => {
         return allJobs.filter(j => j.userId === user?.id);
     }, [allJobs, user]);
@@ -63,7 +75,7 @@ const EmployerDashboard = () => {
         { label: t('totalPostings'), value: employerJobs.length, icon: <FileText />, color: '#6366f1' },
         { label: t('totalApplicants'), value: employerApplications.length, icon: <Users />, color: '#10b981' },
         { label: t('activeJobs'), value: employerJobs.filter(j => j.status === 'Active').length, icon: <TrendingUp />, color: '#f59e0b' },
-        { label: t('followers'), value: user?.followerCount || 0, icon: <Users />, color: '#ec4899' },
+        { label: t('followers'), value: liveProfile?.followerCount ?? 0, icon: <Users />, color: '#ec4899' },
     ];
 
     const handleAction = async (actionType, applicant) => {

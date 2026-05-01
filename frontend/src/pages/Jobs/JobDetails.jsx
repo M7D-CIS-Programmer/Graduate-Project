@@ -3,12 +3,12 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useLanguage } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
-import { ChevronLeft, Building, Briefcase, MapPin, DollarSign, Clock, X, Bookmark, Share2 } from 'lucide-react';
+import { ChevronLeft, Building, Briefcase, MapPin, DollarSign, Clock, X, Bookmark, Share2, Upload, FileText } from 'lucide-react';
 import Button from '../../components/ui/Button';
 import Spinner from '../../components/ui/Spinner';
 import { useJob } from '../../hooks/useJobs';
 import { useApplyForJob } from '../../hooks/useApplications';
-import { useSaveJob, useUnsaveJob, useCheckSavedJob } from '../../hooks/useSavedJobs';
+import { useCheckSavedJob, useSaveJob, useUnsaveJob } from '../../hooks/useSavedJobs';
 import { formatTimeAgo } from '../../utils/dateUtils';
 
 const JobDetails = () => {
@@ -21,12 +21,13 @@ const JobDetails = () => {
     const { data: job, isLoading, error } = useJob(id);
     const { mutate: applyForJob, isPending: isApplying } = useApplyForJob();
 
-    const { data: savedStatus, isLoading: isCheckLoading } = useCheckSavedJob(id);
-    const { mutate: saveJob, isPending: isSaving } = useSaveJob();
-    const { mutate: unsaveJob, isPending: isUnsaving } = useUnsaveJob();
+    const { data: saveStatus } = useCheckSavedJob(parseInt(id));
+    const { mutate: saveJob }   = useSaveJob();
+    const { mutate: unsaveJob } = useUnsaveJob();
 
     const isJobApplied = user?.appliedJobs?.some(j => j.id === parseInt(id)) || false;
 
+    const [isSaved, setIsSaved]     = useState(false);
     const [isApplied, setIsApplied] = useState(isJobApplied);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [formData, setFormData] = useState({
@@ -34,10 +35,14 @@ const JobDetails = () => {
         email: user?.email || '',
         phone: user?.phone || '',
         coverLetter: '',
-        cv: ''
+        cvFile: null
     });
 
-    const isSaved = savedStatus?.isSaved || false;
+    React.useEffect(() => {
+        if (saveStatus?.isSaved !== undefined) {
+            setIsSaved(saveStatus.isSaved);
+        }
+    }, [saveStatus]);
 
     React.useEffect(() => {
         if (!job) return;
@@ -76,14 +81,22 @@ const JobDetails = () => {
         }
 
         if (isSaved) {
-            unsaveJob(savedStatus.savedJobId, {
-                onSuccess: () => addToast(t('removedFromSaved') || 'Job removed from saved', 'info'),
-                onError: () => addToast(t('actionFailed') || 'Failed to unsave job', 'error')
+            const savedJobId = saveStatus?.savedJobId;
+            if (!savedJobId) return;
+            setIsSaved(false);
+            unsaveJob(savedJobId, {
+                onError: () => {
+                    setIsSaved(true);
+                    addToast('Failed to remove saved job.', 'error');
+                },
             });
         } else {
+            setIsSaved(true);
             saveJob(job.id, {
-                onSuccess: () => addToast(t('jobSaved') || 'Job saved successfully', 'success'),
-                onError: () => addToast(t('actionFailed') || 'Failed to save job', 'error')
+                onError: () => {
+                    setIsSaved(false);
+                    addToast('Failed to save job.', 'error');
+                },
             });
         }
     };
@@ -113,14 +126,23 @@ const JobDetails = () => {
         if (isApplied) return;
 
         const appliedDate = new Date().toISOString();
-        const applicationData = {
-            jobId: job.id,
-            userId: user.id || 1,
-            applicationDate: appliedDate,
-            status: 'New',
-            note: formData.coverLetter,
-            cv: formData.cv
-        };
+        if (!formData.cvFile) {
+            addToast('Please upload your CV as a PDF file.', 'error');
+            return;
+        }
+
+        const isPdf = formData.cvFile.type === 'application/pdf'
+            || formData.cvFile.name.toLowerCase().endsWith('.pdf');
+        if (!isPdf) {
+            addToast('Only PDF CV files are allowed.', 'error');
+            return;
+        }
+
+        const applicationData = new FormData();
+        applicationData.append('jobId', String(job.id));
+        applicationData.append('userId', String(user.id || 1));
+        applicationData.append('note', formData.coverLetter || '');
+        applicationData.append('cvFile', formData.cvFile);
 
         applyForJob(applicationData, {
             onSuccess: () => {
@@ -258,65 +280,90 @@ const JobDetails = () => {
                             <div className="modal-body">
                                 <div className="form-group">
                                     <label>{t('fullName') || 'Full Name'}</label>
-                                    <input 
-                                        type="text" 
-                                        name="name" 
-                                        value={formData.name} 
-                                        onChange={handleFormChange} 
-                                        required 
+                                    <input
+                                        type="text"
+                                        name="name"
+                                        value={formData.name}
+                                        onChange={handleFormChange}
+                                        required
                                         className="form-input"
                                     />
                                 </div>
                                 <div className="form-group">
-                                    <label>{t('email') || 'Email'}</label>
-                                    <input 
-                                        type="email" 
-                                        name="email" 
-                                        value={formData.email} 
-                                        onChange={handleFormChange} 
-                                        required 
+                                    <label>{t('email') || 'Email Address'}</label>
+                                    <input
+                                        type="email"
+                                        name="email"
+                                        value={formData.email}
+                                        onChange={handleFormChange}
+                                        required
                                         className="form-input"
                                     />
                                 </div>
                                 <div className="form-group">
                                     <label>{t('phone') || 'Phone Number'}</label>
-                                    <input 
-                                        type="tel" 
-                                        name="phone" 
-                                        value={formData.phone} 
-                                        onChange={handleFormChange} 
-                                        required 
+                                    <input
+                                        type="tel"
+                                        name="phone"
+                                        value={formData.phone}
+                                        onChange={handleFormChange}
+                                        required
                                         className="form-input"
                                     />
                                 </div>
                                 <div className="form-group">
                                     <label>{t('coverLetter') || 'Cover Letter'}</label>
-                                    <textarea 
-                                        name="coverLetter" 
-                                        value={formData.coverLetter} 
-                                        onChange={handleFormChange} 
-                                        rows="4" 
+                                    <textarea
+                                        name="coverLetter"
+                                        value={formData.coverLetter}
+                                        onChange={handleFormChange}
+                                        rows="4"
                                         className="form-input"
                                     ></textarea>
                                 </div>
                                 <div className="form-group">
-                                    <label>{t('resumeLink') || 'Resume Link / URL'}</label>
-                                    <input 
-                                        type="url" 
-                                        name="cv" 
-                                        value={formData.cv} 
-                                        onChange={handleFormChange} 
-                                        placeholder="https://example.com/your-resume.pdf"
-                                        className="form-input"
-                                    />
+                                    <label>{t('cvUploadLabel') || 'CV / Resume'}</label>
+                                    <div
+                                        className={`cv-upload-zone ${formData.cvFile ? 'has-file' : ''}`}
+                                        onClick={() => document.getElementById('cv-file-input').click()}
+                                        onDragOver={(e) => e.preventDefault()}
+                                        onDrop={(e) => {
+                                            e.preventDefault();
+                                            const file = e.dataTransfer.files?.[0];
+                                            if (file) setFormData(prev => ({ ...prev, cvFile: file }));
+                                        }}
+                                    >
+                                        <input
+                                            id="cv-file-input"
+                                            type="file"
+                                            name="cvFile"
+                                            accept=".pdf,application/pdf"
+                                            onChange={(e) => setFormData(prev => ({ ...prev, cvFile: e.target.files?.[0] || null }))}
+                                            style={{ display: 'none' }}
+                                            required
+                                        />
+                                        {formData.cvFile ? (
+                                            <>
+                                                <FileText size={28} className="cv-upload-icon uploaded" />
+                                                <p className="cv-file-name">{formData.cvFile.name}</p>
+                                                <span className="cv-change-hint">Click to change file</span>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Upload size={28} className="cv-upload-icon" />
+                                                <p className="cv-upload-text">Click to upload or drag &amp; drop</p>
+                                                <span className="cv-upload-hint">PDF only</span>
+                                            </>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                             <div className="form-actions">
                                 <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>
                                     {t('cancel') || 'Cancel'}
                                 </Button>
-                                <Button type="submit" variant="primary">
-                                    {t('submit') || 'Submit'}
+                                <Button type="submit" variant="primary" disabled={isApplying}>
+                                    {isApplying ? (t('submitting') || 'Submitting…') : (t('submitApplication') || 'Submit Application')}
                                 </Button>
                             </div>
                         </form>

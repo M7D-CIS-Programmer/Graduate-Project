@@ -72,6 +72,15 @@ namespace aabu_project.Dtos
         public string OverallInsight { get; set; } = string.Empty;
     }
 
+    // ── Bulk text-based match score (no PDF, no Gemini) ──────────────────────
+
+    public class CvMatchScoreRequestDto
+    {
+        public string CvText        { get; set; } = string.Empty;
+        public string JobTitle      { get; set; } = string.Empty;
+        public string JobDescription { get; set; } = string.Empty;
+    }
+
     // ── Hiring recommendation ─────────────────────────────────────────────────
 
     public class HiringRecommendationRequestDto
@@ -102,5 +111,33 @@ namespace aabu_project.Dtos
 
         /// <summary>Actionable next step for the hiring team.</summary>
         public string Recommendation { get; set; } = string.Empty;
+    }
+
+    // ── Unified Job Matching Engine ───────────────────────────────────────────────
+    // Returned by POST /api/cv/match.
+    // One Gemini call processes CV + job description together with semantic understanding.
+
+    public class JobMatchResponseDto
+    {
+        /// <summary>Semantic match score 0-100.</summary>
+        public double MatchScore { get; set; }
+
+        /// <summary>Skills the candidate demonstrably has that the role requires (synonym-aware).</summary>
+        public List<string> MatchedSkills { get; set; } = new();
+
+        /// <summary>Skills the role clearly requires that are absent from the CV.</summary>
+        public List<string> MissingSkills { get; set; } = new();
+
+        /// <summary>2-3 sentence objective assessment of candidate fit.</summary>
+        public string Summary { get; set; } = string.Empty;
+
+        /// <summary>Specific CV sections identified as weak — advisor output.</summary>
+        public List<string> WeakSections { get; set; } = new();
+
+        /// <summary>Actionable improvement suggestions — advisor output, never rewrites.</summary>
+        public List<string> ImprovementSuggestions { get; set; } = new();
+
+        /// <summary>Important job keywords missing from the CV — from local pre-analysis.</summary>
+        public List<string> KeywordGaps { get; set; } = new();
     }
 }

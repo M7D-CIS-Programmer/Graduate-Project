@@ -2,7 +2,7 @@ import React from 'react';
 import Spinner from '../../components/ui/Spinner';
 import { useLanguage } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
-import { Briefcase, Clock, CheckCircle, XCircle, Building2, MapPin, Calendar, Eye } from 'lucide-react';
+import { Briefcase, Clock, CheckCircle, XCircle, Building2, MapPin, Calendar, Eye, MessageSquare } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useApplications } from '../../hooks/useApplications';
 import './Dashboard.css';
@@ -147,6 +147,28 @@ const AppliedJobs = () => {
                                                 {t('viewJob')}
                                             </button>
                                         )}
+                                        <button
+                                            onClick={() => navigate(`/messages?applicationId=${app.id}`)}
+                                            className="btn-outline"
+                                            style={{
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '0.5rem',
+                                                padding: '0.5rem 1rem',
+                                                borderRadius: '12px',
+                                                fontSize: '0.85rem',
+                                                fontWeight: '600',
+                                                width: '100%',
+                                                justifyContent: 'center',
+                                                marginTop: '0.25rem',
+                                                background: 'rgba(99,102,241,0.1)',
+                                                borderColor: 'rgba(99,102,241,0.3)',
+                                                color: 'var(--primary)'
+                                            }}
+                                        >
+                                            <MessageSquare size={16} />
+                                            Message Company
+                                        </button>
                                     </div>
                                 </div>
                             </div>

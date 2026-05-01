@@ -329,6 +329,7 @@ export const LanguageProvider = ({ children }) => {
             reportJob: "Report Job",
             website: "Website",
             linkedin: "LinkedIn",
+            portfolioUrl: "Portfolio URL",
             unknownCompany: "Unknown Company",
             salaryNegotiable: "Salary Negotiable",
             // 

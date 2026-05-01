@@ -11,7 +11,8 @@ import {
     ExternalLink,
     ChevronLeft,
     Heart,
-    Share2
+    Share2,
+    MessageSquare
 } from 'lucide-react';
 import { api } from '../../api/api';
 import { useAuth } from '../../context/AuthContext';
@@ -68,6 +69,20 @@ const CompanyProfileView = () => {
         staleTime: 30_000,
     });
 
+    const isJobSeeker = !currentUser || currentUser.role === 'Job Seeker' || currentUser.role === 'JobSeeker';
+
+    // Job seeker: find any application they have to a job from this company
+    const { data: seekerApplications = [] } = useQuery({
+        queryKey: ['seeker-applications-for-company', currentUser?.id, id],
+        queryFn: () => api.getApplications(),
+        enabled: isJobSeeker && !!currentUser?.id,
+        staleTime: 60_000,
+    });
+
+    const applicationToCompany = isJobSeeker
+        ? seekerApplications.find(a => a.job?.userId?.toString() === id || a.job?.user?.id?.toString() === id)
+        : null;
+
     const isFollowed = followedCompanies?.some(c => c.id.toString() === id) || isLocalFollowed;
 
     const handleFollow = () => {
@@ -115,7 +130,6 @@ const CompanyProfileView = () => {
     }
 
     const logoUrl = `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(company.name)}&backgroundColor=6366f1`;
-    const isJobSeeker = !currentUser || currentUser.role === 'Job Seeker' || currentUser.role === 'JobSeeker';
     const activeJobs = jobs.filter(j => j.status === 'Active' || !j.status);
 
     return (
@@ -131,6 +145,17 @@ const CompanyProfileView = () => {
                     <button className="cv-icon-btn" onClick={handleShare} title="Share">
                         <Share2 size={18} />
                     </button>
+                    {/* Message button — job seekers who have applied to this company */}
+                    {isJobSeeker && applicationToCompany && (
+                        <button
+                            className="cv-follow-btn"
+                            onClick={() => navigate(`/messages?applicationId=${applicationToCompany.id}`)}
+                            style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}
+                        >
+                            <MessageSquare size={16} />
+                            Message
+                        </button>
+                    )}
                     {/* Follow button — job seekers only */}
                     {isJobSeeker && (
                         <button

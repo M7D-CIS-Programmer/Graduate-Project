@@ -5,11 +5,17 @@ public class CategoryCreateDto
     public string Name { get; set; } = null!;
 }
 
+public class CategoryUpdateDto
+{
+    public string Name { get; set; } = null!;
+}
+
 public class CategoryResponseDto
 {
     public int Id { get; set; }
     public string Name { get; set; } = null!;
     public int JobCount { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
 }
 
 public class NotificationCreateDto

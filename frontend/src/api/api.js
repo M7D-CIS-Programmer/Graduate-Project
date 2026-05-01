@@ -44,6 +44,12 @@ const getHeaders = () => {
 
 const get  = (url)         => fetch(url, { headers: getHeaders() }).then(handleResponse);
 const post = (url, body)   => fetch(url, { method: 'POST',   headers: getHeaders(), body: JSON.stringify(body) }).then(handleResponse);
+const postForm = (url, form) => {
+    const headers = {};
+    const token = sessionStorage.getItem('token');
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    return fetch(url, { method: 'POST', headers, body: form }).then(handleResponse);
+};
 const put  = (url, body)   => fetch(url, { method: 'PUT',    headers: getHeaders(), body: JSON.stringify(body) }).then(handleResponse);
 const del  = (url)         => fetch(url, { method: 'DELETE', headers: getHeaders() }).then(handleResponse);
 
@@ -99,18 +105,16 @@ export const api = {
     // Applications
     getApplications:          (employerId) => get(`${BASE_URL}/ApplicationJobs${employerId ? `?employerId=${employerId}` : ''}`),
     getApplicationsByCompany: (companyId)  => get(`${BASE_URL}/ApplicationJobs/company/${companyId}`),
-    applyForJob:              (data)       => post(`${BASE_URL}/ApplicationJobs`, data),
-    updateApplicationStatus:  (id, status) => {
-        console.log(`Updating application ${id} status to: ${status}`);
-        return put(`${BASE_URL}/ApplicationJobs/${id}/status`, { status })
-            .catch(err => {
-                console.error(`Failed to update application status:`, err);
-                throw err;
-            });
-    },
+    applyForJob:              (formData)   => postForm(`${BASE_URL}/ApplicationJobs`, formData),
+    updateApplicationStatus:  (id, status) => put(`${BASE_URL}/ApplicationJobs/${id}/status`, { status }),
 
-    // Categories
-    getCategories: () => get(`${BASE_URL}/Categories`),
+    // Categories (public — all global + company-owned categories)
+    getCategories:    ()              => get(`${BASE_URL}/Categories`),
+    // My departments — authenticated employer only
+    getMyCategories:  ()              => get(`${BASE_URL}/Categories/mine`),
+    createCategory:   (name)          => post(`${BASE_URL}/Categories`, { name }),
+    updateCategory:   (id, name)      => put(`${BASE_URL}/Categories/${id}`, { name }),
+    deleteCategory:   (id)            => del(`${BASE_URL}/Categories/${id}`),
 
     // Follows
     followCompany:        (userId, companyId) => post(`${BASE_URL}/Follows/${userId}/follow/${companyId}`),
@@ -129,6 +133,13 @@ export const api = {
     clearAllNotifications:    (userId) => del(`${BASE_URL}/Notifications/clear-all/${userId}`),
     deleteNotification:       (id)     => del(`${BASE_URL}/Notifications/${id}`),
 
+    // Messages (direct messaging per application thread)
+    getMessages:      (applicationId, userId) => get(`${BASE_URL}/Messages/application/${applicationId}?userId=${userId}`),
+    getConversations: (userId)                => get(`${BASE_URL}/Messages/conversations/${userId}`),
+    getThreadInfo:    (applicationId, userId) => get(`${BASE_URL}/Messages/thread-info/${applicationId}?userId=${userId}`),
+    sendMessage:      (applicationId, senderId, content) => post(`${BASE_URL}/Messages`, { applicationJobId: applicationId, senderId, content }),
+    markMessagesRead: (applicationId, userId) => put(`${BASE_URL}/Messages/read/${applicationId}/${userId}`),
+
     // Search
     search: (query, role, userId, lang) => get(`${BASE_URL}/Search?q=${query}&role=${role || ''}&userId=${userId || ''}&lang=${lang || 'en'}`),
 
@@ -142,6 +153,19 @@ export const api = {
     answerInterview: (sessionId, answer) =>
         post(`${BASE_URL}/interview/answer`, { sessionId, answer }),
 
+    // Unified Job Matching Engine — single Gemini call, semantic + synonym-aware
+    matchCvToJob: (file, jobTitle, jobDescription) => {
+        const form = new FormData();
+        form.append('file', file);
+        form.append('jobTitle', jobTitle);
+        form.append('jobDescription', jobDescription);
+        const headers = {};
+        const token = sessionStorage.getItem('token');
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+        return fetch(`${BASE_URL}/cv/match`, { method: 'POST', headers, body: form })
+            .then(handleResponse);
+    },
+
     // CV vs Job Analysis — multipart/form-data (do NOT set Content-Type; browser sets boundary)
     analyzeCv: (file, jobTitle, jobDescription) => {
         const form = new FormData();
@@ -154,4 +178,35 @@ export const api = {
         return fetch(`${BASE_URL}/cv/analyze`, { method: 'POST', headers, body: form })
             .then(handleResponse);
     },
+
+    // Deep semantic analysis — PDF + job description
+    semanticAnalyzeCv: (file, jobDescription) => {
+        const form = new FormData();
+        form.append('file', file);
+        form.append('jobDescription', jobDescription);
+        const headers = {};
+        const token = sessionStorage.getItem('token');
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+        return fetch(`${BASE_URL}/cv/semantic-analyze`, { method: 'POST', headers, body: form })
+            .then(handleResponse);
+    },
+
+    // CV integrity & fraud detection — PDF only
+    detectCvFraud: (file) => {
+        const form = new FormData();
+        form.append('file', file);
+        const headers = {};
+        const token = sessionStorage.getItem('token');
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+        return fetch(`${BASE_URL}/cv/fraud-check`, { method: 'POST', headers, body: form })
+            .then(handleResponse);
+    },
+
+    // Aggregate hiring recommendation — JSON body (outputs of the two calls above + match score)
+    generateHiringRecommendation: (semanticAnalysis, fraudResult, matchScore) =>
+        post(`${BASE_URL}/cv/hiring-recommendation`, { semanticAnalysis, fraudResult, matchScore }),
+
+    // Fast local-only text match score — no PDF, no Gemini (used for bulk candidate ranking)
+    getMatchScore: (cvText, jobTitle, jobDescription) =>
+        post(`${BASE_URL}/cv/match-score`, { cvText, jobTitle, jobDescription }),
 };

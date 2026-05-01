@@ -1,14 +1,18 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '../api/api';
+import { useAuth } from '../context/AuthContext';
 
 const QUERY_KEY = ['savedJobs'];
 
-export const useSavedJobs = () =>
-    useQuery({
+export const useSavedJobs = () => {
+    const { user } = useAuth();
+    return useQuery({
         queryKey: QUERY_KEY,
         queryFn:  api.getSavedJobs,
+        enabled:  !!user,
         staleTime: 30_000,
     });
+};
 
 export const useSaveJob = () => {
     const queryClient = useQueryClient();

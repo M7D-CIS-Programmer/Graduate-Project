@@ -56,7 +56,51 @@ public class ApplicationJobsController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Apply(ApplicationJobCreateDto dto)
+    [Consumes("application/json")]
+    public async Task<IActionResult> ApplyJson([FromBody] ApplicationJobCreateDto dto)
+    {
+        return await CreateApplication(dto, dto.Cv);
+    }
+
+    [HttpPost]
+    [Consumes("multipart/form-data")]
+    public async Task<IActionResult> Apply([FromForm] ApplicationJobCreateDto dto)
+    {
+        string? cvPath = dto.Cv;
+
+        if (dto.CvFile != null)
+        {
+            var ext = Path.GetExtension(dto.CvFile.FileName).ToLowerInvariant();
+            var isPdfExt = ext == ".pdf";
+            var isPdfMime = string.Equals(dto.CvFile.ContentType, "application/pdf", StringComparison.OrdinalIgnoreCase);
+
+            if (!isPdfExt && !isPdfMime)
+                return BadRequest(new { message = "Only PDF CV files are allowed." });
+
+            if (dto.CvFile.Length <= 0)
+                return BadRequest(new { message = "Uploaded CV file is empty." });
+
+            if (dto.CvFile.Length > 10 * 1024 * 1024)
+                return BadRequest(new { message = "CV file is too large. Maximum size is 10 MB." });
+
+            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "cvs");
+            Directory.CreateDirectory(uploadsFolder);
+
+            var safeName = $"{Guid.NewGuid():N}{ext}";
+            var filePath = Path.Combine(uploadsFolder, safeName);
+
+            await using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await dto.CvFile.CopyToAsync(stream);
+            }
+
+            cvPath = Path.Combine("uploads", "cvs", safeName).Replace("\\", "/");
+        }
+
+        return await CreateApplication(dto, cvPath);
+    }
+
+    private async Task<IActionResult> CreateApplication(ApplicationJobCreateDto dto, string? cvPath)
     {
         if (dto == null) 
             return BadRequest(new { message = "Invalid application data." });
@@ -77,7 +121,7 @@ public class ApplicationJobsController : ControllerBase
             JobId = dto.JobId,
             UserId = dto.UserId,
             Note = dto.Note,
-            Cv = dto.Cv,
+            Cv = string.IsNullOrWhiteSpace(cvPath) ? null : cvPath.Trim(),
             Date = DateTime.Now,
             CandidateStatus = "Applied"
         };

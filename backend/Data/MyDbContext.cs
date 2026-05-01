@@ -20,18 +20,20 @@ namespace aabu_project.Data
         public DbSet<Role> Roles { get; set; }
         public DbSet<SavedJob> SavedJobs { get; set; }
         public DbSet<FollowCompany> FollowCompanies { get; set; }
+        public DbSet<Message> Messages { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            // Seed Categories
+            // Seed Categories — global (UserId = null), visible to all users
+            var seedDate = new DateTimeOffset(2024, 1, 1, 0, 0, 0, TimeSpan.Zero);
             modelBuilder.Entity<Category>().HasData(
-                new Category { Id = 1, Name = "Technology" },
-                new Category { Id = 2, Name = "Design" },
-                new Category { Id = 3, Name = "Marketing" },
-                new Category { Id = 4, Name = "Finance" },
-                new Category { Id = 5, Name = "Healthcare" }
+                new Category { Id = 1, Name = "Technology", CreatedAt = seedDate },
+                new Category { Id = 2, Name = "Design",     CreatedAt = seedDate },
+                new Category { Id = 3, Name = "Marketing",  CreatedAt = seedDate },
+                new Category { Id = 4, Name = "Finance",    CreatedAt = seedDate },
+                new Category { Id = 5, Name = "Healthcare", CreatedAt = seedDate }
             );
 
             // Seed Users
@@ -171,6 +173,27 @@ namespace aabu_project.Data
                 .HasIndex(f => new { f.UserId, f.CompanyId })
                 .IsUnique()
                 .HasDatabaseName("UX_FollowCompany_UserId_CompanyId");
+
+            // Category → User (nullable FK; null = global category)
+            modelBuilder.Entity<Category>()
+                .HasOne(c => c.User)
+                .WithMany(u => u.Categories)
+                .HasForeignKey(c => c.UserId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            // Message → ApplicationJob (cascade: deleting an application removes its messages)
+            modelBuilder.Entity<Message>()
+                .HasOne(m => m.ApplicationJob)
+                .WithMany()
+                .HasForeignKey(m => m.ApplicationJobId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Message → Sender (restrict to avoid multiple cascade paths)
+            modelBuilder.Entity<Message>()
+                .HasOne(m => m.Sender)
+                .WithMany()
+                .HasForeignKey(m => m.SenderId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

@@ -1,6 +1,6 @@
 import React from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { LanguageProvider } from './context/LanguageContext';
 import { ToastProvider } from './context/ToastContext';
@@ -42,9 +42,13 @@ import FAQ from './pages/FAQ';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfService from './pages/TermsOfService';
 import Chatbot from './pages/Chatbot';
-import CVAnalyzer from './pages/CVAnalyzer/CVAnalyzer';
+import JobMatching from './pages/JobMatching/JobMatching';
+import FraudCheck from './pages/CVAnalyzer/FraudCheck';
+import HiringReport from './pages/CVAnalyzer/HiringReport';
+import Departments from './pages/Dashboard/Departments';
 import Interview from './pages/Interview/Interview';
 import AICandidateInsights from './pages/Dashboard/AICandidateInsights';
+import Messages from './pages/Messages/Messages';
 import Spinner from './components/ui/Spinner';
 
 const ConditionalHome = () => {
@@ -60,13 +64,13 @@ const ConditionalHome = () => {
 
 const AuthInitializer = ({ children }) => {
   const { loading } = useAuth();
-  
+
   if (loading) {
     return (
-      <div style={{ 
-        height: '100vh', 
-        display: 'flex', 
-        alignItems: 'center', 
+      <div style={{
+        height: '100vh',
+        display: 'flex',
+        alignItems: 'center',
         justifyContent: 'center',
         background: 'var(--bg-main)'
       }}>
@@ -74,7 +78,17 @@ const AuthInitializer = ({ children }) => {
       </div>
     );
   }
-  
+
+  return children;
+};
+
+// Restricts a route to employer / company accounts only.
+// Unauthenticated users go to /login; everyone else goes to /.
+const EmployerRoute = ({ children }) => {
+  const { user } = useAuth();
+  if (!user) return <Navigate to="/login" replace />;
+  const role = user.role?.toLowerCase();
+  if (role !== 'employer' && role !== 'company') return <Navigate to="/" replace />;
   return children;
 };
 
@@ -132,6 +146,7 @@ function App() {
                   <Route path="/profile/edit" element={<EditProfile />} />
                   <Route path="/candidate/:id" element={<CandidateProfile />} />
                   <Route path="/notifications" element={<Notifications />} />
+                  <Route path="/messages" element={<Messages />} />
                   <Route path="/resume-builder" element={<ResumeBuilder />} />
                   <Route path="/resume/:userId" element={<ResumeView />} />
 
@@ -147,8 +162,16 @@ function App() {
                   <Route path="/terms-of-service" element={<TermsOfService />} />
                   <Route path="/chatbot" element={<Chatbot />} />
                   <Route path="/support" element={<Chatbot />} />
-                  <Route path="/cv-analyzer" element={<CVAnalyzer />} />
-                  <Route path="/interview"  element={<Interview />} />
+                  {/* Unified AI Job Matching — replaces cv-analyzer + cv-semantic */}
+                  <Route path="/job-matching"     element={<JobMatching />} />
+                  {/* Legacy redirects — keep old bookmarks working */}
+                  <Route path="/cv-analyzer"      element={<Navigate to="/job-matching" replace />} />
+                  <Route path="/cv-semantic"      element={<Navigate to="/job-matching" replace />} />
+                  {/* Specialist tools — accessible by direct URL, not shown in sidebar */}
+                  <Route path="/cv-fraud-check"   element={<EmployerRoute><FraudCheck /></EmployerRoute>} />
+                  <Route path="/cv-hiring-report" element={<EmployerRoute><HiringReport /></EmployerRoute>} />
+                  <Route path="/departments"      element={<EmployerRoute><Departments /></EmployerRoute>} />
+                  <Route path="/interview"        element={<Interview />} />
 
                   {/* Fallback */}
                   <Route path="*" element={

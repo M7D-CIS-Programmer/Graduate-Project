@@ -71,6 +71,41 @@
     gap: 0.4rem;
 }
 
+.following-card-stats {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    background: var(--bg-main);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+}
+
+.following-stat {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.following-stat span:first-of-type {
+    font-weight: 700;
+    color: var(--text-main);
+    font-size: 0.95rem;
+}
+
+.following-stat-label {
+    font-size: 0.78rem;
+}
+
+.following-stat-divider {
+    width: 1px;
+    height: 24px;
+    background: var(--border-color);
+    flex-shrink: 0;
+}
+
 .following-card-actions {
     display: flex;
     align-items: center;

@@ -442,10 +442,18 @@
     border: 1px solid var(--border-color, #e2e8f0);
 }
 
-.cva-tag-match {
+.cva-tag-match,
+.cva-tag-matched {
     background: #dcfce7;
     color: #15803d;
     border-color: #bbf7d0;
+}
+
+.cva-summary-text {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    line-height: 1.7;
+    margin: 0;
 }
 
 .cva-tag-missing {
@@ -602,24 +610,69 @@
 
 /* ─── Responsive ──────────────────────────────────────────────────────────── */
 @media (max-width: 640px) {
-    .cva-results-grid {
-        grid-template-columns: 1fr;
-    }
+    .cva-results-grid  { grid-template-columns: 1fr; }
+    .cva-title         { font-size: 1.4rem; }
+    .cva-btn-primary   { width: 100%; justify-content: center; }
+    .cva-actions       { justify-content: stretch; }
+    .cva-mini-score    { gap: .75rem; }
+}
 
-    .cva-title {
-        font-size: 1.4rem;
-    }
+/* ─── Badge ───────────────────────────────────────────────────────────────── */
+.cva-badge {
+    display: inline-flex; align-items: center; gap: .35rem;
+    padding: .3rem .75rem; border-radius: 999px;
+    font-size: .78rem; font-weight: 600;
+}
+.cva-badge-green  { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+.cva-badge-orange { background: #fff7ed; color: #c2410c; border: 1px solid #fed7aa; }
+.cva-badge-red    { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+.cva-badge-blue   { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
 
-    .cva-btn-primary {
-        width: 100%;
-        justify-content: center;
-    }
+/* ─── Verdict / Decision Banner ───────────────────────────────────────────── */
+.cva-verdict {
+    display: flex; align-items: center; gap: 1rem;
+    padding: 1.5rem 1.75rem; border-radius: 16px;
+    border: 2px solid; animation: cva-fade-in .4s ease both;
+}
+.cva-verdict-trusted      { background: #f0fdf4; border-color: #86efac; }
+.cva-verdict-questionable { background: #fff7ed; border-color: #fed7aa; }
+.cva-verdict-likely_fake  { background: #fef2f2; border-color: #fca5a5; }
+.cva-verdict-strong_hire  { background: #f0fdf4; border-color: #4ade80; }
+.cva-verdict-hire         { background: #f0fdf4; border-color: #86efac; }
+.cva-verdict-neutral      { background: #fefce8; border-color: #fde68a; }
+.cva-verdict-reject       { background: #fef2f2; border-color: #fca5a5; }
 
-    .cva-actions {
-        justify-content: stretch;
-    }
+/* ─── Issue Card (fraud) ──────────────────────────────────────────────────── */
+.cva-issue-card {
+    padding: .85rem 1rem;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 10px;
+}
+.cva-issue-title  { font-size: .875rem; font-weight: 600; color: #991b1b; margin-bottom: .25rem; }
+.cva-issue-reason { font-size: .8rem; color: #7f1d1d; line-height: 1.5; }
 
-    .cva-mini-score {
-        gap: .75rem;
-    }
+/* ─── Pipeline progress (hiring report) ───────────────────────────────────── */
+.cva-pipeline {
+    display: flex; flex-direction: column; gap: .5rem;
+    padding: 1rem 1.25rem;
+    background: var(--hover-bg, #f8fafc);
+    border-radius: 10px;
+    border: 1px solid var(--border-color, #e2e8f0);
+}
+.cva-pipeline-step {
+    display: flex; align-items: center; gap: .6rem;
+    font-size: .875rem; color: var(--text-muted, #94a3b8);
+    transition: color .2s;
+}
+.cva-pipeline-step.done   { color: #16a34a; }
+.cva-pipeline-step.active { color: var(--primary-color, #6366f1); font-weight: 600; }
+.cva-pipeline-dot {
+    width: 16px; height: 16px; border-radius: 50%;
+    border: 2px solid currentColor; flex-shrink: 0;
+}
+
+/* ─── Responsive extras ───────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+    .cva-verdict { flex-wrap: wrap; }
 }
