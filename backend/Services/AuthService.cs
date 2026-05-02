@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -25,9 +27,11 @@ namespace aabu_project.Services
         // =========================
         // REGISTER
         // =========================
-        public AuthResultDto Register(RegisterDto dto)
+        public async Task<AuthResultDto> Register(UserCreateDto dto)
         {
-            var existingUser = _context.Users.FirstOrDefault(x => x.Email == dto.Email);
+            // Normalize email
+            var normalizedEmail = dto.Email.Trim().ToLower();
+            var existingUser = await _context.Users.FirstOrDefaultAsync(x => x.Email.ToLower() == normalizedEmail);
 
             if (existingUser != null)
             {
@@ -38,21 +42,62 @@ namespace aabu_project.Services
                 };
             }
 
+            // Normalize RoleName
+            var normalizedRole = dto.RoleName.Trim();
+            if (string.Equals(normalizedRole, "Company", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(normalizedRole, "Employer", StringComparison.OrdinalIgnoreCase))
+            {
+                normalizedRole = "Employer";
+            }
+            else if (string.Equals(normalizedRole, "Job Seeker", StringComparison.OrdinalIgnoreCase) ||
+                     string.Equals(normalizedRole, "JobSeeker", StringComparison.OrdinalIgnoreCase))
+            {
+                normalizedRole = "Job Seeker";
+            }
+
             var user = new User
             {
                 Name = dto.Name,
-                Email = dto.Email,
-                Pass = HashPassword(dto.Password),
-                Roles = new List<Role> { new Role { RoleName = "Job Seeker" } }
+                Email = normalizedEmail,
+                Pass = HashPassword(dto.Pass),
+                Location = dto.Location,
+                Phone = dto.Phone,
+                Website = dto.Website,
+                Description = dto.Description,
+                Industry = dto.Industry,
+                Status = "Active",
+                SearchKey = aabu_project.Utilities.SearchUtility.GenerateSearchKey(dto.Name, dto.Industry, dto.Location, dto.Description),
+                Roles = new List<Role> { new Role { RoleName = normalizedRole } }
             };
 
             _context.Users.Add(user);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
+
+            // Generate JWT token
+            var token = GenerateJwtToken(user);
 
             return new AuthResultDto
             {
                 Success = true,
-                Message = "User registered successfully"
+                Message = "User registered successfully",
+                Token = token,
+                User = new AuthResponseDto
+                {
+                    Id = user.Id,
+                    Name = user.Name,
+                    Email = user.Email,
+                    Role = normalizedRole,
+                    Location = user.Location,
+                    Phone = user.Phone,
+                    Website = user.Website,
+                    Description = user.Description,
+                    Industry = user.Industry,
+                    ProfilePicture = user.ProfilePicture,
+                    CreatedAt = user.CreatedAt,
+                    Token = token,
+                    FollowerCount = 0,
+                    AppliedJobs = new List<JobResponseDto>()
+                }
             };
         }
 

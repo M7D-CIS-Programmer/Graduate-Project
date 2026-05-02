@@ -19,11 +19,11 @@ namespace aabu_project.Controllers
         }
 
         [HttpPost("register")]
-        public IActionResult Register(RegisterDto dto)
+        public async Task<IActionResult> Register(UserCreateDto dto)
         {
-            var result = _authService.Register(dto);
+            var result = await _authService.Register(dto);
             if (!result.Success)
-                return BadRequest(result.Message);
+                return BadRequest(new { message = result.Message });
 
             return Ok(result);
         }

@@ -180,78 +180,15 @@ public class UsersController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreateUser(UserCreateDto dto)
     {
-        // Validate input
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        // Normalize email before storing so lookups are always consistent
-        dto.Email = dto.Email.Trim().ToLower();
+        var result = await _authService.Register(dto);
 
-        var existingUser = await _context.Users
-            .FirstOrDefaultAsync(u => u.Email == dto.Email);
+        if (!result.Success)
+            return BadRequest(new { message = result.Message });
 
-        if (existingUser != null)
-            return BadRequest(new { message = "Email is already registered" });
-
-        // Normalize RoleName for better consistency
-        var normalizedRole = dto.RoleName.Trim();
-        if (string.Equals(normalizedRole, "Company", StringComparison.OrdinalIgnoreCase) ||
-            string.Equals(normalizedRole, "Employer", StringComparison.OrdinalIgnoreCase))
-        {
-            normalizedRole = "Employer";
-        }
-        else if (string.Equals(normalizedRole, "Job Seeker", StringComparison.OrdinalIgnoreCase) ||
-                 string.Equals(normalizedRole, "JobSeeker", StringComparison.OrdinalIgnoreCase))
-        {
-            normalizedRole = "Job Seeker";
-        }
-
-
-
-        // Hash password
-        var hashedPassword = _authService.HashPassword(dto.Pass);
-
-        var user = new User
-        {
-            Name = dto.Name,
-            Email = dto.Email,
-            Pass = hashedPassword,  // Store hashed password
-            Location = dto.Location,
-            Phone = dto.Phone,
-            Status = "Active",
-            Industry = dto.Industry,
-            SearchKey = aabu_project.Utilities.SearchUtility.GenerateSearchKey(dto.Name, dto.Industry, dto.Location),
-            Roles = new List<Role> { new Role { RoleName = normalizedRole } }
-        };
-
-        _context.Users.Add(user);
-        await _context.SaveChangesAsync();
-
-        // Generate JWT token
-        var token = _authService.GenerateJwtToken(user);
-
-        // Return auth response with token
-        var response = new AuthResponseDto
-        {
-            Id = user.Id,
-            Name = user.Name,
-            Email = user.Email,
-            Location = user.Location,
-            Phone = user.Phone,
-            Website = user.Website,
-            Description = user.Description,
-            LinkedIn = user.LinkedIn,
-            Github = user.Github,
-            Industry = user.Industry,
-            Role = user.Roles?.FirstOrDefault()?.RoleName ?? "Job Seeker",
-            Token = token,
-            CreatedAt = user.CreatedAt,
-            ProfilePicture = user.ProfilePicture,
-            FollowerCount = 0,
-            AppliedJobs = new List<JobResponseDto>()
-        };
-
-        return CreatedAtAction(nameof(GetUser), new { id = user.Id }, response);
+        return CreatedAtAction(nameof(GetUser), new { id = result.User.Id }, result.User);
     }
 
     [Authorize]

@@ -23,8 +23,9 @@ public class UserCreateDto
     public string RoleName { get; set; } = null!;
 
     public string? Industry { get; set; }
+    public string? Website { get; set; }
+    public string? Description { get; set; }
     public string? ProfilePicture { get; set; }
-
 }
 
 public class UserUpdateDto
@@ -38,7 +39,7 @@ public class UserUpdateDto
     public string? LinkedIn { get; set; }
     public string? Github { get; set; }
     public string? Industry { get; set; }
-    public string? ProfilePicture { get; set; } // For potential later use
+    public string? ProfilePicture { get; set; } 
 }
 
 public record UserDto(
@@ -85,7 +86,6 @@ public class AuthResultDto
     public AuthResponseDto? User { get; set; }
     public string? Token { get; set; }
 }
-
 
 public class ChangePasswordDto
 {
