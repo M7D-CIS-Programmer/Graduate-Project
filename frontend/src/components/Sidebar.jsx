@@ -53,7 +53,7 @@ const Sidebar = ({ isOpen }) => {
                 { name: t('myApplications'), icon: <Briefcase size={20} />,       path: '/dashboard/seeker/applications' },
                 { name: t('savedJobs'),      icon: <Bookmark size={20} />,        path: '/saved-jobs' },
                 { name: t('resumeBuilder'),  icon: <FileEdit size={20} />,        path: '/resume-builder' },
-                { name: 'Job Matching',      icon: <Zap size={20} />,             path: '/job-matching' },
+                { name: t('jobMatching'),    icon: <Zap size={20} />,             path: '/job-matching' },
                 { name: t('interview'),      icon: <MessageSquare size={20} />,   path: '/interview' },
                 { name: 'Messages',          icon: <Mail size={20} />,            path: '/messages' },
                 { name: 'Following',         icon: <Building size={20} />,        path: '/dashboard/seeker/following' },
@@ -68,7 +68,7 @@ const Sidebar = ({ isOpen }) => {
                 { name: t('candidates'),   icon: <Users size={20} />,           path: '/dashboard/employer/applicants' },
                 { name: 'Messages',        icon: <Mail size={20} />,            path: '/messages' },
                 { name: 'Departments',     icon: <FolderOpen size={20} />,      path: '/departments' },
-                { name: 'Job Matching',    icon: <Zap size={20} />,             path: '/job-matching' },
+                { name: t('jobMatching'),  icon: <Zap size={20} />,             path: '/job-matching' },
                 { name: 'Fraud Detection', icon: <ShieldAlert size={20} />,     path: '/cv-fraud-check' },
             ];
         }

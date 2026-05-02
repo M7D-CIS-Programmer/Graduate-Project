@@ -20,12 +20,13 @@ const scoreColor = (n) =>
     n >= 75 ? '#10b981' :
     n >= 50 ? '#f59e0b' : '#ef4444';
 
-const scoreLabel = (n) =>
-    n >= 75 ? 'Strong Match'  :
-    n >= 50 ? 'Good Match'    :
-    n >= 35 ? 'Partial Match' : 'Weak Match';
+const scoreLabel = (n, t) =>
+    n >= 75 ? t('jmStrongMatch')  :
+    n >= 50 ? t('jmGoodMatch')    :
+    n >= 35 ? t('jmPartialMatch') : t('jmWeakMatch');
 
 const ScoreRing = ({ score }) => {
+    const { t } = useLanguage();
     const n      = Math.round(Math.min(Math.max(score, 0), 100));
     const offset = CIRCUMFERENCE * (1 - n / 100);
     const color  = scoreColor(n);
@@ -59,7 +60,7 @@ const ScoreRing = ({ score }) => {
                     <span className="jm-score-pct" style={{ color }}>%</span>
                 </div>
             </div>
-            <p className="jm-score-label" style={{ color }}>{scoreLabel(n)}</p>
+            <p className="jm-score-label" style={{ color }}>{scoreLabel(n, t)}</p>
         </div>
     );
 };
@@ -78,7 +79,7 @@ const TagList = ({ items, variant }) =>
 // ── Main page ─────────────────────────────────────────────────────────────────
 
 const JobMatching = () => {
-    const { dir } = useLanguage();
+    const { dir, t } = useLanguage();
     const fileInputRef = useRef(null);
 
     const [file,     setFile]     = useState(null);
@@ -98,11 +99,11 @@ const JobMatching = () => {
         const isPdf = selected.name.toLowerCase().endsWith('.pdf')
                    || selected.type === 'application/pdf';
         if (!isPdf) {
-            setError('Please upload a PDF file.');
+            setError(t('jmErrorNotPdf'));
             return;
         }
         if (selected.size > MAX_FILE_MB * 1024 * 1024) {
-            setError(`File too large. Maximum is ${MAX_FILE_MB} MB.`);
+            setError(t('jmErrorFileTooLarge', { max: MAX_FILE_MB }));
             return;
         }
         setFile(selected);
@@ -121,10 +122,10 @@ const JobMatching = () => {
     // ── Analysis ──────────────────────────────────────────────────────────────
 
     const handleAnalyze = async () => {
-        if (!file)                          { setError('Please upload your CV (PDF).'); return; }
-        if (!jobTitle.trim())               { setError('Please enter a job title.'); return; }
-        if (!jobDesc.trim())                { setError('Please enter a job description.'); return; }
-        if (jobDesc.trim().length < 20)     { setError('Job description is too short (min 20 characters).'); return; }
+        if (!file)                          { setError(t('jmErrorNoCv')); return; }
+        if (!jobTitle.trim())               { setError(t('jmErrorNoJobTitle')); return; }
+        if (!jobDesc.trim())                { setError(t('jmErrorNoJobDesc')); return; }
+        if (jobDesc.trim().length < 20)     { setError(t('jmErrorJobDescShort')); return; }
 
         setError('');
         setResult(null);
@@ -136,13 +137,13 @@ const JobMatching = () => {
         } catch (err) {
             const msg = err.message || '';
             if (msg.includes('quota') || msg.includes('429'))
-                setError('Analysis quota exceeded. Please try again later.');
+                setError(t('jmErrorQuota'));
             else if (msg.includes('timed out') || msg.includes('408'))
-                setError('Analysis timed out. Please try again.');
+                setError(t('jmErrorTimeout'));
             else if (msg.includes('scanned') || msg.includes('image'))
-                setError('This PDF appears to be scanned. Please use a text-based PDF.');
+                setError(t('jmErrorScanned'));
             else
-                setError(msg || 'Analysis failed. Please try again.');
+                setError(msg || t('jmErrorFailed'));
         } finally {
             setLoading(false);
         }
@@ -161,11 +162,8 @@ const JobMatching = () => {
                     <Brain size={26} />
                 </div>
                 <div>
-                    <h1 className="jm-title">AI Job Matching Engine</h1>
-                    <p className="jm-subtitle">
-                        Upload a CV and describe the role — AI analyzes both together using
-                        semantic understanding and synonym-aware skill matching.
-                    </p>
+                    <h1 className="jm-title">{t('jmTitle')}</h1>
+                    <p className="jm-subtitle">{t('jmSubtitle')}</p>
                 </div>
             </div>
 
@@ -176,7 +174,7 @@ const JobMatching = () => {
                 <div className="jm-field">
                     <label className="jm-label">
                         <Briefcase size={14} />
-                        Job Title <span className="jm-required">*</span>
+                        {t('jmJobTitle')} <span className="jm-required">*</span>
                     </label>
                     <input
                         className="jm-input"
@@ -193,19 +191,19 @@ const JobMatching = () => {
                 <div className="jm-field">
                     <label className="jm-label">
                         <FileText size={14} />
-                        Job Description <span className="jm-required">*</span>
+                        {t('jmJobDesc')} <span className="jm-required">*</span>
                     </label>
                     <div className="jm-textarea-wrap">
                         <textarea
                             className="jm-textarea"
-                            placeholder="Paste the full job description here — skills, responsibilities, requirements…"
+                            placeholder={t('jmJobDescPlaceholder')}
                             value={jobDesc}
                             onChange={(e) => { setJobDesc(e.target.value); setError(''); }}
                             disabled={loading}
                             rows={6}
                         />
                         {jobDesc && (
-                            <span className="jm-char-count">{jobDesc.length} chars</span>
+                            <span className="jm-char-count">{jobDesc.length} {t('jmChars')}</span>
                         )}
                     </div>
                 </div>
@@ -214,7 +212,7 @@ const JobMatching = () => {
                 <div className="jm-field">
                     <label className="jm-label">
                         <Upload size={14} />
-                        Candidate CV <span className="jm-required">*</span>
+                        {t('jmCandidateCv')} <span className="jm-required">*</span>
                     </label>
                     <div
                         className={`jm-dropzone${file ? ' jm-dropzone--has-file' : ''}${loading ? ' jm-dropzone--disabled' : ''}`}
@@ -255,8 +253,8 @@ const JobMatching = () => {
                         ) : (
                             <div className="jm-dropzone-empty">
                                 <Upload size={34} className="jm-upload-icon" />
-                                <p className="jm-dropzone-title">Click to upload or drag &amp; drop</p>
-                                <p className="jm-dropzone-hint">PDF only · Max 10 MB</p>
+                                <p className="jm-dropzone-title">{t('jmDropzoneTitle')}</p>
+                                <p className="jm-dropzone-hint">{t('jmDropzoneHint')}</p>
                             </div>
                         )}
                     </div>
@@ -278,8 +276,8 @@ const JobMatching = () => {
                         disabled={!canSubmit}
                     >
                         {loading
-                            ? <><Loader2 size={18} className="jm-spin" /><span>Analyzing…</span></>
-                            : <><Zap size={18} /><span>Analyze Match</span></>
+                            ? <><Loader2 size={18} className="jm-spin" /><span>{t('jmAnalyzing')}</span></>
+                            : <><Zap size={18} /><span>{t('jmAnalyzeBtn')}</span></>
                         }
                     </button>
                 </div>
@@ -291,7 +289,7 @@ const JobMatching = () => {
 
                     <div className="jm-results-banner">
                         <Zap size={15} />
-                        <span>Match results for <strong>{jobTitle}</strong></span>
+                        <span>{t('jmMatchResultsFor')} <strong>{jobTitle}</strong></span>
                     </div>
 
                     <div className="jm-results-grid">
@@ -300,7 +298,7 @@ const JobMatching = () => {
                         <div className="jm-card jm-result-card jm-score-card">
                             <div className="jm-result-card-header">
                                 <Zap size={15} className="jm-icon-purple" />
-                                <h3>Match Score</h3>
+                                <h3>{t('jmMatchScore')}</h3>
                             </div>
                             <ScoreRing score={result.matchScore ?? 0} />
                         </div>
@@ -310,7 +308,7 @@ const JobMatching = () => {
                             <div className="jm-card jm-result-card jm-summary-card">
                                 <div className="jm-result-card-header">
                                     <MessageSquare size={15} className="jm-icon-purple" />
-                                    <h3>AI Summary</h3>
+                                    <h3>{t('jmAiSummary')}</h3>
                                 </div>
                                 <p className="jm-summary-text">{result.summary}</p>
                             </div>
@@ -320,11 +318,11 @@ const JobMatching = () => {
                         <div className="jm-card jm-result-card">
                             <div className="jm-result-card-header">
                                 <CheckCircle size={15} className="jm-icon-green" />
-                                <h3>Matched Skills</h3>
+                                <h3>{t('jmMatchedSkills')}</h3>
                             </div>
                             {result.matchedSkills?.length > 0
                                 ? <TagList items={result.matchedSkills} variant="matched" />
-                                : <p className="jm-empty-note">No matched skills detected.</p>
+                                : <p className="jm-empty-note">{t('jmNoMatchedSkills')}</p>
                             }
                         </div>
 
@@ -332,11 +330,11 @@ const JobMatching = () => {
                         <div className="jm-card jm-result-card">
                             <div className="jm-result-card-header">
                                 <XCircle size={15} className="jm-icon-red" />
-                                <h3>Missing Skills</h3>
+                                <h3>{t('jmMissingSkills')}</h3>
                             </div>
                             {result.missingSkills?.length > 0
                                 ? <TagList items={result.missingSkills} variant="missing" />
-                                : <p className="jm-empty-note">✅ No major skill gaps detected.</p>
+                                : <p className="jm-empty-note">{t('jmNoMajorGaps')}</p>
                             }
                         </div>
 
@@ -345,7 +343,7 @@ const JobMatching = () => {
                             <div className="jm-card jm-result-card">
                                 <div className="jm-result-card-header">
                                     <AlertTriangle size={15} className="jm-icon-orange" />
-                                    <h3>Keyword Gaps</h3>
+                                    <h3>{t('jmKeywordGaps')}</h3>
                                 </div>
                                 <TagList items={result.keywordGaps} variant="gap" />
                             </div>
@@ -356,7 +354,7 @@ const JobMatching = () => {
                             <div className="jm-card jm-result-card">
                                 <div className="jm-result-card-header">
                                     <TrendingUp size={15} className="jm-icon-orange" />
-                                    <h3>Weak Sections</h3>
+                                    <h3>{t('jmWeakSections')}</h3>
                                 </div>
                                 <ul className="jm-list">
                                     {result.weakSections.map((s, i) => (
@@ -371,7 +369,7 @@ const JobMatching = () => {
                             <div className="jm-card jm-result-card jm-full-width">
                                 <div className="jm-result-card-header">
                                     <Lightbulb size={15} className="jm-icon-yellow" />
-                                    <h3>Improvement Suggestions</h3>
+                                    <h3>{t('jmImprovementSuggestions')}</h3>
                                 </div>
                                 <ol className="jm-suggestions">
                                     {result.improvementSuggestions.map((s, i) => (

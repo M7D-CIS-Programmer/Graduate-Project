@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { MessageSquare, Send, ArrowLeft, User as UserIcon } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { useToast } from '../../context/ToastContext';
 import { api, getImageUrl } from '../../api/api';
 import {
@@ -81,6 +82,7 @@ const MessageBubble = ({ msg, currentUserId }) => {
 };
 
 const Thread = ({ conv, currentUserId }) => {
+    const { t } = useLanguage();
     const [text, setText] = useState('');
     const bottomRef = useRef(null);
     const { showToast } = useToast();
@@ -115,7 +117,7 @@ const Thread = ({ conv, currentUserId }) => {
             });
             setText('');
         } catch {
-            showToast('Failed to send message.', 'error');
+            showToast(t('msgFailedSend'), 'error');
         }
     };
 
@@ -138,11 +140,11 @@ const Thread = ({ conv, currentUserId }) => {
 
             <div className="thread-messages">
                 {isLoading ? (
-                    <div className="thread-empty">Loading messages…</div>
+                    <div className="thread-empty">{t('msgLoadingMessages')}</div>
                 ) : messages.length === 0 ? (
                     <div className="thread-empty">
                         <MessageSquare size={40} style={{ opacity: 0.3 }} />
-                        <p>No messages yet. Say hello!</p>
+                        <p>{t('msgNoMessages')}</p>
                     </div>
                 ) : (
                     messages.map(msg => (
@@ -155,7 +157,7 @@ const Thread = ({ conv, currentUserId }) => {
             <div className="thread-input-row">
                 <textarea
                     className="thread-textarea"
-                    placeholder="Type a message… (Enter to send)"
+                    placeholder={t('msgTypePlaceholder')}
                     value={text}
                     onChange={e => setText(e.target.value)}
                     onKeyDown={handleKey}
@@ -165,7 +167,7 @@ const Thread = ({ conv, currentUserId }) => {
                     className="thread-send-btn"
                     onClick={handleSend}
                     disabled={!text.trim() || sendMessage.isPending}
-                    title="Send"
+                    title={t('msgSend')}
                 >
                     <Send size={18} />
                 </button>
@@ -176,6 +178,7 @@ const Thread = ({ conv, currentUserId }) => {
 
 const Messages = () => {
     const { user } = useAuth();
+    const { dir, t } = useLanguage();
     const [searchParams, setSearchParams] = useSearchParams();
     const urlAppId = searchParams.get('applicationId') ? Number(searchParams.get('applicationId')) : null;
 
@@ -227,23 +230,23 @@ const Messages = () => {
     if (!user) return null;
 
     return (
-        <div className="messages-page">
+        <div className="messages-page" dir={dir}>
             <div className={`conv-list-panel ${mobileShowThread ? 'hidden-mobile' : ''}`}>
                 <div className="conv-list-header">
                     <MessageSquare size={20} />
-                    <h2>Messages</h2>
+                    <h2>{t('msgMessages')}</h2>
                 </div>
 
                 {isLoading ? (
-                    <div className="conv-list-empty">Loading…</div>
+                    <div className="conv-list-empty">{t('msgLoading')}</div>
                 ) : conversations.length === 0 && !pendingConv ? (
                     <div className="conv-list-empty">
                         <UserIcon size={36} style={{ opacity: 0.3 }} />
-                        <p>No conversations yet.</p>
+                        <p>{t('msgNoConversations')}</p>
                         <span>
                             {user.role?.toLowerCase() === 'employer' || user.role?.toLowerCase() === 'company'
-                                ? 'Go to Applicants and click "Message" to start a conversation.'
-                                : 'Go to My Applications and click "Message" to reach out to a company.'}
+                                ? t('msgEmployerNoConv')
+                                : t('msgSeekerNoConv')}
                         </span>
                     </div>
                 ) : (
@@ -274,19 +277,19 @@ const Messages = () => {
             <div className={`thread-container ${mobileShowThread ? 'show-mobile' : ''}`}>
                 {mobileShowThread && (
                     <button className="back-btn" onClick={backToList}>
-                        <ArrowLeft size={18} /> Back
+                        <ArrowLeft size={18} /> {t('msgBack')}
                     </button>
                 )}
                 {pendingLoading ? (
                     <div className="thread-placeholder">
-                        <div className="thread-empty">Loading conversation…</div>
+                        <div className="thread-empty">{t('msgLoadingConversation')}</div>
                     </div>
                 ) : activeConv ? (
                     <Thread conv={activeConv} currentUserId={user.id} />
                 ) : (
                     <div className="thread-placeholder">
                         <MessageSquare size={56} style={{ opacity: 0.2 }} />
-                        <p>Select a conversation to start messaging</p>
+                        <p>{t('msgSelectConversation')}</p>
                     </div>
                 )}
             </div>
