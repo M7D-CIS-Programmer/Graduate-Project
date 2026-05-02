@@ -1,9 +1,24 @@
 .chatbot-wrapper {
     position: fixed;
     bottom: 2rem;
-    right: 2rem;
     z-index: 1000;
     transition: var(--transition);
+}
+
+/* English / LTR -> Left side */
+.chatbot-wrapper.ltr {
+    left: 2rem;
+    right: auto;
+}
+
+.chatbot-wrapper.ltr.sidebar-open {
+    left: calc(var(--sidebar-width) + 2rem);
+}
+
+/* Arabic / RTL -> Right side */
+.chatbot-wrapper.rtl {
+    right: 2rem;
+    left: auto;
 }
 
 /* In RTL mode, the sidebar is on the right, so we must shift the chatbot to the left when it's open */

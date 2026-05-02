@@ -77,7 +77,7 @@ const Chatbot = ({ isSidebarOpen }) => {
     };
 
     return (
-        <div className={`chatbot-wrapper ${dir} ${isSidebarOpen ? 'sidebar-open' : ''}`}>
+        <div className={`chatbot-wrapper ${dir} ${isSidebarOpen ? 'sidebar-open' : ''}`} dir={dir}>
             {!isOpen && (
                 <button
                     className="chatbot-toggle shadow-lg"

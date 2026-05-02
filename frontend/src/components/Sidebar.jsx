@@ -61,7 +61,6 @@ const Sidebar = ({ isOpen }) => {
                 { name: t('myJobs'), icon: <Briefcase size={20} />, path: '/dashboard/employer/jobs' },
                 { name: t('postAJob'), icon: <PlusCircle size={20} />, path: '/jobs/post' },
                 { name: t('candidates'), icon: <Users size={20} />, path: '/dashboard/employer/applicants' },
-                { name: t('departments'), icon: <FolderOpen size={20} />, path: '/departments' },
                 { name: t('jobMatching'), icon: <Zap size={20} />, path: '/job-matching' },
                 { name: t('fraudDetection'), icon: <ShieldAlert size={20} />, path: '/cv-fraud-check' },
             ];
