@@ -9,28 +9,28 @@ import './CVAnalyzer.css';
 
 const MAX_FILE_MB = 10;
 
-const riskColor = (r) => {
-    if (r === 'low')    return 'cva-badge-green';
-    if (r === 'medium') return 'cva-badge-orange';
-    return 'cva-badge-red';
-};
-
-const verdictConfig = (v) => {
-    if (v === 'trusted')      return { cls: 'cva-verdict-trusted',      Icon: CheckCircle, color: '#15803d', label: 'Trusted',      sub: 'No suspicious content detected.' };
-    if (v === 'questionable') return { cls: 'cva-verdict-questionable', Icon: AlertCircle, color: '#c2410c', label: 'Questionable', sub: 'Some inconsistencies were found. Manual review recommended.' };
-    return                           { cls: 'cva-verdict-likely_fake',  Icon: XCircle,     color: '#991b1b', label: 'Likely Fake',  sub: 'Multiple red flags detected. Proceed with caution.' };
-};
-
 // ─────────────────────────────────────────────────────────────────────────────
 
 const FraudCheck = () => {
-    const { dir } = useLanguage();
+    const { t, dir } = useLanguage();
     const fileInputRef = useRef(null);
 
-    const [file, setFile]       = useState(null);
+    const [file, setFile] = useState(null);
     const [loading, setLoading] = useState(false);
-    const [result, setResult]   = useState(null);
-    const [error, setError]     = useState('');
+    const [result, setResult] = useState(null);
+    const [error, setError] = useState('');
+
+    const riskColor = (r) => {
+        if (r === 'low') return 'cva-badge-green';
+        if (r === 'medium') return 'cva-badge-orange';
+        return 'cva-badge-red';
+    };
+
+    const verdictConfig = (v) => {
+        if (v === 'trusted') return { cls: 'cva-verdict-trusted', Icon: CheckCircle, color: '#15803d', label: t('trusted'), sub: t('trustedDesc') };
+        if (v === 'questionable') return { cls: 'cva-verdict-questionable', Icon: AlertCircle, color: '#c2410c', label: t('questionable'), sub: t('questionableDesc') };
+        return { cls: 'cva-verdict-likely_fake', Icon: XCircle, color: '#991b1b', label: t('likelyFake'), sub: t('likelyFakeDesc') };
+    };
 
     // ── File handling ──────────────────────────────────────────────────────────
 
@@ -39,11 +39,11 @@ const FraudCheck = () => {
         e.target.value = '';
         if (!selected) return;
         if (!selected.name.toLowerCase().endsWith('.pdf') && selected.type !== 'application/pdf') {
-            setError('Only PDF files are accepted.');
+            setError(t('onlyPdfAccepted'));
             return;
         }
         if (selected.size > MAX_FILE_MB * 1024 * 1024) {
-            setError(`File too large. Maximum is ${MAX_FILE_MB} MB.`);
+            setError(t('fileTooLargeMax', { max: MAX_FILE_MB }));
             return;
         }
         setFile(selected);
@@ -62,7 +62,7 @@ const FraudCheck = () => {
     // ── Check ──────────────────────────────────────────────────────────────────
 
     const handleCheck = async () => {
-        if (!file) { setError('Please upload a PDF file.'); return; }
+        if (!file) { setError(t('pleaseUploadPdf')); return; }
 
         setError('');
         setResult(null);
@@ -74,13 +74,13 @@ const FraudCheck = () => {
         } catch (err) {
             const msg = err.message || '';
             if (msg.includes('quota') || msg.includes('429'))
-                setError('Quota exceeded. Please try again later.');
+                setError(t('jmErrorQuota'));
             else if (msg.includes('timed out') || msg.includes('408'))
-                setError('Request timed out. Please try again.');
+                setError(t('jmErrorTimeout'));
             else if (msg.includes('scanned') || msg.includes('image'))
-                setError('Scanned PDFs cannot be analysed — please use a text-based PDF.');
+                setError(t('scannedPdfError'));
             else
-                setError(msg || 'An error occurred. Please try again.');
+                setError(msg || t('cvErrorGeneral'));
         } finally {
             setLoading(false);
         }
@@ -91,16 +91,20 @@ const FraudCheck = () => {
     // ── Render ─────────────────────────────────────────────────────────────────
 
     return (
-        <div className="cva-page" dir={dir}>
+        <div className={`cva-page ${dir}`} dir={dir}>
 
             {/* Header */}
             <div className="cva-header">
-                <div className="cva-header-icon" style={{ background: 'linear-gradient(135deg, #ef4444, #f97316)' }}>
+                <div className="cva-header-icon" style={{
+                    background: 'linear-gradient(135deg, #ef4444, #f97316)',
+                    marginLeft: dir === 'rtl' ? '1rem' : '0',
+                    marginRight: dir === 'ltr' ? '1rem' : '0'
+                }}>
                     <ShieldAlert size={28} />
                 </div>
                 <div>
-                    <h1 className="cva-title">CV Fraud Detection</h1>
-                    <p className="cva-subtitle">Detect timeline gaps, unrealistic claims, and logical inconsistencies</p>
+                    <h1 className="cva-title">{t('fraudDetection')}</h1>
+                    <p className="cva-subtitle">{t('fraudDetectionDesc')}</p>
                 </div>
             </div>
 
@@ -108,8 +112,11 @@ const FraudCheck = () => {
             <div className="cva-card cva-input-card">
                 <div className="cva-field">
                     <label className="cva-label">
-                        <Upload size={15} />
-                        Candidate CV (PDF) <span className="cva-required">*</span>
+                        <Upload size={15} style={{
+                            marginLeft: dir === 'rtl' ? '0.5rem' : '0',
+                            marginRight: dir === 'ltr' ? '0.5rem' : '0'
+                        }} />
+                        {t('candidateCvPdf')} <span className="cva-required">*</span>
                     </label>
                     <div
                         className={`cva-dropzone ${file ? 'cva-dropzone--has-file' : ''} ${loading ? 'cva-dropzone--disabled' : ''}`}
@@ -145,8 +152,8 @@ const FraudCheck = () => {
                         ) : (
                             <div className="cva-dropzone-empty">
                                 <Upload size={32} className="cva-upload-icon" />
-                                <p className="cva-dropzone-title">Upload CV</p>
-                                <p className="cva-dropzone-hint">Drag & drop or click — PDF only, max 10 MB</p>
+                                <p className="cva-dropzone-title">{t('uploadCvTitle')}</p>
+                                <p className="cva-dropzone-hint">{t('fraudDropzoneHint')}</p>
                             </div>
                         )}
                     </div>
@@ -167,8 +174,8 @@ const FraudCheck = () => {
                         style={{ background: 'linear-gradient(135deg, #ef4444, #f97316)' }}
                     >
                         {loading
-                            ? <><Loader2 size={18} className="cva-spin" /><span>Checking...</span></>
-                            : <><ShieldAlert size={18} /><span>Run Fraud Check</span></>
+                            ? <><Loader2 size={18} className="cva-spin" /><span>{t('checking')}</span></>
+                            : <><ShieldAlert size={18} /><span>{t('runFraudCheck')}</span></>
                         }
                     </button>
                 </div>
@@ -180,7 +187,12 @@ const FraudCheck = () => {
 
                     {/* Verdict Banner */}
                     <div className={`cva-verdict ${cfg.cls}`}>
-                        <cfg.Icon size={38} style={{ color: cfg.color, flexShrink: 0 }} />
+                        <cfg.Icon size={38} style={{
+                            color: cfg.color,
+                            flexShrink: 0,
+                            marginLeft: dir === 'rtl' ? '1rem' : '0',
+                            marginRight: dir === 'ltr' ? '1rem' : '0'
+                        }} />
                         <div style={{ flex: 1 }}>
                             <div style={{ fontSize: '1.3rem', fontWeight: 800, color: cfg.color, lineHeight: 1, marginBottom: '.3rem' }}>
                                 {cfg.label}
@@ -193,20 +205,21 @@ const FraudCheck = () => {
                             className={`cva-badge ${riskColor(result.riskLevel)}`}
                             style={{ fontSize: '.85rem', padding: '.38rem 1rem', flexShrink: 0 }}
                         >
-                            {result.riskLevel
-                                ? result.riskLevel.charAt(0).toUpperCase() + result.riskLevel.slice(1)
-                                : 'Low'
-                            } Risk
+                            {result.riskLevel ? t(result.riskLevel) : t('low')} {t('risk')}
                         </span>
                     </div>
 
                     {/* Issues */}
                     {result.issuesFound?.length > 0 ? (
-                        <div className="cva-card cva-result-card" style={{ borderLeft: '3px solid #ef4444' }}>
+                        <div className="cva-card cva-result-card" style={{ borderLeft: dir === 'ltr' ? '3px solid #ef4444' : 'none', borderRight: dir === 'rtl' ? '3px solid #ef4444' : 'none' }}>
                             <div className="cva-card-header">
-                                <AlertTriangle size={18} style={{ color: '#ef4444' }} />
+                                <AlertTriangle size={18} style={{
+                                    color: '#ef4444',
+                                    marginLeft: dir === 'rtl' ? '0.5rem' : '0',
+                                    marginRight: dir === 'ltr' ? '0.5rem' : '0'
+                                }} />
                                 <h3 style={{ color: '#ef4444' }}>
-                                    Issues Found ({result.issuesFound.length})
+                                    {t('issuesFound')} ({result.issuesFound.length})
                                 </h3>
                             </div>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '.65rem' }}>
@@ -221,7 +234,7 @@ const FraudCheck = () => {
                     ) : (
                         <div className="cva-card cva-result-card">
                             <p className="cva-empty-note" style={{ fontSize: '.9rem' }}>
-                                ✅ No issues found. The CV appears consistent and credible.
+                                {t('noIssuesFound')}
                             </p>
                         </div>
                     )}

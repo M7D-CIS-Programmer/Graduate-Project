@@ -417,6 +417,30 @@
     color: var(--text-muted);
 }
 
+.item-footer-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 0.5rem;
+}
+
+.btn-chat-nav {
+    padding: 4px 10px;
+    border-radius: 6px;
+    background: rgba(99, 102, 241, 0.1);
+    border: 1px solid rgba(99, 102, 241, 0.2);
+    color: var(--primary);
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.btn-chat-nav:hover {
+    background: var(--primary);
+    color: white;
+}
+
 .unread-dot {
     width: 8px;
     height: 8px;

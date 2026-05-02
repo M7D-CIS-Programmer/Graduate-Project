@@ -28,7 +28,7 @@
 }
 
 .cva-header h1 {
-    text-align: left;
+    text-align: inherit;
     color: var(--main-text);
 }
 
@@ -185,7 +185,7 @@
     display: flex;
     align-items: center;
     gap: .75rem;
-    text-align: left;
+    text-align: inherit;
 }
 
 .cva-file-details {

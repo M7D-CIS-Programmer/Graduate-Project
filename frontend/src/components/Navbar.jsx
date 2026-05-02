@@ -265,9 +265,24 @@ const Navbar = ({ toggleSidebar }) => {
                                                 >
                                                     <div className="item-content">
                                                         <p className="item-message">{notif.message}</p>
-                                                        <span className="item-time">
-                                                            {new Date(notif.createdAt).toLocaleDateString()}
-                                                        </span>
+                                                        <div className="item-footer-row">
+                                                            <span className="item-time">
+                                                                {new Date(notif.createdAt).toLocaleDateString()}
+                                                            </span>
+                                                            {notif.type?.toLowerCase() === 'message' && (
+                                                                <button 
+                                                                    className="btn-chat-nav"
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        if (!notif.isRead) markAsRead(notif.id);
+                                                                        navigate(`/chat/${notif.relatedId}`);
+                                                                        setShowNotifications(false);
+                                                                    }}
+                                                                >
+                                                                    {t('goToChat')}
+                                                                </button>
+                                                            )}
+                                                        </div>
                                                     </div>
                                                     {!notif.isRead && <span className="unread-dot"></span>}
                                                 </div>

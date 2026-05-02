@@ -1,6 +1,6 @@
 import React from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useParams } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { LanguageProvider } from './context/LanguageContext';
 import { ToastProvider } from './context/ToastContext';
@@ -58,6 +58,11 @@ const ConditionalHome = () => {
   }
 
   return <Home />;
+};
+
+const ChatRedirect = () => {
+  const { applicationId } = useParams();
+  return <Navigate to={`/messages?applicationId=${applicationId}`} replace />;
 };
 
 const AuthInitializer = ({ children }) => {
@@ -143,6 +148,7 @@ function App() {
                   <Route path="/candidate/:id" element={<CandidateProfile />} />
                   <Route path="/notifications" element={<Notifications />} />
                   <Route path="/messages" element={<Messages />} />
+                  <Route path="/chat/:applicationId" element={<ChatRedirect />} />
                   <Route path="/resume-builder" element={<ResumeBuilder />} />
                   <Route path="/resume/:userId" element={<ResumeView />} />
 

@@ -24,126 +24,74 @@ const Notifications = () => {
     const { t, dir } = useLanguage();
     const { user } = useAuth();
     const navigate = useNavigate();
-    const { setUnreadCount } = useNotifications();
-    const [notifications, setNotifications] = useState([]);
+    const { 
+        notifications: rawNotifications, 
+        markAsRead, 
+        deleteNotification, 
+        clearAll, 
+        markAllRead 
+    } = useNotifications();
 
-    const fetchNotifications = async () => {
-        if (!user?.id) return;
-        
-        try {
-            const data = await api.getNotificationsByUserId(user.id, user.role);
+    const notifications = React.useMemo(() => {
+        return rawNotifications.map(notif => {
+            let icon = <Bell />;
+            let title = notif.title;
+            let message = notif.message;
+            const type = notif.type?.toLowerCase();
             
-            // Map backend notifications to UI structure
-            const mappedNotifications = data.map(notif => {
-                let icon = <Bell />;
-                let title = notif.title;
-                let message = notif.message;
-                const type = notif.type?.toLowerCase();
-                
-                // Simple regex mapping for backend English strings
-                if (message.includes("Your application for '") && message.includes("' has been updated to: ")) {
-                    const match = message.match(/Your application for '(.+)' has been updated to: (.+)/);
-                    if (match) {
-                        title = t('applicationStatusUpdate');
-                        message = t('applicationStatusUpdateMsg', { jobTitle: match[1], status: t(match[2].toLowerCase()) || match[2] });
-                    }
-                } else if (message.includes("viewed your resume")) {
-                    const match = message.match(/(.+) viewed your resume/);
-                    if (match) {
-                        title = t('resumeViewed');
-                        message = t('employerViewedResumeMsg', { company: match[1] });
-                    }
-                } else if (message.includes("Your application for ") && message.includes(" has been received")) {
-                    const match = message.match(/Your application for (.+) has been received/);
-                    if (match) {
-                        title = t('applicationReceived');
-                        message = t('applicationReceivedMsg', { jobTitle: match[1] });
-                    }
-                } else if (message.includes("An employer viewed your profile")) {
-                    title = t('applicationViewed');
-                    message = t('employerViewedProfileMsg');
-                } else if (type === 'follow') {
-                    title = t('newFollower') || "New Follower";
+            // Simple regex mapping for backend English strings
+            if (message.includes("Your application for '") && message.includes("' has been updated to: ")) {
+                const match = message.match(/Your application for '(.+)' has been updated to: (.+)/);
+                if (match) {
+                    title = t('applicationStatusUpdate');
+                    message = t('applicationStatusUpdateMsg', { jobTitle: match[1], status: t(match[2].toLowerCase()) || match[2] });
                 }
-                
-                if (notif.type === 'Application') icon = <Users />;
-                else if (notif.type === 'StatusUpdate') icon = <CheckCircle />;
-                else if (notif.type === 'ProfileView') icon = <Building2 />;
-                else if (notif.type === 'ResumeView') icon = <Briefcase />;
-                else if (notif.type === 'Follow') icon = <UserIcon />;
-                
-                return {
-                    id: notif.id,
-                    title: title,
-                    message: message,
-                    time: formatTimeAgo(notif.createdAt, t, dir === 'rtl' ? 'ar' : 'en'),
-                    unread: !notif.isRead,
-                    icon: icon,
-                    type: type,
-                    relatedId: notif.relatedId
-                };
-            });
-
-            setNotifications(mappedNotifications);
-            setUnreadCount(mappedNotifications.filter(n => n.unread).length);
-        } catch (err) {
-            console.error('Error fetching notifications:', err);
-        }
-    };
-
-    useEffect(() => {
-        fetchNotifications();
-    }, [user?.id, t, setUnreadCount]);
-
-    const markAsRead = async (id) => {
-        try {
-            await api.markNotificationAsRead(id);
-            setNotifications(prev => prev.map(n => n.id === id ? { ...n, unread: false } : n));
-            setUnreadCount(prev => Math.max(0, prev - 1));
-        } catch (err) {
-            console.error('Failed to mark notification as read:', err);
-        }
-    };
-
-    const markAllRead = async () => {
-        if (!user?.id) return;
-        try {
-            await api.markAllNotificationsAsRead(user.id);
-            setNotifications(notifications.map(n => ({ ...n, unread: false })));
-            setUnreadCount(0);
-        } catch (err) {
-            console.error('Failed to mark all as read:', err);
-        }
-    };
-
-    const clearAll = async () => {
-        if (!user?.id) return;
-        try {
-            await api.clearAllNotifications(user.id);
-            setNotifications([]);
-            setUnreadCount(0);
-        } catch (err) {
-            console.error('Failed to clear notifications:', err);
-        }
-    };
+            } else if (message.includes("viewed your resume")) {
+                const match = message.match(/(.+) viewed your resume/);
+                if (match) {
+                    title = t('resumeViewed');
+                    message = t('employerViewedResumeMsg', { company: match[1] });
+                }
+            } else if (message.includes("Your application for ") && message.includes(" has been received")) {
+                const match = message.match(/Your application for (.+) has been received/);
+                if (match) {
+                    title = t('applicationReceived');
+                    message = t('applicationReceivedMsg', { jobTitle: match[1] });
+                }
+            } else if (message.includes("An employer viewed your profile")) {
+                title = t('applicationViewed');
+                message = t('employerViewedProfileMsg');
+            } else if (type === 'follow') {
+                title = t('newFollower') || "New Follower";
+            }
+            
+            if (notif.type === 'Application') icon = <Users />;
+            else if (notif.type === 'StatusUpdate') icon = <CheckCircle />;
+            else if (notif.type === 'ProfileView') icon = <Building2 />;
+            else if (notif.type === 'ResumeView') icon = <Briefcase />;
+            else if (notif.type === 'Follow') icon = <UserIcon />;
+            
+            return {
+                id: notif.id,
+                title: title,
+                message: message,
+                time: formatTimeAgo(notif.createdAt, t, dir === 'rtl' ? 'ar' : 'en'),
+                unread: !notif.isRead,
+                icon: icon,
+                type: type,
+                relatedId: notif.relatedId
+            };
+        });
+    }, [rawNotifications, t, dir]);
 
     const deleteOne = async (e, id) => {
         e.stopPropagation();
-        try {
-            await api.deleteNotification(id);
-            setNotifications(prev => {
-                const filtered = prev.filter(n => n.id !== id);
-                setUnreadCount(filtered.filter(n => n.unread).length);
-                return filtered;
-            });
-        } catch (err) {
-            console.error('Failed to delete notification:', err);
-        }
+        await deleteNotification(id);
     };
 
     const handleViewProfile = (e, notif) => {
         e.stopPropagation();
-        if (!notif.unread) markAsRead(notif.id);
+        if (notif.unread) markAsRead(notif.id);
         
         let path = `/candidate/${notif.relatedId}`;
         const isSeeker = user.role === 'Job Seeker' || user.role === 'JobSeeker';
@@ -195,7 +143,21 @@ const Notifications = () => {
                                 <span className="notification-date">{notif.time}</span>
                             </div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                {notif.relatedId && (
+                                {notif.type?.toLowerCase() === 'message' && (
+                                    <Button 
+                                        variant="outline" 
+                                        size="sm" 
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            if (notif.unread) markAsRead(notif.id);
+                                            navigate(`/chat/${notif.relatedId}`);
+                                        }}
+                                        style={{ height: '32px', fontSize: '0.8rem', padding: '0 0.75rem' }}
+                                    >
+                                        {t('goToChat')}
+                                    </Button>
+                                )}
+                                {notif.relatedId && notif.type?.toLowerCase() !== 'message' && (
                                     <Button 
                                         variant="outline" 
                                         size="sm" 

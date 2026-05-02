@@ -10,10 +10,14 @@ import './Dashboard.css';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-const formatDate = (iso) => {
+const formatDate = (iso, lang) => {
     if (!iso) return '—';
     try {
-        return new Date(iso).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+        return new Date(iso).toLocaleDateString(lang === 'ar' ? 'ar-EG' : 'en-US', { 
+            year: 'numeric', 
+            month: 'short', 
+            day: 'numeric' 
+        });
     } catch {
         return '—';
     }
@@ -22,7 +26,7 @@ const formatDate = (iso) => {
 // ── Main Page ─────────────────────────────────────────────────────────────────
 
 const Departments = () => {
-    const { t, dir }   = useLanguage();
+    const { t, dir, language }   = useLanguage();
     const { addToast } = useToast();
 
     const { data: departments = [], isLoading, isError } = useMyCategories();
@@ -39,11 +43,11 @@ const Departments = () => {
 
     const handleCreate = () => {
         const name = newName.trim();
-        if (!name) { addToast('Department name cannot be empty.', 'error'); return; }
+        if (!name) { addToast(t('deptEmpty'), 'error'); return; }
 
         create(name, {
-            onSuccess: () => { setNewName(''); addToast('Department created successfully.', 'success'); },
-            onError:   (err) => addToast(err.message || 'Failed to create department.', 'error'),
+            onSuccess: () => { setNewName(''); addToast(t('deptCreated'), 'success'); },
+            onError:   (err) => addToast(err.message || t('deptCreateFailed'), 'error'),
         });
     };
 
@@ -58,11 +62,11 @@ const Departments = () => {
 
     const handleUpdate = () => {
         const name = editingName.trim();
-        if (!name) { addToast('Department name cannot be empty.', 'error'); return; }
+        if (!name) { addToast(t('deptEmpty'), 'error'); return; }
 
         update({ id: editingId, name }, {
-            onSuccess: () => { cancelEdit(); addToast('Department updated.', 'success'); },
-            onError:   (err) => addToast(err.message || 'Failed to update department.', 'error'),
+            onSuccess: () => { cancelEdit(); addToast(t('deptUpdated'), 'success'); },
+            onError:   (err) => addToast(err.message || t('deptUpdateFailed'), 'error'),
         });
     };
 
@@ -73,8 +77,8 @@ const Departments = () => {
 
     const handleDelete = () => {
         remove(deletingId, {
-            onSuccess: () => { setDeletingId(null); addToast('Department deleted.', 'success'); },
-            onError:   (err) => { setDeletingId(null); addToast(err.message || 'Failed to delete department.', 'error'); },
+            onSuccess: () => { setDeletingId(null); addToast(t('deptDeleted'), 'success'); },
+            onError:   (err) => { setDeletingId(null); addToast(err.message || t('deptDeleteFailed'), 'error'); },
         });
     };
 
@@ -85,17 +89,17 @@ const Departments = () => {
     // ── Render ─────────────────────────────────────────────────────────────────
 
     return (
-        <div className="dashboard-container" dir={dir}>
+        <div className={`dashboard-container ${dir}`} dir={dir}>
 
             {/* Header */}
             <div className="dashboard-header">
                 <div>
                     <h1 className="dashboard-title" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                         <Building2 size={28} style={{ color: 'var(--primary)' }} />
-                        My Departments
+                        {t('myDepartments')}
                     </h1>
                     <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', marginTop: '0.25rem' }}>
-                        Manage your company's private departments used for job categorization.
+                        {t('departmentsDesc')}
                     </p>
                 </div>
             </div>
@@ -108,7 +112,7 @@ const Departments = () => {
                     </div>
                     <div className="stat-details">
                         <h3>{departments.length}</h3>
-                        <p>Departments</p>
+                        <p>{t('departments')}</p>
                     </div>
                 </div>
                 <div className="stat-card glass">
@@ -117,7 +121,7 @@ const Departments = () => {
                     </div>
                     <div className="stat-details">
                         <h3>{totalJobs}</h3>
-                        <p>Jobs Assigned</p>
+                        <p>{t('jobsAssigned')}</p>
                     </div>
                 </div>
             </div>
@@ -126,13 +130,13 @@ const Departments = () => {
             <div className="dashboard-section" style={{ border: '1px solid rgba(99,102,241,.2)', background: 'linear-gradient(135deg, rgba(99,102,241,.05), var(--bg-card))' }}>
                 <h2 className="section-title">
                     <Plus size={20} style={{ color: 'var(--primary)' }} />
-                    Add New Department
+                    {t('addNewDept')}
                 </h2>
 
                 <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
                     <input
                         type="text"
-                        placeholder="e.g. Engineering, Sales, Operations…"
+                        placeholder={t('deptPlaceholder')}
                         value={newName}
                         onChange={(e) => setNewName(e.target.value)}
                         onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
@@ -166,8 +170,8 @@ const Departments = () => {
                         }}
                     >
                         {isCreating
-                            ? <><Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> Creating…</>
-                            : <><Plus size={16} /> Add Department</>
+                            ? <><Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> {t('creating')}</>
+                            : <><Plus size={16} /> {t('addDept')}</>
                         }
                     </button>
                 </div>
@@ -177,8 +181,12 @@ const Departments = () => {
             <div className="dashboard-section">
                 <h2 className="section-title">
                     <FolderOpen size={20} style={{ color: 'var(--primary)' }} />
-                    Your Departments
-                    <span style={{ marginLeft: '0.5rem', fontSize: '0.82rem', fontWeight: 500, color: 'var(--text-muted)', background: 'rgba(99,102,241,.1)', padding: '0.15rem 0.55rem', borderRadius: 6 }}>
+                    {t('yourDepts')}
+                    <span style={{ 
+                        marginLeft: dir === 'ltr' ? '0.5rem' : '0',
+                        marginRight: dir === 'rtl' ? '0.5rem' : '0',
+                        fontSize: '0.82rem', fontWeight: 500, color: 'var(--text-muted)', background: 'rgba(99,102,241,.1)', padding: '0.15rem 0.55rem', borderRadius: 6 
+                    }}>
                         {departments.length}
                     </span>
                 </h2>
@@ -194,7 +202,7 @@ const Departments = () => {
                 {isError && !isLoading && (
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', color: '#ef4444', padding: '1.5rem', background: 'rgba(239,68,68,.07)', borderRadius: 12 }}>
                         <AlertCircle size={18} />
-                        Failed to load departments. Please refresh the page.
+                        {t('failedLoadDepts')}
                     </div>
                 )}
 
@@ -202,8 +210,8 @@ const Departments = () => {
                 {!isLoading && !isError && departments.length === 0 && (
                     <div style={{ textAlign: 'center', padding: '4rem 1rem', color: 'var(--text-muted)' }}>
                         <Building2 size={52} style={{ opacity: 0.2, marginBottom: '1rem' }} />
-                        <p style={{ fontSize: '1rem', fontWeight: 500, marginBottom: '0.4rem' }}>No departments yet</p>
-                        <p style={{ fontSize: '0.875rem', opacity: 0.7 }}>Use the form above to create your first department.</p>
+                        <p style={{ fontSize: '1rem', fontWeight: 500, marginBottom: '0.4rem' }}>{t('noDeptsYet')}</p>
+                        <p style={{ fontSize: '0.875rem', opacity: 0.7 }}>{t('noDeptsDesc')}</p>
                     </div>
                 )}
 
@@ -251,10 +259,10 @@ const Departments = () => {
                                             <span style={{ fontWeight: 600, fontSize: '0.95rem' }}>{dept.name}</span>
                                             <div style={{ display: 'flex', gap: '1rem', marginTop: '0.25rem', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
                                                 <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                                                    <Briefcase size={11} /> {dept.jobCount} job{dept.jobCount !== 1 ? 's' : ''}
+                                                    <Briefcase size={11} /> {dept.jobCount} {dept.jobCount === 1 ? t('job') : t('jobsCount')}
                                                 </span>
                                                 <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                                                    <Calendar size={11} /> {formatDate(dept.createdAt)}
+                                                    <Calendar size={11} /> {formatDate(dept.createdAt, language)}
                                                 </span>
                                             </div>
                                         </div>
@@ -268,54 +276,58 @@ const Departments = () => {
                                             <button
                                                 onClick={handleUpdate}
                                                 disabled={isUpdating}
-                                                title="Save"
+                                                title={t('save')}
                                                 style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', background: 'rgba(16,185,129,.15)', border: '1px solid rgba(16,185,129,.35)', color: '#10b981', padding: '0.4rem 0.85rem', borderRadius: 8, fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}
                                             >
                                                 {isUpdating ? <Loader2 size={14} style={{ animation: 'spin 1s linear infinite' }} /> : <Check size={14} />}
-                                                Save
+                                                {t('save')}
                                             </button>
                                             <button
                                                 onClick={cancelEdit}
-                                                title="Cancel"
+                                                title={t('cancel')}
                                                 style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', background: 'transparent', border: '1px solid var(--border-color)', color: 'var(--text-muted)', padding: '0.4rem 0.85rem', borderRadius: 8, fontSize: '0.8rem', cursor: 'pointer', whiteSpace: 'nowrap' }}
                                             >
-                                                <X size={14} /> Cancel
+                                                <X size={14} /> {t('cancel')}
                                             </button>
                                         </>
                                     ) : deletingId === dept.id ? (
                                         <>
-                                            <span style={{ fontSize: '0.8rem', color: '#ef4444', fontWeight: 500, marginRight: '0.25rem', alignSelf: 'center' }}>Delete?</span>
+                                            <span style={{ fontSize: '0.8rem', color: '#ef4444', fontWeight: 500, 
+                                                marginLeft: dir === 'ltr' ? '0' : '0.25rem',
+                                                marginRight: dir === 'rtl' ? '0' : '0.25rem',
+                                                alignSelf: 'center' 
+                                            }}>{t('deleteQuestion')}</span>
                                             <button
                                                 onClick={handleDelete}
                                                 disabled={isDeleting}
-                                                title="Confirm delete"
+                                                title={t('yes')}
                                                 style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', background: 'rgba(239,68,68,.15)', border: '1px solid rgba(239,68,68,.35)', color: '#ef4444', padding: '0.4rem 0.85rem', borderRadius: 8, fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}
                                             >
                                                 {isDeleting ? <Loader2 size={14} style={{ animation: 'spin 1s linear infinite' }} /> : <Check size={14} />}
-                                                Yes
+                                                {t('yes')}
                                             </button>
                                             <button
                                                 onClick={cancelDelete}
                                                 style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', background: 'transparent', border: '1px solid var(--border-color)', color: 'var(--text-muted)', padding: '0.4rem 0.85rem', borderRadius: 8, fontSize: '0.8rem', cursor: 'pointer', whiteSpace: 'nowrap' }}
                                             >
-                                                <X size={14} /> No
+                                                <X size={14} /> {t('no')}
                                             </button>
                                         </>
                                     ) : (
                                         <>
                                             <button
                                                 onClick={() => startEdit(dept)}
-                                                title="Edit department"
+                                                title={t('edit')}
                                                 style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', background: 'rgba(99,102,241,.1)', border: '1px solid rgba(99,102,241,.25)', color: 'var(--primary)', padding: '0.4rem 0.85rem', borderRadius: 8, fontSize: '0.8rem', fontWeight: 500, cursor: 'pointer', whiteSpace: 'nowrap' }}
                                             >
-                                                <Pencil size={14} /> Edit
+                                                <Pencil size={14} /> {t('edit')}
                                             </button>
                                             <button
                                                 onClick={() => confirmDelete(dept.id)}
-                                                title="Delete department"
+                                                title={t('delete')}
                                                 style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', background: 'transparent', border: '1px solid var(--border-color)', color: 'var(--text-muted)', padding: '0.4rem 0.85rem', borderRadius: 8, fontSize: '0.8rem', cursor: 'pointer', whiteSpace: 'nowrap' }}
                                             >
-                                                <Trash2 size={14} /> Delete
+                                                <Trash2 size={14} /> {t('delete')}
                                             </button>
                                         </>
                                     )}

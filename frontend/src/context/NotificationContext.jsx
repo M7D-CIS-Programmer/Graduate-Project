@@ -42,15 +42,59 @@ export const NotificationProvider = ({ children }) => {
         }
     };
 
-    // Initial fetch when user logs in or app loads
+    const deleteNotification = async (id) => {
+        try {
+            await api.deleteNotification(id);
+            setNotifications(prev => {
+                const updated = prev.filter(n => n.id !== id);
+                setUnreadCount(updated.filter(n => !n.isRead).length);
+                return updated;
+            });
+        } catch (error) {
+            console.error('Failed to delete notification:', error);
+        }
+    };
+
+    const clearAll = async () => {
+        if (!user?.id) return;
+        try {
+            await api.clearAllNotifications(user.id);
+            setNotifications([]);
+            setUnreadCount(0);
+        } catch (error) {
+            console.error('Failed to clear notifications:', error);
+        }
+    };
+
+    const markAllRead = async () => {
+        if (!user?.id) return;
+        try {
+            await api.markAllNotificationsAsRead(user.id);
+            setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+            setUnreadCount(0);
+        } catch (error) {
+            console.error('Failed to mark all as read:', error);
+        }
+    };
+
+    // Initial fetch and polling
     useEffect(() => {
-        if (user?.id) {
-            fetchUnreadCount(true);
-        } else {
+        if (!user?.id) {
             setUnreadCount(0);
             setNotifications([]);
+            return;
         }
-    }, [user?.id]); // Only trigger when user object itself changes (login/logout)
+
+        // Fetch immediately
+        fetchUnreadCount(true);
+
+        // Set up polling interval (every 5 seconds)
+        const interval = setInterval(() => {
+            fetchUnreadCount(false); // Don't show toast on background polling
+        }, 5000);
+
+        return () => clearInterval(interval);
+    }, [user?.id, fetchUnreadCount]);
 
     return (
         <NotificationContext.Provider value={{ 
@@ -58,7 +102,10 @@ export const NotificationProvider = ({ children }) => {
             setUnreadCount, 
             fetchUnreadCount, 
             notifications, 
-            markAsRead 
+            markAsRead,
+            deleteNotification,
+            clearAll,
+            markAllRead
         }}>
             {children}
         </NotificationContext.Provider>
