@@ -166,6 +166,7 @@ export const LanguageProvider = ({ children }) => {
             candidatePlaceholder: "Skill or Job Title",
             forEmployers: "For Employers",
             forJobSeekers: "For Job Seekers",
+            explore: "Explore",
             // New Translations
             filters: "Filters",
             jobType: "Job Type",
@@ -203,6 +204,8 @@ export const LanguageProvider = ({ children }) => {
             employerProfile: "Employer Profile",
             jobSeekerProfile: "Job Seeker Profile",
             memberSince: "Member since",
+            bio: "Bio",
+            following: "Following",
             aboutMe: "About Me",
             aboutCompany: "About Company",
             professionalDetails: "Professional Details",
@@ -820,6 +823,7 @@ export const LanguageProvider = ({ children }) => {
             candidatePlaceholder: "المهارة أو المسمى الوظيفي",
             forEmployers: "لأصحاب العمل",
             forJobSeekers: "للباحثين عن عمل",
+            explore: "استكشف",
             // New Translations
             noAppliedJobsYet: "لم تقدم على أي وظيفة بعد",
             filters: "الفلاتر",
@@ -858,6 +862,8 @@ export const LanguageProvider = ({ children }) => {
             employerProfile: "ملف صاحب العمل",
             jobSeekerProfile: "ملف الباحث عن عمل",
             memberSince: "عضو منذ",
+            bio: "السيرة الذاتية",
+            following: "المتابعة",
             aboutCompany: "عن الشركة",
             professionalDetails: "التفاصيل المهنية",
             contactInformation: "معلومات الاتصال",

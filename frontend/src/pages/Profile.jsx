@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { api, getImageUrl } from '../api/api';
 import {
     User,
@@ -12,11 +12,16 @@ import {
     Phone,
     Edit,
     Calendar,
-    ExternalLink
+    ExternalLink,
+    Building,
+    HeartOff,
+    Users
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
+import { useFollowedCompanies, useUnfollowCompany } from '../hooks/useFollows';
+import { useQuery } from '@tanstack/react-query';
 import Button from '../components/ui/Button';
 import Spinner from '../components/ui/Spinner';
 import './User.css';
@@ -29,8 +34,28 @@ const Profile = () => {
     const navigate = useNavigate();
 
     const isOwnProfile = !id || id === currentUser?.id?.toString();
+
+    const [searchParams, setSearchParams] = useSearchParams();
+    const activeTab = searchParams.get('tab') || 'bio';
     const [userData, setUserData] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
+
+    const { data: followedCompanies = [], isLoading: followingLoading } = useFollowedCompanies();
+    const { mutate: unfollowCompany, isPending: isUnfollowing } = useUnfollowCompany();
+
+    const { data: allJobs = [] } = useQuery({
+        queryKey: ['jobs'],
+        queryFn: () => api.getJobs(),
+        staleTime: 60_000,
+        enabled: activeTab === 'following'
+    });
+
+    const openJobsCountFor = (companyId) =>
+        allJobs.filter(j => j.userId === companyId && (j.status === 'Active' || !j.status)).length;
+
+    const handleTabChange = (tab) => {
+        setSearchParams({ tab });
+    };
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -72,13 +97,32 @@ const Profile = () => {
                 </div>
                 {isOwnProfile && (
                     <div style={{ display: 'flex', gap: '1rem' }}>
-                        <Button onClick={() => navigate('/profile/edit')}>
-                            <Edit size={18} />
-                            {t('editProfile') || 'Edit Profile'}
-                        </Button>
-                    </div>
-                )}
-            </div>
+                    <Button onClick={() => navigate('/profile/edit')}>
+                        <Edit size={18} />
+                        {t('editProfile') || 'Edit Profile'}
+                    </Button>
+                </div>
+            )}
+        </div>
+
+        <div className="profile-tabs glass">
+            <button 
+                className={`profile-tab-btn ${activeTab === 'bio' ? 'active' : ''}`}
+                onClick={() => handleTabChange('bio')}
+            >
+                <User size={18} />
+                {t('bio') || 'Bio'}
+            </button>
+            {isOwnProfile && currentUser?.role === 'Job Seeker' && (
+                <button 
+                    className={`profile-tab-btn ${activeTab === 'following' ? 'active' : ''}`}
+                    onClick={() => handleTabChange('following')}
+                >
+                    <Building size={18} />
+                    {t('following') || 'Following'}
+                </button>
+            )}
+        </div>
 
             <div className="profile-layout">
                 <aside className="profile-card-left">
@@ -129,68 +173,172 @@ const Profile = () => {
                 </aside>
 
                 <div className="profile-content-main">
-                    {/* About Section */}
-                    <div className="dashboard-section">
-                        <h3 className="section-title">
-                            <User size={20} />
-                            {isEmployer ? t('aboutCompany') || 'About Company' : t('aboutMe')}
-                        </h3>
-                        <p className="profile-bio-text">
-                            {userData.description || userData.bio || t('noDescriptionProvided') || 'No description provided yet.'}
-                        </p>
-                    </div>
+                    {activeTab === 'bio' ? (
+                        <>
+                            {/* About Section */}
+                            <div className="dashboard-section">
+                                <h3 className="section-title">
+                                    <User size={20} />
+                                    {isEmployer ? t('aboutCompany') || 'About Company' : t('aboutMe')}
+                                </h3>
+                                <p className="profile-bio-text">
+                                    {userData.description || userData.bio || t('noDescriptionProvided') || 'No description provided yet.'}
+                                </p>
+                            </div>
 
-                    {/* Details Grid */}
-                    <div className="profile-details-grid">
-                        <div className="dashboard-section">
-                            <h3 className="section-title">
-                                <Briefcase size={20} />
-                                {t('professionalDetails') || 'Professional Details'}
-                            </h3>
-                            <div className="info-list">
-                                <div className="info-row">
-                                    <span className="info-label">{t('role') || 'Role'}:</span>
-                                    <span className="info-value">{userData.role}</span>
-                                </div>
-                                {isEmployer && userData.industry && (
-                                    <div className="info-row">
-                                        <span className="info-label">{t('industry') || 'Industry'}:</span>
-                                        <span className="info-value">{t(userData.industry.toLowerCase().replace(' ', '')) || userData.industry}</span>
+                            {/* Details Grid */}
+                            <div className="profile-details-grid">
+                                <div className="dashboard-section">
+                                    <h3 className="section-title">
+                                        <Briefcase size={20} />
+                                        {t('professionalDetails') || 'Professional Details'}
+                                    </h3>
+                                    <div className="info-list">
+                                        <div className="info-row">
+                                            <span className="info-label">{t('role') || 'Role'}:</span>
+                                            <span className="info-value">{userData.role}</span>
+                                        </div>
+                                        {isEmployer && userData.industry && (
+                                            <div className="info-row">
+                                                <span className="info-label">{t('industry') || 'Industry'}:</span>
+                                                <span className="info-value">{t(userData.industry.toLowerCase().replace(' ', '')) || userData.industry}</span>
+                                            </div>
+                                        )}
+                                        <div className="info-row">
+                                            <span className="info-label">{t('location') || 'Location'}:</span>
+                                            <span className="info-value">{userData.location || t('notSpecified') || 'Not specified'}</span>
+                                        </div>
                                     </div>
-                                )}
-                                <div className="info-row">
-                                    <span className="info-label">{t('location') || 'Location'}:</span>
-                                    <span className="info-value">{userData.location || t('notSpecified') || 'Not specified'}</span>
+                                </div>
+
+                                <div className="dashboard-section">
+                                    <h3 className="section-title">
+                                        <Mail size={20} />
+                                        {t('contactInformation') || 'Contact Information'}
+                                    </h3>
+                                    <div className="info-list">
+                                        <div className="info-row">
+                                            <span className="info-label">{t('email') || 'Email'}:</span>
+                                            <span className="info-value">{userData.email}</span>
+                                        </div>
+                                        <div className="info-row">
+                                            <span className="info-label">{t('phone') || 'Phone'}:</span>
+                                            <span className="info-value">{userData.phone || t('notSpecified') || 'Not specified'}</span>
+                                        </div>
+                                        {userData.website && (
+                                            <div className="info-row">
+                                                <span className="info-label">{t('website') || 'Website'}:</span>
+                                                <a href={userData.website} target="_blank" rel="noopener noreferrer" className="info-value link">
+                                                    {userData.website.replace(/^https?:\/\//, '')}
+                                                    <ExternalLink size={12} />
+                                                </a>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        </>
+                    ) : (
+                        <div className="following-tab-content">
+                            {followingLoading ? (
+                                <Spinner />
+                            ) : followedCompanies.length === 0 ? (
+                                <div className="empty-state glass">
+                                    <Building size={56} className="empty-icon" />
+                                    <h3>{t('noFollowedCompanies')}</h3>
+                                    <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>
+                                        {t('findCompaniesToFollow')}
+                                    </p>
+                                    <Button onClick={() => navigate('/companies')}>
+                                        {t('exploreCompanies')}
+                                    </Button>
+                                </div>
+                            ) : (
+                                <div className="following-grid">
+                                    {followedCompanies.map(company => {
+                                        const openJobs = openJobsCountFor(company.id);
+                                        return (
+                                            <div
+                                                key={company.id}
+                                                className="following-card glass"
+                                                onClick={() => navigate(`/companies/${company.id}`)}
+                                                style={{ cursor: 'pointer' }}
+                                            >
+                                                <div className="following-card-header">
+                                                    <div className="company-logo-wrapper">
+                                                        <img
+                                                            src={`https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(company.name)}&backgroundColor=6366f1`}
+                                                            alt={company.name}
+                                                        />
+                                                    </div>
+                                                    <div className="company-info">
+                                                        <h3>{company.name}</h3>
+                                                        <div className="company-meta">
+                                                            <span className="industry-badge">
+                                                                <Building size={12} />
+                                                                {company.industry || t('notProvided')}
+                                                            </span>
+                                                            {company.location && (
+                                                                <span className="location-info">
+                                                                    <MapPin size={12} />
+                                                                    {company.location}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </div>
 
-                        <div className="dashboard-section">
-                            <h3 className="section-title">
-                                <Mail size={20} />
-                                {t('contactInformation') || 'Contact Information'}
-                            </h3>
-                            <div className="info-list">
-                                <div className="info-row">
-                                    <span className="info-label">{t('email') || 'Email'}:</span>
-                                    <span className="info-value">{userData.email}</span>
+                                                <div className="following-card-stats">
+                                                    <div className="following-stat">
+                                                        <Users size={14} />
+                                                        <span>{company.followerCount ?? 0}</span>
+                                                        <span className="following-stat-label">{t('followers')}</span>
+                                                    </div>
+                                                    <div className="following-stat-divider" />
+                                                    <div className="following-stat">
+                                                        <Briefcase size={14} />
+                                                        <span>{openJobs}</span>
+                                                        <span className="following-stat-label">{t('openPositions')}</span>
+                                                    </div>
+                                                </div>
+
+                                                <div className="following-card-actions" onClick={e => e.stopPropagation()}>
+                                                    <button
+                                                        className="action-btn view-profile"
+                                                        onClick={() => navigate(`/companies/${company.id}`)}
+                                                    >
+                                                        {t('viewProfile')}
+                                                    </button>
+                                                    <button
+                                                        className="action-btn view-jobs"
+                                                        onClick={() => {
+                                                            navigate(`/companies/${company.id}`);
+                                                            setTimeout(() => {
+                                                                document.getElementById('company-jobs-section')?.scrollIntoView({ behavior: 'smooth' });
+                                                            }, 500);
+                                                        }}
+                                                    >
+                                                        {t('viewJobs')} <ExternalLink size={14} />
+                                                    </button>
+                                                    <button
+                                                        className="action-btn unfollow-btn"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            unfollowCompany(company.id);
+                                                        }}
+                                                        disabled={isUnfollowing}
+                                                        title={t('unfollow')}
+                                                    >
+                                                        <HeartOff size={18} />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
                                 </div>
-                                <div className="info-row">
-                                    <span className="info-label">{t('phone') || 'Phone'}:</span>
-                                    <span className="info-value">{userData.phone || t('notSpecified') || 'Not specified'}</span>
-                                </div>
-                                {userData.website && (
-                                    <div className="info-row">
-                                        <span className="info-label">{t('website') || 'Website'}:</span>
-                                        <a href={userData.website} target="_blank" rel="noopener noreferrer" className="info-value link">
-                                            {userData.website.replace(/^https?:\/\//, '')}
-                                            <ExternalLink size={12} />
-                                        </a>
-                                    </div>
-                                )}
-                            </div>
+                            )}
                         </div>
-                    </div>
+                    )}
                 </div>
             </div>
         </div>

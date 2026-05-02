@@ -57,7 +57,7 @@ const JobSeekerDashboard = () => {
         { label: t('appliedJobs'), value: userApplications.length, icon: <Briefcase />, color: '#6366f1' },
         { label: t('interviews'), value: userApplications.filter(a => a.candidateStatus === 'Shortlisted').length, icon: <CheckCircle />, color: '#10b981' },
         { label: t('pending'), value: userApplications.filter(a => a.candidateStatus === 'Applied').length, icon: <Clock />, color: '#f59e0b' },
-        { label: 'Following', value: followedCompanies.length, icon: <Building />, color: '#06b6d4', link: '/dashboard/seeker/following' },
+        { label: 'Following', value: followedCompanies.length, icon: <Building />, color: '#06b6d4', link: '/profile?tab=following' },
     ];
 
     const chartData = useMemo(() => {

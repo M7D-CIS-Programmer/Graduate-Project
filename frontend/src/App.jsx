@@ -13,7 +13,6 @@ import Login from './pages/Auth/Login';
 import Register from './pages/Auth/Register';
 import JobSeekerDashboard from './pages/Dashboard/JobSeekerDashboard';
 import AppliedJobs from './pages/Dashboard/AppliedJobs';
-import FollowingCompanies from './pages/Dashboard/FollowingCompanies';
 import EmployerDashboard from './pages/Dashboard/EmployerDashboard';
 import Applicants from './pages/Dashboard/Applicants';
 import MyJobs from './pages/Dashboard/MyJobs';
@@ -24,7 +23,6 @@ import ManageCompanies from './pages/Dashboard/ManageCompanies';
 import PlatformSettings from './pages/Dashboard/PlatformSettings';
 import JobListings from './pages/Jobs/JobListings';
 import JobDetails from './pages/Jobs/JobDetails';
-import SavedJobs from './pages/SavedJobs';
 import Profile from './pages/Profile';
 import EditProfile from './pages/EditProfile';
 import Notifications from './pages/Notifications';
@@ -124,7 +122,6 @@ function App() {
                   {/* Dashboards */}
                   <Route path="/dashboard/seeker" element={<JobSeekerDashboard />} />
                   <Route path="/dashboard/seeker/applications" element={<AppliedJobs />} />
-                  <Route path="/dashboard/seeker/following" element={<FollowingCompanies />} />
                   <Route path="/dashboard/employer" element={<EmployerDashboard />} />
                   <Route path="/dashboard/employer/applicants" element={<Applicants />} />
                   <Route path="/dashboard/employer/jobs" element={<MyJobs />} />
@@ -139,7 +136,6 @@ function App() {
                   <Route path="/jobs" element={<JobListings />} />
                   <Route path="/jobs/:id" element={<JobDetails />} />
                   <Route path="/jobs/post" element={<JobPost />} />
-                  <Route path="/saved-jobs" element={<SavedJobs />} />
 
                   {/* User Features */}
                   <Route path="/profile/:id?" element={<Profile />} />

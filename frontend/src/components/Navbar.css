@@ -154,8 +154,9 @@
     color: var(--text-main);
     width: 100%;
     outline: none;
-    padding: 4px 0;
+    padding: 4px 7px;
     font-size: 0.875rem;
+    margin-left: 20px;
 }
 
 .search-input::placeholder {

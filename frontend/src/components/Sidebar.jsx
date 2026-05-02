@@ -17,7 +17,8 @@ import {
     Heart,
     Zap,
     FolderOpen,
-    ShieldAlert
+    ShieldAlert,
+    Mail
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
