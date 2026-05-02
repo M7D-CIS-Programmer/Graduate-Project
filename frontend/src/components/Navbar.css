@@ -207,6 +207,39 @@
     color: var(--text-main);
 }
 
+.msg-nav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 6px 12px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-main);
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition: var(--transition);
+    border: 1px solid var(--border-color);
+    text-decoration: none;
+}
+
+.msg-nav-link:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--text-main);
+
+}
+
+@media (max-width: 1024px) {
+    .msg-nav-link span {
+        display: none;
+    }
+
+    .msg-nav-link {
+        padding: 8px;
+        background: transparent;
+        border: none;
+    }
+}
+
 .nav-user-actions {
     display: flex;
     align-items: center;
@@ -267,6 +300,7 @@
 }
 
 @media (max-width: 768px) {
+
     .user-info,
     .search-container {
         display: none;
@@ -289,7 +323,7 @@
     justify-content: center;
     padding: 2px;
     border: 2px solid var(--bg-card);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 /* Search Dropdown Styles */
@@ -394,8 +428,13 @@
 }
 
 @keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 @keyframes slideUp {
@@ -403,6 +442,7 @@
         opacity: 0;
         transform: translateY(10px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);

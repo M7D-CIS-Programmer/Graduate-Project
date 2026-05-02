@@ -7,7 +7,6 @@ import {
     MapPin, 
     Briefcase, 
     GraduationCap, 
-    ChevronLeft, 
     Download,
     Calendar,
     Award
@@ -63,22 +62,6 @@ const ResumeView = () => {
         <div className={`dashboard-container ${dir}`}>
             <div className="dashboard-header" style={{ marginBottom: '2rem' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    <button 
-                        onClick={() => navigate(-1)} 
-                        className="back-btn-circle"
-                        style={{ 
-                            background: 'rgba(255, 255, 255, 0.05)', 
-                            border: '1px solid var(--border-color)',
-                            borderRadius: '50%',
-                            padding: '0.75rem',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            transition: 'all 0.3s ease'
-                        }}
-                    >
-                        <ChevronLeft size={24} className={dir === 'rtl' ? 'rotate-180' : ''} />
-                    </button>
                     <div>
                         <h1 className="dashboard-title">{resume.name}</h1>
                         <p style={{ color: 'var(--text-muted)' }}>Dynamic Resume View</p>

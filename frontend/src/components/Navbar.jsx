@@ -16,7 +16,8 @@ import {
     Building,
     FileText,
     Settings,
-    Loader2
+    Loader2,
+    MessageSquare
 } from 'lucide-react';
 import { api } from '../api/api';
 import logo from '../assets/logo.png';
@@ -221,6 +222,10 @@ const Navbar = ({ toggleSidebar }) => {
 
                 {user && (
                     <>
+                        <Link to="/messages" className="msg-nav-link" title={t('msgMessages')}>
+                            <MessageSquare size={20} />
+                            <span>{t('msgMessages')}</span>
+                        </Link>
                         <Link to="/notifications" className="nav-icon-btn notification-btn" title={t('notifications')}>
                             <Bell size={20} />
                             {unreadCount > 0 && (

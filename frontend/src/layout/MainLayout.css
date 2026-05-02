@@ -43,3 +43,20 @@
         margin-left: 0;
     }
 }
+
+.global-back-wrapper {
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.global-back-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem !important;
+}
+
+.rotate-180 {
+    transform: rotate(180deg);
+}

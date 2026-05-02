@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useLanguage } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
-import { ChevronLeft, Building, Briefcase, MapPin, DollarSign, Clock, X, Bookmark, Share2, Upload, FileText } from 'lucide-react';
+import { Building, Briefcase, MapPin, DollarSign, Clock, X, Bookmark, Share2, Upload, FileText } from 'lucide-react';
 import Button from '../../components/ui/Button';
 import Spinner from '../../components/ui/Spinner';
 import { useJob } from '../../hooks/useJobs';
@@ -184,11 +184,6 @@ const JobDetails = () => {
 
     return (
         <div className="job-details-page">
-            <button className="back-btn" onClick={() => navigate(-1)}>
-                <ChevronLeft size={20} className={dir === 'rtl' ? 'rotate-180' : ''} />
-                {t('back')}
-            </button>
-
             <div className="job-details-grid">
                 <main className="main-content">
                     <div className="card glass job-main-card">

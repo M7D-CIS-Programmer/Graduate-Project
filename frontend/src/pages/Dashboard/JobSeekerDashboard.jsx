@@ -4,7 +4,6 @@ import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { useNavigate } from 'react-router-dom';
 import { useApplications } from '../../hooks/useApplications';
-import { useSavedJobs } from '../../hooks/useSavedJobs';
 import { useFollowedCompanies } from '../../hooks/useFollows';
 import Spinner from '../../components/ui/Spinner';
 import {
@@ -48,7 +47,6 @@ const JobSeekerDashboard = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
     const { data: allApplications = [], isLoading } = useApplications();
-    const { data: savedJobs = [], isLoading: isLoadingSavedJobs } = useSavedJobs();
     const { data: followedCompanies = [] } = useFollowedCompanies();
 
     const userApplications = useMemo(() => {
@@ -59,7 +57,6 @@ const JobSeekerDashboard = () => {
         { label: t('appliedJobs'), value: userApplications.length, icon: <Briefcase />, color: '#6366f1' },
         { label: t('interviews'), value: userApplications.filter(a => a.candidateStatus === 'Shortlisted').length, icon: <CheckCircle />, color: '#10b981' },
         { label: t('pending'), value: userApplications.filter(a => a.candidateStatus === 'Applied').length, icon: <Clock />, color: '#f59e0b' },
-        { label: t('saved'), value: savedJobs.length || 0, icon: <Bookmark />, color: '#ec4899' },
         { label: 'Following', value: followedCompanies.length, icon: <Building />, color: '#06b6d4', link: '/dashboard/seeker/following' },
     ];
 
@@ -98,7 +95,7 @@ const JobSeekerDashboard = () => {
             }));
     }, [userApplications]);
 
-    if (isLoading || isLoadingSavedJobs) return <Spinner />;
+    if (isLoading) return <Spinner />;
 
     return (
         <div className="dashboard-container">

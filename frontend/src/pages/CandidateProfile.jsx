@@ -17,7 +17,6 @@ import {
     Phone,
     User,
     Calendar,
-    ChevronLeft,
     FileText,
     ExternalLink,
     MessageSquare
@@ -72,9 +71,6 @@ const CandidateProfile = () => {
         <div className={`user-page-container ${dir}`}>
             <div className="dashboard-header">
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    <button className="btn-icon" onClick={() => navigate(-1)}>
-                        <ChevronLeft size={20} className={dir === 'rtl' ? 'rotate-180' : ''} />
-                    </button>
                     <h1 className="dashboard-title">{t('candidateProfile') || 'Candidate Profile'}</h1>
                 </div>
 

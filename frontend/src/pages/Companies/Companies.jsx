@@ -7,13 +7,18 @@ import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
 import './Companies.css';
 import { useUsers } from '../../hooks/useUsers';
+import { useFollowedCompanies } from '../../hooks/useFollows';
+import { useAuth } from '../../context/AuthContext';
 
 const Companies = () => {
     const { t, dir } = useLanguage();
     const navigate = useNavigate();
+    const { user } = useAuth();
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedSector, setSelectedSector] = useState('all');
+    const [showFollowingOnly, setShowFollowingOnly] = useState(false);
     const { data: users = [], isLoading, error } = useUsers();
+    const { data: followedCompanies = [] } = useFollowedCompanies();
 
     const companies = users.filter(u => u.role === 'Employer').map(u => ({
         id: u.id,
@@ -31,7 +36,8 @@ const Companies = () => {
         const matchesSector = selectedSector === 'all' ||
             company.sector.toLowerCase() === selectedSector.toLowerCase() ||
             (selectedSector === 'tech' && company.sector === t('tech'));
-        return matchesSearch && matchesSector;
+        const matchesFollowing = !showFollowingOnly || followedCompanies.some(f => f.id === company.id);
+        return matchesSearch && matchesSector && matchesFollowing;
     }).sort((a, b) => b.id - a.id);
 
     if (isLoading) return <Spinner />;
@@ -51,6 +57,23 @@ const Companies = () => {
                     <h1 className="dashboard-title">{t('exploreCompanies')}</h1>
                     <p className="subtitle">{t('companiesSubtitle')}</p>
                 </div>
+                {user?.role === 'Job Seeker' && (
+                    <div className="companies-tabs">
+                        <button 
+                            className={`tab-btn ${!showFollowingOnly ? 'active' : ''}`}
+                            onClick={() => setShowFollowingOnly(false)}
+                        >
+                            {t('allCompanies') || 'All Companies'}
+                        </button>
+                        <button 
+                            className={`tab-btn ${showFollowingOnly ? 'active' : ''}`}
+                            onClick={() => setShowFollowingOnly(true)}
+                        >
+                            {t('followingCompanies') || 'Following'}
+                            {followedCompanies.length > 0 && <span className="tab-count">{followedCompanies.length}</span>}
+                        </button>
+                    </div>
+                )}
             </div>
 
             <div className="companies-filters glass">

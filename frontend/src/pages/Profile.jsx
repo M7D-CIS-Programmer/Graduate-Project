@@ -72,16 +72,6 @@ const Profile = () => {
                 </div>
                 {isOwnProfile && (
                     <div style={{ display: 'flex', gap: '1rem' }}>
-                        {!isEmployer && (
-                            <Button 
-                                variant="outline" 
-                                onClick={() => navigate('/dashboard/seeker/following')}
-                                style={{ background: 'rgba(255, 255, 255, 0.05)', border: '1px solid var(--border-color)', color: 'var(--text-main)' }}
-                            >
-                                <Briefcase size={18} />
-                                {t('followingCompanies') || 'Following'}
-                            </Button>
-                        )}
                         <Button onClick={() => navigate('/profile/edit')}>
                             <Edit size={18} />
                             {t('editProfile') || 'Edit Profile'}

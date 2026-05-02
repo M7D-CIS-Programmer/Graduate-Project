@@ -13,13 +13,11 @@ import {
     Bell,
     User as UserIcon,
     FileEdit,
-    Mail,
     MessageSquare,
     Heart,
     Zap,
     FolderOpen,
-    ShieldAlert,
-    Building
+    ShieldAlert
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -55,8 +53,6 @@ const Sidebar = ({ isOpen }) => {
                 { name: t('resumeBuilder'),  icon: <FileEdit size={20} />,        path: '/resume-builder' },
                 { name: t('jobMatching'),    icon: <Zap size={20} />,             path: '/job-matching' },
                 { name: t('interview'),      icon: <MessageSquare size={20} />,   path: '/interview' },
-                { name: 'Messages',          icon: <Mail size={20} />,            path: '/messages' },
-                { name: 'Following',         icon: <Building size={20} />,        path: '/dashboard/seeker/following' },
             ];
         }
 
@@ -66,7 +62,6 @@ const Sidebar = ({ isOpen }) => {
                 { name: t('myJobs'),       icon: <Briefcase size={20} />,       path: '/dashboard/employer/jobs' },
                 { name: t('postAJob'),     icon: <PlusCircle size={20} />,      path: '/jobs/post' },
                 { name: t('candidates'),   icon: <Users size={20} />,           path: '/dashboard/employer/applicants' },
-                { name: 'Messages',        icon: <Mail size={20} />,            path: '/messages' },
                 { name: 'Departments',     icon: <FolderOpen size={20} />,      path: '/departments' },
                 { name: t('jobMatching'),  icon: <Zap size={20} />,             path: '/job-matching' },
                 { name: 'Fraud Detection', icon: <ShieldAlert size={20} />,     path: '/cv-fraud-check' },
