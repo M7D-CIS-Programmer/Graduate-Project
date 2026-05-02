@@ -19,7 +19,7 @@ import './JobPost.css';
 import { api } from '../api/api';
 import { useAuth } from '../context/AuthContext';
 import { useCreateJob, useUpdateJob, useJob } from '../hooks/useJobs';
-import { useQuery } from '@tanstack/react-query';
+import { useDepartments } from '../hooks/useDepartments';
 
 export default function JobPost() {
     const { t, dir } = useLanguage();
@@ -30,17 +30,14 @@ export default function JobPost() {
     const createJobMutation = useCreateJob();
     const updateJobMutation = useUpdateJob();
     const { data: editJobData } = useJob(editId);
-    const { data: categories = [] } = useQuery({
-        queryKey: ['categories'],
-        queryFn: api.getCategories
-    });
+    const { data: departments = [] } = useDepartments();
 
     const [step, setStep] = useState(1);
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [formData, setFormData] = useState({
         title: '',
         company: '',
-        category: '',
+        departmentId: '',
         type: 'Full-time',
         workMode: 'On-site',
         location: '',
@@ -58,7 +55,7 @@ export default function JobPost() {
             setFormData({
                 title: editJobData.title || '',
                 company: editJobData.company || '',
-                category: editJobData.categoryId || '',
+                departmentId: editJobData.departmentId || '',
                 type: editJobData.type || 'Full-time',
                 workMode: editJobData.workMode || 'On-site',
                 location: editJobData.location || '',
@@ -102,8 +99,8 @@ export default function JobPost() {
         }
 
         try {
-            // Find category ID by name
-            const categoryObj = categories.find(c => c.name === formData.category || c.id.toString() === formData.category);
+            // Find department ID by name
+            const departmentObj = departments.find(d => d.name === formData.departmentId || d.id.toString() === formData.departmentId);
 
             // Map frontend data to backend model
             const jobData = {
@@ -114,12 +111,14 @@ export default function JobPost() {
                 workMode: formData.workMode,
                 responsibilities: formData.responsibilities,
                 requirements: formData.requirements,
-                categoryId: categoryObj?.id || 1,
+                departmentId: parseInt(formData.departmentId),
                 isSalaryNegotiable: formData.isNegotiable,
                 salaryMin: formData.salaryMin ? parseFloat(formData.salaryMin) : null,
                 salaryMax: formData.salaryMax ? parseFloat(formData.salaryMax) : null,
                 features: formData.benefits,
-                status: 'Active'
+                status: 'Active',
+                location: formData.location,
+                company: formData.company
             };
 
             if (editId) {
@@ -161,7 +160,7 @@ export default function JobPost() {
                                 setFormData({
                                     title: '',
                                     company: '',
-                                    category: '',
+                                    departmentId: '',
                                     type: 'Full-time',
                                     workMode: 'On-site',
                                     location: '',
@@ -233,17 +232,17 @@ export default function JobPost() {
                                     required
                                 />
                             </div>
-                            <div className="form-group">
-                                <label>{t('category')}</label>
+                             <div className="form-group">
+                                <label>{t('department')}</label>
                                 <select
-                                    name="category"
-                                    value={formData.category}
+                                    name="departmentId"
+                                    value={formData.departmentId}
                                     onChange={handleInputChange}
                                     required
                                 >
-                                    <option value="">{t('selectCategory')}</option>
-                                    {categories.map(cat => (
-                                        <option key={cat.id} value={cat.id}>{cat.name}</option>
+                                    <option value="">{t('selectDepartment')}</option>
+                                    {departments.map(dept => (
+                                        <option key={dept.id} value={dept.id}>{dept.name}</option>
                                     ))}
                                 </select>
                             </div>
@@ -376,8 +375,8 @@ export default function JobPost() {
                                         <span>{formData.company}</span>
                                     </div>
                                     <div className="review-item">
-                                        <label>{t('category')}</label>
-                                        <span>{categories.find(c => c.id.toString() === formData.category)?.name || formData.category}</span>
+                                        <label>{t('department')}</label>
+                                        <span>{departments.find(d => d.id.toString() === formData.departmentId)?.name || formData.departmentId}</span>
                                     </div>
                                     <div className="review-item">
                                         <label>{t('jobType')}</label>

@@ -63,7 +63,7 @@ export const api = {
         const params = new URLSearchParams();
         if (filters.type) params.append('type', filters.type);
         if (filters.workMode) params.append('workMode', filters.workMode);
-        if (filters.categoryId) params.append('categoryId', filters.categoryId);
+        if (filters.departmentId) params.append('departmentId', filters.departmentId);
         if (filters.minSalary) params.append('minSalary', filters.minSalary);
         if (filters.maxSalary) params.append('maxSalary', filters.maxSalary);
         if (filters.q) params.append('q', filters.q);
@@ -108,13 +108,13 @@ export const api = {
     applyForJob:              (formData)   => postForm(`${BASE_URL}/ApplicationJobs`, formData),
     updateApplicationStatus:  (id, status) => put(`${BASE_URL}/ApplicationJobs/${id}/status`, { status }),
 
-    // Categories (public — all global + company-owned categories)
-    getCategories:    ()              => get(`${BASE_URL}/Categories`),
+    // Departments (public — all global + company-owned departments)
+    getDepartments:    ()              => get(`${BASE_URL}/Departments`),
     // My departments — authenticated employer only
-    getMyCategories:  ()              => get(`${BASE_URL}/Categories/mine`),
-    createCategory:   (name)          => post(`${BASE_URL}/Categories`, { name }),
-    updateCategory:   (id, name)      => put(`${BASE_URL}/Categories/${id}`, { name }),
-    deleteCategory:   (id)            => del(`${BASE_URL}/Categories/${id}`),
+    getMyDepartments:  ()              => get(`${BASE_URL}/Departments/mine`),
+    createDepartment:   (name)          => post(`${BASE_URL}/Departments`, { name }),
+    updateDepartment:   (id, name)      => put(`${BASE_URL}/Departments/${id}`, { name }),
+    deleteDepartment:   (id)            => del(`${BASE_URL}/Departments/${id}`),
 
     // Follows
     followCompany:        (userId, companyId) => post(`${BASE_URL}/Follows/${userId}/follow/${companyId}`),

@@ -20,7 +20,7 @@ import {
 import { useLanguage } from '../../context/LanguageContext';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useJobs } from '../../hooks/useJobs';
-import { useCategories } from '../../hooks/useCategories';
+import { useDepartments } from '../../hooks/useDepartments';
 import { useDebounce } from '../../hooks/useDebounce';
 import { useSavedJobs, useSaveJob, useUnsaveJob } from '../../hooks/useSavedJobs';
 import { useAuth } from '../../context/AuthContext';
@@ -67,10 +67,10 @@ const JobListings = () => {
     const [selectedTypes, setSelectedTypes] = useState(() => getInitialArray('types', 'types'));
     const [selectedWorkModes, setSelectedWorkModes] = useState(() => getInitialArray('modes', 'modes'));
     const [selectedSalaries, setSelectedSalaries] = useState(() => getInitialArray('salaries', 'salaries'));
-    const [selectedCategory, setSelectedCategory] = useState(() => getInitial('category', 'category'));
+    const [selectedDepartment, setSelectedDepartment] = useState(() => getInitial('department', 'departmentId'));
 
     const debouncedQuery = useDebounce(searchQuery, 400);
-    const { data: categories = [] } = useCategories();
+    const { data: departments = [] } = useDepartments();
 
     // Sync state to URL and localStorage
     useEffect(() => {
@@ -80,7 +80,7 @@ const JobListings = () => {
         if (selectedTypes.length > 0) params.set('types', selectedTypes.join(','));
         if (selectedWorkModes.length > 0) params.set('modes', selectedWorkModes.join(','));
         if (selectedSalaries.length > 0) params.set('salaries', selectedSalaries.join(','));
-        if (selectedCategory) params.set('category', selectedCategory);
+        if (selectedDepartment) params.set('departmentId', selectedDepartment);
         
         setSearchParams(params, { replace: true });
 
@@ -88,15 +88,15 @@ const JobListings = () => {
         localStorage.setItem('job_filter_types', selectedTypes.join(','));
         localStorage.setItem('job_filter_modes', selectedWorkModes.join(','));
         localStorage.setItem('job_filter_salaries', selectedSalaries.join(','));
-        localStorage.setItem('job_filter_category', selectedCategory);
-    }, [debouncedQuery, selectedTypes, selectedWorkModes, selectedSalaries, selectedCategory, setSearchParams, activeTab]);
+        localStorage.setItem('job_filter_department', selectedDepartment);
+    }, [debouncedQuery, selectedTypes, selectedWorkModes, selectedSalaries, selectedDepartment, setSearchParams, activeTab]);
 
     // Data Hooks
     const { data: jobs = [], isLoading: jobsLoading } = useJobs({
         type: selectedTypes.join(','),
         workMode: selectedWorkModes.join(','),
         q: debouncedQuery,
-        categoryId: selectedCategory
+        departmentId: selectedDepartment
     });
 
     const { data: savedJobs = [], isLoading: savedLoading } = useSavedJobs();
@@ -194,7 +194,7 @@ const JobListings = () => {
         setSelectedTypes([]);
         setSelectedWorkModes([]);
         setSelectedSalaries([]);
-        setSelectedCategory('');
+        setSelectedDepartment('');
     };
 
     return (
@@ -241,7 +241,7 @@ const JobListings = () => {
                                 <Filter size={20} className="text-primary" />
                                 <h2 style={{ fontSize: '1.25rem' }}>{t('filters')}</h2>
                             </div>
-                            {(searchQuery || selectedTypes.length > 0 || selectedWorkModes.length > 0 || selectedSalaries.length > 0 || selectedCategory) && (
+                            {(searchQuery || selectedTypes.length > 0 || selectedWorkModes.length > 0 || selectedSalaries.length > 0 || selectedDepartment) && (
                                 <Button variant="secondary" size="sm" onClick={handleResetFilters} style={{ gap: '0.25rem', padding: '0.35rem 0.65rem' }}>
                                     <X size={14} />
                                     {t('reset') || 'Reset'}
@@ -250,15 +250,15 @@ const JobListings = () => {
                         </div>
 
                         <div className="filter-section">
-                            <h3 className="filter-title">{t('category') || 'Category'}</h3>
+                            <h3 className="filter-title">{t('department') || 'Department'}</h3>
                             <select
                                 className="filter-select"
-                                value={selectedCategory}
-                                onChange={(e) => setSelectedCategory(e.target.value)}
+                                value={selectedDepartment}
+                                onChange={(e) => setSelectedDepartment(e.target.value)}
                                 style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', background: 'var(--bg-card)', border: '1px solid var(--border-color)', color: 'var(--text-main)', marginBottom: '1rem' }}
                             >
-                                <option value="">{t('allCategories') || 'All Categories'}</option>
-                                {categories.map(cat => (
+                                <option value="">{t('allDepartments') || 'All Departments'}</option>
+                                {departments.map(cat => (
                                     <option key={cat.id} value={cat.id}>{cat.name}</option>
                                 ))}
                             </select>
@@ -369,7 +369,7 @@ const JobListings = () => {
                                         </div>
                                         <h3 className="job-title">{job.title}</h3>
                                         <p className="job-meta">{job.company}{job.location && ` • ${job.location}`}</p>
-                                        <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>{job.category} • {job.workMode}</p>
+                                        <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>{job.department} • {job.workMode}</p>
                                         <div className="job-card-footer">
                                             {formatSalary(job.salaryMin, job.salaryMax, job.isSalaryNegotiable) && (
                                                 <span className="job-salary" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>

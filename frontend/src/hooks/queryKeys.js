@@ -4,6 +4,6 @@ export const queryKeys = {
     users:          ['users'],
     user:           (id) => ['users', id],
     applications:   ['applications'],
-    categories:     ['categories'],
-    myCategories:   ['categories', 'mine'],
+    departments:    ['departments'],
+    myDepartments:  ['departments', 'mine'],
 };

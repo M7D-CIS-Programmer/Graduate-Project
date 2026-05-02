@@ -1,16 +1,16 @@
 namespace aabu_project.Dtos;
 
-public class CategoryCreateDto
+public class DepartmentCreateDto
 {
     public string Name { get; set; } = null!;
 }
 
-public class CategoryUpdateDto
+public class DepartmentUpdateDto
 {
     public string Name { get; set; } = null!;
 }
 
-public class CategoryResponseDto
+public class DepartmentResponseDto
 {
     public int Id { get; set; }
     public string Name { get; set; } = null!;

@@ -254,9 +254,9 @@ const AICandidateInsights = () => {
                             onChange={(e) => setFilterScore(e.target.value)}
                         >
                             <option value="all">{t('allStatuses')}</option>
-                            <option value="high">85%+ Score</option>
-                            <option value="med">75% - 85% Score</option>
-                            <option value="low">Below 75%</option>
+                            <option value="high">{t('highScoreRange') || '85%+ Score'}</option>
+                            <option value="med">{t('medScoreRange') || '75% - 85% Score'}</option>
+                            <option value="low">{t('lowScoreRange') || 'Below 75%'}</option>
                         </select>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>

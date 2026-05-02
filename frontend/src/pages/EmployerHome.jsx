@@ -17,18 +17,18 @@ const EmployerHome = () => {
     const [currentImage, setCurrentImage] = useState(0);
     const [searchQuery, setSearchQuery] = useState('');
     const [candidates, setCandidates] = useState([]);
-    const [categories, setCategories] = useState([]);
+    const [departments, setDepartments] = useState([]);
 
     useEffect(() => {
         Promise.all([
             api.getUsers(),
-            api.getCategories()
-        ]).then(([users, catData]) => {
+            api.getDepartments()
+        ]).then(([users, deptData]) => {
             const seekers = users
                 .filter((u) => u.role?.toLowerCase() === 'job seeker')
                 .slice(0, 3);
             setCandidates(seekers);
-            setCategories(catData.slice(0, 4));
+            setDepartments(deptData.slice(0, 4));
         }).catch((error) => {
             console.error('Error fetching dashboard data:', error);
         });
@@ -49,7 +49,7 @@ const EmployerHome = () => {
         return () => clearInterval(timer);
     }, []);
 
-    const getCategoryIcon = (name) => {
+    const getDepartmentIcon = (name) => {
         const n = name.toLowerCase();
         if (n.includes('tech') || n.includes('engineering')) return <Briefcase />;
         if (n.includes('design')) return <Users />;
@@ -137,21 +137,21 @@ const EmployerHome = () => {
                 </div>
             </section>
 
-            {/* Categories */}
+            {/* Departments */}
             <section className="categories-section">
                 <div className="featured-header">
                     <div>
-                        <h2 className="featured-title">{t('popularCategories')}</h2>
-                        <p style={{ color: 'var(--text-muted)' }}>{t('categoriesSubtitle')}</p>
+                        <h2 className="featured-title">{t('popularDepartments')}</h2>
+                        <p style={{ color: 'var(--text-muted)' }}>{t('departmentsSubtitle')}</p>
                     </div>
                 </div>
                 <div className="categories-grid">
-                    {categories.length > 0 ? (
-                        categories.map((cat, i) => (
-                            <div key={cat.id || i} className="card categories-card">
-                                <div className="cat-icon-box">{getCategoryIcon(cat.name)}</div>
-                                <h3>{t(cat.name.toLowerCase()) || cat.name}</h3>
-                                <p>{cat.jobCount || 0} {t('activeJobs')}</p>
+                    {departments.length > 0 ? (
+                        departments.map((dept, i) => (
+                            <div key={dept.id || i} className="card categories-card">
+                                <div className="cat-icon-box">{getDepartmentIcon(dept.name)}</div>
+                                <h3>{t(dept.name.toLowerCase()) || dept.name}</h3>
+                                <p>{dept.jobCount || 0} {t('activeJobs')}</p>
                             </div>
                         ))
                     ) : (

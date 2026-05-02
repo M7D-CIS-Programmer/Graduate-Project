@@ -9,7 +9,7 @@ public class JobCreateDto
     public string WorkMode { get; set; } = null!;
     public string Responsibilities { get; set; } = null!;
     public string Requirements { get; set; } = null!;
-    public int CategoryId { get; set; }
+    public int DepartmentId { get; set; }
     public bool IsSalaryNegotiable { get; set; }
     public decimal? SalaryMin { get; set; }
     public decimal? SalaryMax { get; set; }
@@ -31,7 +31,7 @@ public record SavedJobDto(
     decimal? SalaryMax,
     bool IsSalaryNegotiable,
     string? Status,
-    string? Category,
+    string? Department,
     DateTimeOffset SavedAt
 );
 
@@ -43,6 +43,11 @@ public class JobUpdateDto
     public string WorkMode { get; set; } = null!;
     public string Responsibilities { get; set; } = null!;
     public string Requirements { get; set; } = null!;
+    public int DepartmentId { get; set; }
+    public decimal? SalaryMin { get; set; }
+    public decimal? SalaryMax { get; set; }
+    public bool IsSalaryNegotiable { get; set; }
+    public string? Features { get; set; }
     public string? Location { get; set; }
     public string? Company { get; set; }
 }
@@ -57,7 +62,7 @@ public class JobResponseDto
     public string WorkMode { get; set; } = null!;
     public string Responsibilities { get; set; } = null!;
     public string Requirements { get; set; } = null!;
-    public int CategoryId { get; set; }
+    public int DepartmentId { get; set; }
     public bool IsSalaryNegotiable { get; set; }
     public decimal? SalaryMin { get; set; }
     public decimal? SalaryMax { get; set; }
@@ -70,6 +75,6 @@ public class JobResponseDto
 
     public int ApplicantsCount { get; set; }
     public UserDto User { get; set; } = null!;
-    public CategoryResponseDto Category { get; set; } = null!;
+    public DepartmentResponseDto Department { get; set; } = null!;
 }
 

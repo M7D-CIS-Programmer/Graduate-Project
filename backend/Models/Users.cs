@@ -29,7 +29,7 @@ public class User
     public ICollection<ApplicationJob> Applications { get; set; } = new List<ApplicationJob>();
     public ICollection<Role> Roles { get; set; } = new List<Role>();
     public ICollection<SavedJob> SavedJobs { get; set; } = new List<SavedJob>();
-    public ICollection<Category> Categories { get; set; } = new List<Category>();
+    public ICollection<Department> Departments { get; set; } = new List<Department>();
 
     // Navigation properties for following companies
     public ICollection<FollowCompany> FollowedCompanies { get; set; } = new List<FollowCompany>();

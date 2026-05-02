@@ -48,7 +48,7 @@ public class UsersController : ControllerBase
             .Include(u => u.Followers)
             .Include(u => u.Applications)
                 .ThenInclude(a => a.Job)
-                    .ThenInclude(j => j.Category)
+                    .ThenInclude(j => j.Department)
             .Include(u => u.Applications)
                 .ThenInclude(a => a.Job)
                     .ThenInclude(j => j.User)
@@ -95,7 +95,7 @@ public class UsersController : ControllerBase
                 WorkMode = a.Job.WorkMode,
                 Responsibilities = a.Job.Responsibilities,
                 Requirements = a.Job.Requirements,
-                CategoryId = a.Job.CategoryId,
+                DepartmentId = a.Job.DepartmentId,
                 IsSalaryNegotiable = a.Job.IsSalaryNegotiable,
                 SalaryMin = a.Job.SalaryMin,
                 SalaryMax = a.Job.SalaryMax,
@@ -122,10 +122,10 @@ public class UsersController : ControllerBase
                     a.Job.User.ProfilePicture,
                     a.Job.User.Followers?.Count ?? 0
                 ),
-                Category = new CategoryResponseDto
+                Department = new DepartmentResponseDto
                 {
-                    Id = a.Job.Category.Id,
-                    Name = a.Job.Category.Name
+                    Id = a.Job.Department.Id,
+                    Name = a.Job.Department.Name
                 }
             }).ToList()
         };

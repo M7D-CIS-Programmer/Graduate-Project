@@ -8,20 +8,20 @@ using System.Security.Claims;
 
 [ApiController]
 [Route("api/[controller]")]
-public class CategoriesController(MyDbContext context) : ControllerBase
+public class DepartmentsController(MyDbContext context) : ControllerBase
 {
     private readonly MyDbContext _ctx = context;
 
     private int CallerId =>
         int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-    // ── GET /api/Categories ───────────────────────────────────────────────────
-    // Public — returns ALL categories (global seed + all company departments).
+    // ── GET /api/Departments ───────────────────────────────────────────────────
+    // Public — returns ALL departments (global seed + all company departments).
     // Used by job seekers and job-listing filters.
     [HttpGet]
     public async Task<IActionResult> GetAll() =>
-        Ok(await _ctx.Categories
-            .Select(c => new CategoryResponseDto
+        Ok(await _ctx.Departments
+            .Select(c => new DepartmentResponseDto
             {
                 Id        = c.Id,
                 Name      = c.Name,
@@ -31,7 +31,7 @@ public class CategoriesController(MyDbContext context) : ControllerBase
             .OrderBy(c => c.Name)
             .ToListAsync());
 
-    // ── GET /api/Categories/mine ──────────────────────────────────────────────
+    // ── GET /api/Departments/mine ──────────────────────────────────────────────
     // Authenticated employer only — returns only THIS company's departments.
     [HttpGet("mine")]
     [Authorize]
@@ -39,9 +39,9 @@ public class CategoriesController(MyDbContext context) : ControllerBase
     {
         var userId = CallerId;
 
-        var list = await _ctx.Categories
+        var list = await _ctx.Departments
             .Where(c => c.UserId == userId)
-            .Select(c => new CategoryResponseDto
+            .Select(c => new DepartmentResponseDto
             {
                 Id        = c.Id,
                 Name      = c.Name,
@@ -54,86 +54,86 @@ public class CategoriesController(MyDbContext context) : ControllerBase
         return Ok(list);
     }
 
-    // ── POST /api/Categories ──────────────────────────────────────────────────
+    // ── POST /api/Departments ──────────────────────────────────────────────────
     // Authenticated — creates a department owned by the caller.
     [HttpPost]
     [Authorize]
-    public async Task<IActionResult> Create([FromBody] CategoryCreateDto dto)
+    public async Task<IActionResult> Create([FromBody] DepartmentCreateDto dto)
     {
         if (string.IsNullOrWhiteSpace(dto.Name))
             return BadRequest(new { error = "Department name is required." });
 
         var userId = CallerId;
 
-        var duplicate = await _ctx.Categories
+        var duplicate = await _ctx.Departments
             .AnyAsync(c => c.UserId == userId && c.Name.ToLower() == dto.Name.Trim().ToLower());
         if (duplicate)
             return Conflict(new { error = "You already have a department with this name." });
 
-        var cat = new Category
+        var dept = new Department
         {
             Name   = dto.Name.Trim(),
             UserId = userId,
         };
 
-        _ctx.Categories.Add(cat);
+        _ctx.Departments.Add(dept);
         await _ctx.SaveChangesAsync();
 
-        return Ok(new CategoryResponseDto
+        return Ok(new DepartmentResponseDto
         {
-            Id        = cat.Id,
-            Name      = cat.Name,
+            Id        = dept.Id,
+            Name      = dept.Name,
             JobCount  = 0,
-            CreatedAt = cat.CreatedAt,
+            CreatedAt = dept.CreatedAt,
         });
     }
 
-    // ── PUT /api/Categories/{id} ──────────────────────────────────────────────
+    // ── PUT /api/Departments/{id} ──────────────────────────────────────────────
     // Authenticated — update only if the caller owns this department.
     [HttpPut("{id:int}")]
     [Authorize]
-    public async Task<IActionResult> Update(int id, [FromBody] CategoryUpdateDto dto)
+    public async Task<IActionResult> Update(int id, [FromBody] DepartmentUpdateDto dto)
     {
         if (string.IsNullOrWhiteSpace(dto.Name))
             return BadRequest(new { error = "Department name is required." });
 
         var userId = CallerId;
-        var cat    = await _ctx.Categories.FindAsync(id);
+        var dept    = await _ctx.Departments.FindAsync(id);
 
-        if (cat is null)           return NotFound(new { error = "Department not found." });
-        if (cat.UserId != userId)  return Forbid();
+        if (dept is null)           return NotFound(new { error = "Department not found." });
+        if (dept.UserId != userId)  return Forbid();
 
-        var duplicate = await _ctx.Categories
+        var duplicate = await _ctx.Departments
             .AnyAsync(c => c.UserId == userId && c.Id != id &&
                            c.Name.ToLower() == dto.Name.Trim().ToLower());
         if (duplicate)
             return Conflict(new { error = "You already have a department with this name." });
 
-        cat.Name = dto.Name.Trim();
+        dept.Name = dto.Name.Trim();
         await _ctx.SaveChangesAsync();
 
-        return Ok(new CategoryResponseDto
+        return Ok(new DepartmentResponseDto
         {
-            Id        = cat.Id,
-            Name      = cat.Name,
-            JobCount  = await _ctx.Jobs.CountAsync(j => j.CategoryId == id),
-            CreatedAt = cat.CreatedAt,
+            Id        = dept.Id,
+            Name      = dept.Name,
+            JobCount  = await _ctx.Jobs.CountAsync(j => j.DepartmentId == id),
+            CreatedAt = dept.CreatedAt,
         });
     }
 
-    // ── DELETE /api/Categories/{id} ───────────────────────────────────────────
+    // ── DELETE /api/Departments/{id} ───────────────────────────────────────────
     // Authenticated — delete only if the caller owns this department.
     [HttpDelete("{id:int}")]
     [Authorize]
     public async Task<IActionResult> Delete(int id)
     {
         var userId = CallerId;
-        var cat    = await _ctx.Categories.FindAsync(id);
+        var dept    = await _ctx.Departments.FindAsync(id);
 
-        if (cat is null)           return NotFound(new { error = "Department not found." });
-        if (cat.UserId != userId)  return Forbid();
+        if (dept is null)           return NotFound(new { error = "Department not found." });
+        if (dept.UserId != userId)  return Forbid();
 
-        _ctx.Categories.Remove(cat);
+        _ctx.Departments.Remove(dept);
         await _ctx.SaveChangesAsync();
 
         return Ok(new { message = "Department deleted successfully." });

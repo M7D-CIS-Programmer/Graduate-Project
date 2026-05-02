@@ -5,7 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { useMyJobs } from '../../hooks/useJobs';
-import { useCategories } from '../../hooks/useCategories';
+import { useDepartments } from '../../hooks/useDepartments';
 import { api, getImageUrl } from '../../api/api';
 import {
     Users, Search, Eye, CheckCircle, XCircle, Clock,
@@ -134,20 +134,20 @@ const Applicants = () => {
     // Data hooks
     const { data: applications = [], isLoading } = useApplicationsByCompany(user?.id);
     const { data: myJobs = [] }                  = useMyJobs(user?.id);
-    const { data: dbCategories = [] }            = useCategories();
+    const { data: dbDepartments = [] }           = useDepartments();
     const { mutate: updateStatus }               = useUpdateApplicationStatus();
 
-    // Category names from DB (used in both dropdowns)
-    const categoryNames = useMemo(() => dbCategories.map(c => c.name).filter(Boolean), [dbCategories]);
+    // Department names from DB (used in both dropdowns)
+    const departmentNames = useMemo(() => dbDepartments.map(c => c.name).filter(Boolean), [dbDepartments]);
 
     // Table filters
     const [searchTerm,     setSearchTerm]    = useState('');
     const [statusFilter,   setStatusFilter]  = useState('All');
-    const [categoryFilter, setCategoryFilter] = useState('All');
+    const [departmentFilter, setDepartmentFilter] = useState('All');
 
     // Report form
     const [reportJobTitle, setReportJobTitle] = useState('');
-    const [reportCategory, setReportCategory] = useState('');
+    const [reportDepartment, setReportDepartment] = useState('');
     const [reportJobDesc,  setReportJobDesc]  = useState('');
     const [reportTopCount, setReportTopCount] = useState(10);
 
@@ -161,30 +161,30 @@ const Applicants = () => {
 
     const myJobIds = useMemo(() => new Set(myJobs.map(j => j.id)), [myJobs]);
 
-    const jobCategoryMap = useMemo(() => {
+    const jobDepartmentMap = useMemo(() => {
         const map = new Map();
-        myJobs.forEach(j => map.set(j.id, j.category?.name || 'General'));
+        myJobs.forEach(j => map.set(j.id, j.department?.name || 'General'));
         return map;
     }, [myJobs]);
 
-    const getCategory = useCallback((app) =>
-        app.job?.category?.name || jobCategoryMap.get(app.jobId) || 'General',
-        [jobCategoryMap]);
+    const getDepartment = useCallback((app) =>
+        app.job?.department?.name || jobDepartmentMap.get(app.jobId) || 'General',
+        [jobDepartmentMap]);
 
     const employerApplications = useMemo(() =>
         applications.filter(app => myJobIds.size === 0 || myJobIds.has(app.jobId)),
         [applications, myJobIds]);
 
-    // Categories shown in the table filter — seeded from DB, narrowed to ones with applicants
-    const availableCategories = useMemo(() => {
-        const usedCats = new Set(employerApplications.map(a => getCategory(a)).filter(Boolean));
-        const ordered = categoryNames.length > 0
-            ? categoryNames.filter(n => usedCats.has(n))
-            : Array.from(usedCats).sort();
+    // Departments shown in the table filter — seeded from DB, narrowed to ones with applicants
+    const availableDepartments = useMemo(() => {
+        const usedDepts = new Set(employerApplications.map(a => getDepartment(a)).filter(Boolean));
+        const ordered = departmentNames.length > 0
+            ? departmentNames.filter(n => usedDepts.has(n))
+            : Array.from(usedDepts).sort();
         return ['All', ...ordered];
-    }, [employerApplications, getCategory, categoryNames]);
+    }, [employerApplications, getDepartment, departmentNames]);
 
-    // Table rows (search + category + status)
+    // Table rows (search + department + status)
     const tableApplicants = useMemo(() => {
         return employerApplications.filter(app => {
             const name = (app.user?.name || '').toLowerCase();
@@ -192,7 +192,7 @@ const Applicants = () => {
             const q    = searchTerm.toLowerCase();
             if (q && !name.includes(q) && !role.includes(q)) return false;
 
-            if (categoryFilter !== 'All' && getCategory(app) !== categoryFilter) return false;
+            if (departmentFilter !== 'All' && getDepartment(app) !== departmentFilter) return false;
 
             let status = app.candidateStatus || 'New';
             if (status === 'Applied')  status = 'New';
@@ -201,7 +201,7 @@ const Applicants = () => {
 
             return true;
         }).sort((a, b) => new Date(b.date) - new Date(a.date));
-    }, [employerApplications, searchTerm, categoryFilter, statusFilter, getCategory]);
+    }, [employerApplications, searchTerm, departmentFilter, statusFilter, getDepartment]);
 
     // ── Handlers ───────────────────────────────────────────────────────────────
 
@@ -224,7 +224,7 @@ const Applicants = () => {
     };
 
     const handleGenerateReport = async () => {
-        if (!reportCategory)                  { addToast('Please select a category.', 'error'); return; }
+        if (!reportDepartment)                  { addToast('Please select a department.', 'error'); return; }
         if (!reportJobTitle.trim())           { addToast('Please enter a job title.', 'error'); return; }
         if (reportJobDesc.trim().length < 20) { addToast('Job description is too short (min 20 chars).', 'error'); return; }
 
@@ -233,11 +233,11 @@ const Applicants = () => {
         setReportError('');
 
         try {
-            setGeneratingStep('Filtering candidates by category…');
-            const catApps = employerApplications.filter(app => getCategory(app) === reportCategory);
+            setGeneratingStep('Filtering candidates by department…');
+            const catApps = employerApplications.filter(app => getDepartment(app) === reportDepartment);
 
             if (catApps.length === 0) {
-                setReportError(`No applicants found in the "${reportCategory}" category.`);
+                setReportError(`No applicants found in the "${reportDepartment}" department.`);
                 return;
             }
 
@@ -283,11 +283,11 @@ const Applicants = () => {
 
             setReportResults({
                 ranked,
-                totalInCategory:  catApps.length,
+                totalInDepartment: catApps.length,
                 analyzed:         valid.length,
                 topScore:         valid.length ? Math.max(...valid.map(r => r.score)) : 0,
                 recommendedCount: valid.filter(r => r.score >= 55).length,
-                category:         reportCategory,
+                department:       reportDepartment,
                 jobTitle:         reportJobTitle,
             });
 
@@ -312,7 +312,7 @@ const Applicants = () => {
                         {t('allApplicants')}
                     </h1>
                     <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginTop: '0.3rem' }}>
-                        Manage applicants, filter by category, and generate AI hiring recommendations.
+                        Manage applicants, filter by department, and generate AI hiring recommendations.
                     </p>
                 </div>
                 <div className="glass" style={{ display: 'flex', alignItems: 'center', padding: '0.5rem 1rem', borderRadius: 12, gap: '0.5rem' }}>
@@ -336,7 +336,7 @@ const Applicants = () => {
                     <div>
                         <h2 style={{ fontSize: '1.1rem', fontWeight: 700, margin: 0 }}>AI Hiring Report</h2>
                         <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: 0 }}>
-                            Filter by category and generate ranked candidate recommendations
+                            Filter by department and generate ranked candidate recommendations
                         </p>
                     </div>
                 </div>
@@ -364,27 +364,27 @@ const Applicants = () => {
                         />
                     </div>
 
-                    {/* Category */}
+                    {/* Department */}
                     <div>
                         <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600, marginBottom: '0.4rem', display: 'block' }}>
-                            Category <span style={{ color: '#ef4444' }}>*</span>
+                            Department <span style={{ color: '#ef4444' }}>*</span>
                         </label>
                         <div style={{ position: 'relative' }}>
                             <select
-                                value={reportCategory}
-                                onChange={(e) => setReportCategory(e.target.value)}
+                                value={reportDepartment}
+                                onChange={(e) => setReportDepartment(e.target.value)}
                                 disabled={isGenerating}
                                 style={{
                                     width: '100%', boxSizing: 'border-box', appearance: 'none',
                                     background: 'var(--bg-card)', border: '1px solid var(--border-color)',
-                                    color: reportCategory ? 'var(--text-main)' : 'var(--text-muted)',
+                                    color: reportDepartment ? 'var(--text-main)' : 'var(--text-muted)',
                                     padding: '0.6rem 2.2rem 0.6rem 0.85rem',
                                     borderRadius: 10, fontSize: '0.875rem', outline: 'none', cursor: 'pointer',
                                     opacity: isGenerating ? 0.6 : 1,
                                 }}
                             >
-                                <option value="">Select category…</option>
-                                {categoryNames.map(name => (
+                                <option value="">Select department…</option>
+                                {departmentNames.map(name => (
                                     <option key={name} value={name} style={{ background: 'var(--bg-card)' }}>{name}</option>
                                 ))}
                             </select>
@@ -489,7 +489,7 @@ const Applicants = () => {
             {reportResults && !isGenerating && (
                 <>
                     <div className="smart-summary-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem' }}>
-                        <SummaryCard icon={<Users size={20} />}     label="Total in Category"    value={reportResults.totalInCategory}  color="#6366f1" />
+                        <SummaryCard icon={<Users size={20} />}     label="Total in Department"  value={reportResults.totalInDepartment} color="#6366f1" />
                         <SummaryCard icon={<BarChart3 size={20} />} label="Candidates Analyzed"  value={reportResults.analyzed}         color="#8b5cf6" />
                         <SummaryCard icon={<TrendingUp size={20} />} label="Top Match Score"     value={`${reportResults.topScore}%`}   color="#10b981" />
                         <SummaryCard icon={<Trophy size={20} />}    label="Recommended"          value={reportResults.recommendedCount} color="#f59e0b" />
@@ -501,14 +501,14 @@ const Applicants = () => {
                                 <Target size={20} style={{ color: 'var(--primary)' }} />
                                 AI Ranking — {reportResults.jobTitle}
                                 <span style={{ marginLeft: '0.6rem', fontSize: '0.8rem', fontWeight: 500, color: 'var(--text-muted)', background: 'rgba(99,102,241,.12)', padding: '0.2rem 0.6rem', borderRadius: 6 }}>
-                                    {reportResults.category}
+                                    {reportResults.department}
                                 </span>
                             </h2>
                             <button
                                 onClick={() => { setReportResults(null); setReportError(''); }}
                                 style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', background: 'transparent', border: '1px solid var(--border-color)', color: 'var(--text-muted)', padding: '0.4rem 0.85rem', borderRadius: 8, fontSize: '0.82rem', cursor: 'pointer' }}
                             >
-                                <RefreshCw size={13} /> Clear Results
+                                <RefreshCw size={13} /> {t('clear') || 'Clear Results'}
                             </button>
                         </div>
 
@@ -522,7 +522,7 @@ const Applicants = () => {
                                 <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: dir === 'rtl' ? 'right' : 'left' }}>
                                     <thead>
                                         <tr style={{ borderBottom: '1px solid var(--border-color)' }}>
-                                            {['Rank', 'Candidate', 'Category', 'Match Score', 'App. Status', 'AI Recommendation', 'Action'].map(h => (
+                                            {[t('rank'), t('candidate'), t('department'), t('matchScore'), t('status'), t('aiRecommendation'), t('actions')].map(h => (
                                                 <th key={h} style={{ padding: '0.85rem 1rem', color: 'var(--text-muted)', fontWeight: 600, fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap' }}>{h}</th>
                                             ))}
                                         </tr>
@@ -550,7 +550,7 @@ const Applicants = () => {
                                                     </td>
                                                     <td style={{ padding: '1rem' }}>
                                                         <span style={{ fontSize: '0.8rem', background: 'rgba(99,102,241,.1)', color: 'var(--primary)', padding: '0.2rem 0.6rem', borderRadius: 6 }}>
-                                                            {getCategory(item.app)}
+                                                            {getDepartment(item.app)}
                                                         </span>
                                                     </td>
                                                     <td style={{ padding: '1rem', minWidth: 160 }}>
@@ -600,9 +600,9 @@ const Applicants = () => {
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                             <Filter size={14} style={{ color: 'var(--text-muted)' }} />
                             <FilterSelect
-                                value={categoryFilter}
-                                onChange={setCategoryFilter}
-                                options={availableCategories}
+                                value={departmentFilter}
+                                onChange={setDepartmentFilter}
+                                options={availableDepartments}
                             />
                         </div>
 
@@ -632,9 +632,9 @@ const Applicants = () => {
                     <div style={{ textAlign: 'center', padding: '3rem 1rem', color: 'var(--text-muted)' }}>
                         <Users size={48} style={{ opacity: 0.25, marginBottom: '0.75rem' }} />
                         <p style={{ fontSize: '0.95rem' }}>
-                            {categoryFilter !== 'All'
-                                ? `No applicants available in the "${categoryFilter}" category.`
-                                : 'No applicants match your current filters.'}
+                            {departmentFilter !== 'All'
+                                ? `${t('noApplicantsInDept') || 'No applicants available in the'} "${departmentFilter}" ${t('department')}.`
+                                : t('noApplicantsMatch') || 'No applicants match your current filters.'}
                         </p>
                     </div>
                 ) : (
@@ -643,7 +643,7 @@ const Applicants = () => {
                             <tr style={{ borderBottom: '1px solid var(--border-color)' }}>
                                 <th style={{ padding: '0.85rem 1rem', color: 'var(--text-muted)', fontWeight: 600, fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{t('applicantName')}</th>
                                 <th style={{ padding: '0.85rem 1rem', color: 'var(--text-muted)', fontWeight: 600, fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{t('appliedFor')}</th>
-                                <th style={{ padding: '0.85rem 1rem', color: 'var(--text-muted)', fontWeight: 600, fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Category</th>
+                                <th style={{ padding: '0.85rem 1rem', color: 'var(--text-muted)', fontWeight: 600, fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{t('department')}</th>
                                 <th style={{ padding: '0.85rem 1rem', color: 'var(--text-muted)', fontWeight: 600, fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{t('status')}</th>
                                 <th style={{ padding: '0.85rem 1rem', color: 'var(--text-muted)', fontWeight: 600, fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: 'center' }}>{t('actions')}</th>
                             </tr>
@@ -669,7 +669,7 @@ const Applicants = () => {
                                     </td>
                                     <td style={{ padding: '1.1rem 1rem' }}>
                                         <span style={{ fontSize: '0.78rem', background: 'rgba(99,102,241,.1)', color: 'var(--primary)', padding: '0.2rem 0.55rem', borderRadius: 6 }}>
-                                            {getCategory(app)}
+                                            {getDepartment(app)}
                                         </span>
                                     </td>
                                     <td style={{ padding: '1.1rem 1rem' }}>
@@ -685,8 +685,8 @@ const Applicants = () => {
                                             <button className="btn-candidate-action" onClick={() => handleAction('viewProfile', app)} title={t('viewProfile')}>
                                                 <Eye size={15} /><span>{t('viewProfile') || 'Profile'}</span>
                                             </button>
-                                            <button className="btn-candidate-action" onClick={() => navigate(`/messages?applicationId=${app.id}`)} title="Message candidate">
-                                                <MessageSquare size={15} /><span>Message</span>
+                                            <button className="btn-candidate-action" onClick={() => navigate(`/messages?applicationId=${app.id}`)} title={t('message') || 'Message candidate'}>
+                                                <MessageSquare size={15} /><span>{t('message') || 'Message'}</span>
                                             </button>
                                             <button className="btn-candidate-action success" onClick={() => handleAction('accept', app)} title={t('accept')}>
                                                 <CheckCircle size={15} /><span>{t('accept') || 'Accept'}</span>

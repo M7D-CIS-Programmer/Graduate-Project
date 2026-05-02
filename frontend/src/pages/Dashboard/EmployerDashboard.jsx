@@ -42,7 +42,7 @@ ChartJS.register(
 
 const EmployerDashboard = () => {
     const { theme } = useTheme();
-    const { t } = useLanguage();
+    const { t, dir } = useLanguage();
     const { user } = useAuth();
     const { addToast } = useToast();
     const navigate = useNavigate();
@@ -123,7 +123,7 @@ const EmployerDashboard = () => {
     if (jobsLoading || appsLoading) return <Spinner />;
 
     return (
-        <div className="dashboard-container">
+        <div className="dashboard-container" dir={dir}>
             <div className="dashboard-header">
                 <div>
 
@@ -166,7 +166,7 @@ const EmployerDashboard = () => {
                                 </div>
                                 <div className="activity-content">
                                     <h4>{applicant.name}</h4>
-                                    <p>{applicant.role} • {applicant.status}</p>
+                                    <p>{applicant.role} • {t(applicant.status.toLowerCase()) || applicant.status}</p>
                                 </div>
                                 <div style={{ display: 'flex', gap: '0.5rem' }}>
                                     <button className="btn-icon" title={t('viewProfile')} onClick={() => handleAction('view', applicant)}><Eye size={18} /></button>

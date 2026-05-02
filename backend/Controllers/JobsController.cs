@@ -25,7 +25,7 @@ public class JobsController : ControllerBase
         WorkMode = job.WorkMode,
         Responsibilities = job.Responsibilities,
         Requirements = job.Requirements,
-        CategoryId = job.CategoryId,
+        DepartmentId = job.DepartmentId,
         IsSalaryNegotiable = job.IsSalaryNegotiable,
         SalaryMin = job.SalaryMin,
         SalaryMax = job.SalaryMax,
@@ -45,7 +45,7 @@ public class JobsController : ControllerBase
             job.User.ProfilePicture,
             job.User.Followers?.Count ?? 0
         ) : null!,
-        Category = job.Category != null ? new CategoryResponseDto { Id = job.Category.Id, Name = job.Category.Name, JobCount = job.Category.Jobs?.Count ?? 0 } : null!,
+        Department = job.Department != null ? new DepartmentResponseDto { Id = job.Department.Id, Name = job.Department.Name, JobCount = job.Department.Jobs?.Count ?? 0 } : null!,
         ApplicantsCount = job.Applications?.Count ?? 0,
         ViewsCount = job.ViewsCount
     };
@@ -54,7 +54,7 @@ public class JobsController : ControllerBase
     public async Task<IActionResult> GetJobs(
         [FromQuery] string? type, 
         [FromQuery] string? workMode,
-        [FromQuery] int? categoryId,
+        [FromQuery] int? departmentId,
         [FromQuery] decimal? minSalary,
         [FromQuery] decimal? maxSalary,
         [FromQuery] string? q)
@@ -64,7 +64,7 @@ public class JobsController : ControllerBase
                 .ThenInclude(u => u.Roles)
             .Include(j => j.User)
                 .ThenInclude(u => u.Followers)
-            .Include(j => j.Category)
+            .Include(j => j.Department)
                 .ThenInclude(c => c.Jobs)
             .Include(j => j.Applications)
             .AsQueryable();
@@ -98,10 +98,10 @@ public class JobsController : ControllerBase
             query = query.Where(j => modes.Contains(j.WorkMode));
         }
 
-        // Filter by Category
-        if (categoryId.HasValue && categoryId.Value > 0)
+        // Filter by Department
+        if (departmentId.HasValue && departmentId.Value > 0)
         {
-            query = query.Where(j => j.CategoryId == categoryId.Value);
+            query = query.Where(j => j.DepartmentId == departmentId.Value);
         }
 
         // Filter by Salary Range
@@ -127,7 +127,7 @@ public class JobsController : ControllerBase
                 .ThenInclude(u => u.Roles)
             .Include(j => j.User)
                 .ThenInclude(u => u.Followers)
-            .Include(j => j.Category)
+            .Include(j => j.Department)
                 .ThenInclude(c => c.Jobs)
             .Include(j => j.Applications)
             .Where(j => j.UserId == userId)
@@ -143,7 +143,7 @@ public class JobsController : ControllerBase
                 .ThenInclude(u => u.Roles)
             .Include(j => j.User)
                 .ThenInclude(u => u.Followers)
-            .Include(j => j.Category)
+            .Include(j => j.Department)
                 .ThenInclude(c => c.Jobs)
             .Include(j => j.Applications)
             .FirstOrDefaultAsync(j => j.Id == id);
@@ -170,7 +170,7 @@ public class JobsController : ControllerBase
             WorkMode = dto.WorkMode,
             Responsibilities = dto.Responsibilities,
             Requirements = dto.Requirements,
-            CategoryId = dto.CategoryId,
+            DepartmentId = dto.DepartmentId,
             IsSalaryNegotiable = dto.IsSalaryNegotiable,
             SalaryMin = dto.SalaryMin,
             SalaryMax = dto.SalaryMax,
@@ -183,7 +183,13 @@ public class JobsController : ControllerBase
         _context.Jobs.Add(job);
         await _context.SaveChangesAsync();
 
-        return Ok(job);
+        var created = await _context.Jobs
+            .Include(j => j.User)
+            .Include(j => j.Department)
+                .ThenInclude(d => d.Jobs)
+            .FirstOrDefaultAsync(j => j.Id == job.Id);
+
+        return Ok(ToResponseDto(created!));
     }
 
     [HttpPut("{id}")]
@@ -198,15 +204,26 @@ public class JobsController : ControllerBase
         job.Description = updated.Description;
         job.Type = updated.Type;
         job.WorkMode = updated.WorkMode;
-        job.Requirements = updated.Requirements;
         job.Responsibilities = updated.Responsibilities;
+        job.Requirements = updated.Requirements;
+        job.DepartmentId = updated.DepartmentId;
+        job.SalaryMin = updated.SalaryMin;
+        job.SalaryMax = updated.SalaryMax;
+        job.IsSalaryNegotiable = updated.IsSalaryNegotiable;
+        job.Features = updated.Features;
         job.Location = updated.Location;
         job.Company = updated.Company;
         job.SearchKey = aabu_project.Utilities.SearchUtility.GenerateSearchKey(updated.Title, updated.Description, updated.Company, updated.Location);
 
         await _context.SaveChangesAsync();
 
-        return Ok(job);
+        var refreshed = await _context.Jobs
+            .Include(j => j.User)
+            .Include(j => j.Department)
+                .ThenInclude(d => d.Jobs)
+            .FirstOrDefaultAsync(j => j.Id == id);
+
+        return Ok(ToResponseDto(refreshed!));
     }
 
     [HttpPut("{id}/status")]

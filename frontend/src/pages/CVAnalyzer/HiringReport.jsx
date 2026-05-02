@@ -39,11 +39,11 @@ const ScoreBar = ({ value, label }) => (
     </div>
 );
 
-const decisionConfig = (d) => {
-    if (d === 'strong_hire') return { cls: 'cva-verdict-strong_hire', Icon: Trophy,      color: '#15803d', label: 'Strong Hire' };
-    if (d === 'hire')        return { cls: 'cva-verdict-hire',        Icon: CheckCircle, color: '#16a34a', label: 'Hire' };
-    if (d === 'neutral')     return { cls: 'cva-verdict-neutral',     Icon: AlertCircle, color: '#b45309', label: 'Neutral' };
-    return                          { cls: 'cva-verdict-reject',      Icon: XCircle,     color: '#991b1b', label: 'Reject' };
+const decisionConfig = (d, t) => {
+    if (d === 'strong_hire') return { cls: 'cva-verdict-strong_hire', Icon: Trophy,      color: '#15803d', label: t('strongHire') || 'Strong Hire' };
+    if (d === 'hire')        return { cls: 'cva-verdict-hire',        Icon: CheckCircle, color: '#16a34a', label: t('hire') || 'Hire' };
+    if (d === 'neutral')     return { cls: 'cva-verdict-neutral',     Icon: AlertCircle, color: '#b45309', label: t('neutral') || 'Neutral' };
+    return                          { cls: 'cva-verdict-reject',      Icon: XCircle,     color: '#991b1b', label: t('reject') || 'Reject' };
 };
 
 const riskColor = (r) => {
@@ -52,17 +52,17 @@ const riskColor = (r) => {
     return 'cva-badge-red';
 };
 
-const STEPS = [
-    'Calculating match score...',
-    'Running semantic analysis...',
-    'Running fraud detection...',
-    'Generating hiring recommendation...',
+const STEPS = (t) => [
+    t('calculatingScore') || 'Calculating match score...',
+    t('semanticAnalysisStep') || 'Running semantic analysis...',
+    t('fraudDetectionStep') || 'Running fraud detection...',
+    t('generatingRecommendation') || 'Generating hiring recommendation...',
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
 
 const HiringReport = () => {
-    const { dir } = useLanguage();
+    const { dir, t } = useLanguage();
     const fileInputRef = useRef(null);
 
     const [file, setFile]         = useState(null);
@@ -84,7 +84,7 @@ const HiringReport = () => {
             return;
         }
         if (selected.size > MAX_FILE_MB * 1024 * 1024) {
-            setError(`File too large. Maximum is ${MAX_FILE_MB} MB.`);
+            setError(t('jmErrorFileTooLarge', { max: MAX_FILE_MB }));
             return;
         }
         setFile(selected);
@@ -136,13 +136,13 @@ const HiringReport = () => {
         } catch (err) {
             const msg = err.message || '';
             if (msg.includes('quota') || msg.includes('429'))
-                setError('Quota exceeded. Please try again later.');
+                setError(t('jmErrorQuota'));
             else if (msg.includes('timed out') || msg.includes('408'))
-                setError('Request timed out. Please try again.');
+                setError(t('jmErrorTimeout'));
             else if (msg.includes('scanned') || msg.includes('image'))
-                setError('Scanned PDFs cannot be analysed — please use a text-based PDF.');
+                setError(t('scannedPdfError'));
             else
-                setError(msg || 'An error occurred. Please try again.');
+                setError(msg || t('cvErrorGeneral'));
         } finally {
             setLoading(false);
             setStep(-1);
@@ -151,7 +151,7 @@ const HiringReport = () => {
 
     const canSubmit = file && jobTitle.trim() && jobDesc.trim().length >= 20 && !loading;
     const rec = result?.recommendation;
-    const cfg = rec ? decisionConfig(rec.finalDecision) : null;
+    const cfg = rec ? decisionConfig(rec.finalDecision, t) : null;
 
     // ── Render ─────────────────────────────────────────────────────────────────
 
@@ -160,12 +160,16 @@ const HiringReport = () => {
 
             {/* Header */}
             <div className="cva-header">
-                <div className="cva-header-icon" style={{ background: 'linear-gradient(135deg, #059669, #0ea5e9)' }}>
+                <div className="cva-header-icon" style={{
+                    background: 'linear-gradient(135deg, #059669, #0ea5e9)',
+                    marginLeft: dir === 'rtl' ? '1rem' : '0',
+                    marginRight: dir === 'ltr' ? '1rem' : '0'
+                }}>
                     <Trophy size={28} />
                 </div>
                 <div>
-                    <h1 className="cva-title">Full Hiring Report</h1>
-                    <p className="cva-subtitle">Runs semantic analysis, fraud detection, and generates a final hiring recommendation</p>
+                    <h1 className="cva-title">{t('fullHiringReport')}</h1>
+                    <p className="cva-subtitle">{t('hiringReportDesc')}</p>
                 </div>
             </div>
 
@@ -175,8 +179,11 @@ const HiringReport = () => {
                 {/* Job Title */}
                 <div className="cva-field">
                     <label className="cva-label">
-                        <Briefcase size={15} />
-                        Job Title <span className="cva-required">*</span>
+                        <Briefcase size={15} style={{
+                            marginLeft: dir === 'rtl' ? '0.5rem' : '0',
+                            marginRight: dir === 'ltr' ? '0.5rem' : '0'
+                        }} />
+                        {t('jmJobTitle')} <span className="cva-required">*</span>
                     </label>
                     <input
                         className="cva-input"
@@ -211,8 +218,11 @@ const HiringReport = () => {
                 {/* PDF Upload */}
                 <div className="cva-field">
                     <label className="cva-label">
-                        <Upload size={15} />
-                        Candidate CV (PDF) <span className="cva-required">*</span>
+                        <Upload size={15} style={{
+                            marginLeft: dir === 'rtl' ? '0.5rem' : '0',
+                            marginRight: dir === 'ltr' ? '0.5rem' : '0'
+                        }} />
+                        {t('jmCandidateCv')} <span className="cva-required">*</span>
                     </label>
                     <div
                         className={`cva-dropzone ${file ? 'cva-dropzone--has-file' : ''} ${loading ? 'cva-dropzone--disabled' : ''}`}
@@ -248,8 +258,8 @@ const HiringReport = () => {
                         ) : (
                             <div className="cva-dropzone-empty">
                                 <Upload size={32} className="cva-upload-icon" />
-                                <p className="cva-dropzone-title">Upload CV</p>
-                                <p className="cva-dropzone-hint">Drag & drop or click — PDF only, max 10 MB</p>
+                                <p className="jm-dropzone-title">{t('jmDropzoneTitle')}</p>
+                                <p className="jm-dropzone-hint">{t('jmDropzoneHint')}</p>
                             </div>
                         )}
                     </div>
@@ -258,7 +268,7 @@ const HiringReport = () => {
                 {/* Pipeline progress */}
                 {loading && step >= 0 && (
                     <div className="cva-pipeline">
-                        {STEPS.map((label, i) => (
+                        {STEPS(t).map((label, i) => (
                             <div
                                 key={i}
                                 className={`cva-pipeline-step ${i < step ? 'done' : ''} ${i === step ? 'active' : ''}`}
@@ -290,8 +300,8 @@ const HiringReport = () => {
                         style={{ background: 'linear-gradient(135deg, #059669, #0ea5e9)' }}
                     >
                         {loading
-                            ? <><Loader2 size={18} className="cva-spin" /><span>Processing...</span></>
-                            : <><Trophy size={18} /><span>Generate Hiring Report</span></>
+                            ? <><Loader2 size={18} className="cva-spin" /><span>{t('jmAnalyzing')}</span></>
+                            : <><Trophy size={18} /><span>{t('generateHiringReport')}</span></>
                         }
                     </button>
                 </div>
@@ -303,10 +313,15 @@ const HiringReport = () => {
 
                     {/* Final Decision Banner */}
                     <div className={`cva-verdict ${cfg.cls}`}>
-                        <cfg.Icon size={40} style={{ color: cfg.color, flexShrink: 0 }} />
+                        <cfg.Icon size={40} style={{
+                            color: cfg.color,
+                            flexShrink: 0,
+                            marginLeft: dir === 'rtl' ? '1rem' : '0',
+                            marginRight: dir === 'ltr' ? '1rem' : '0'
+                        }} />
                         <div style={{ flex: 1 }}>
                             <div style={{ fontSize: '.72rem', fontWeight: 700, color: cfg.color, textTransform: 'uppercase', letterSpacing: '.07em', marginBottom: '.3rem' }}>
-                                Final Decision
+                                {t('finalDecision')}
                             </div>
                             <div style={{ fontSize: '1.65rem', fontWeight: 800, color: cfg.color, lineHeight: 1 }}>
                                 {cfg.label}
@@ -316,10 +331,7 @@ const HiringReport = () => {
                             className={`cva-badge ${riskColor(rec.riskAssessment)}`}
                             style={{ fontSize: '.85rem', padding: '.38rem 1rem', flexShrink: 0 }}
                         >
-                            {rec.riskAssessment
-                                ? rec.riskAssessment.charAt(0).toUpperCase() + rec.riskAssessment.slice(1)
-                                : 'Low'
-                            } Risk
+                            {rec.riskAssessment ? t(rec.riskAssessment) : t('low')} {t('risk')}
                         </span>
                     </div>
 
@@ -328,8 +340,11 @@ const HiringReport = () => {
                         {/* Final Score */}
                         <div className="cva-card cva-result-card cva-score-card">
                             <div className="cva-card-header">
-                                <TrendingUp size={18} className="cva-icon-purple" />
-                                <h3>Final Score</h3>
+                                <TrendingUp size={18} className="cva-icon-purple" style={{
+                                    marginLeft: dir === 'rtl' ? '0.5rem' : '0',
+                                    marginRight: dir === 'ltr' ? '0.5rem' : '0'
+                                }} />
+                                <h3>{t('finalScore')}</h3>
                             </div>
                             <ScoreBar value={rec.finalScore} />
                         </div>
@@ -337,8 +352,11 @@ const HiringReport = () => {
                         {/* System Match Score */}
                         <div className="cva-card cva-result-card">
                             <div className="cva-card-header">
-                                <Shield size={18} className="cva-icon-blue" />
-                                <h3>System Match Score</h3>
+                                <Shield size={18} className="cva-icon-blue" style={{
+                                    marginLeft: dir === 'rtl' ? '0.5rem' : '0',
+                                    marginRight: dir === 'ltr' ? '0.5rem' : '0'
+                                }} />
+                                <h3>{t('systemMatchScore')}</h3>
                             </div>
                             <ScoreBar value={result.matchScore} />
                         </div>
@@ -346,8 +364,11 @@ const HiringReport = () => {
                         {/* Reasoning — full width */}
                         <div className="cva-card cva-result-card cva-full-width">
                             <div className="cva-card-header">
-                                <MessageSquare size={18} className="cva-icon-blue" />
-                                <h3>Reasoning</h3>
+                                <MessageSquare size={18} className="cva-icon-blue" style={{
+                                    marginLeft: dir === 'rtl' ? '0.5rem' : '0',
+                                    marginRight: dir === 'ltr' ? '0.5rem' : '0'
+                                }} />
+                                <h3>{t('reasoning')}</h3>
                             </div>
                             <p style={{ fontSize: '.875rem', color: 'var(--text-secondary, #475569)', lineHeight: 1.7, margin: 0 }}>
                                 {rec.reasoning}
@@ -357,11 +378,18 @@ const HiringReport = () => {
                         {/* Recommendation — full width */}
                         <div
                             className="cva-card cva-result-card cva-full-width cva-suggestions-card"
-                            style={{ borderLeftColor: cfg.color }}
+                            style={{
+                                borderLeft: dir === 'ltr' ? `3px solid ${cfg.color}` : 'none',
+                                borderRight: dir === 'rtl' ? `3px solid ${cfg.color}` : 'none'
+                            }}
                         >
                             <div className="cva-card-header">
-                                <Briefcase size={18} style={{ color: cfg.color }} />
-                                <h3>Next Step Recommendation</h3>
+                                <Briefcase size={18} style={{
+                                    color: cfg.color,
+                                    marginLeft: dir === 'rtl' ? '0.5rem' : '0',
+                                    marginRight: dir === 'ltr' ? '0.5rem' : '0'
+                                }} />
+                                <h3>{t('nextStepRecommendation')}</h3>
                             </div>
                             <p style={{ fontSize: '.9rem', fontWeight: 500, color: 'var(--text-primary, #1e293b)', margin: 0, lineHeight: 1.6 }}>
                                 {rec.recommendation}
@@ -372,9 +400,13 @@ const HiringReport = () => {
                         {result.fraudResult?.isSuspicious && result.fraudResult.issuesFound?.length > 0 && (
                             <div className="cva-card cva-result-card cva-full-width" style={{ borderLeft: '3px solid #ef4444' }}>
                                 <div className="cva-card-header">
-                                    <AlertTriangle size={18} style={{ color: '#ef4444' }} />
+                                    <AlertTriangle size={18} style={{
+                                        color: '#ef4444',
+                                        marginLeft: dir === 'rtl' ? '0.5rem' : '0',
+                                        marginRight: dir === 'ltr' ? '0.5rem' : '0'
+                                    }} />
                                     <h3 style={{ color: '#ef4444' }}>
-                                        Fraud Flags ({result.fraudResult.issuesFound.length})
+                                        {t('issuesFound')} ({result.fraudResult.issuesFound.length})
                                     </h3>
                                 </div>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '.55rem' }}>

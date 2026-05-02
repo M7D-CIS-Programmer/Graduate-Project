@@ -2,12 +2,12 @@ using System;
 using System.Collections.Generic;
 namespace aabu_project.Models;
 
-public class Category
+public class Department
 {
     public int Id { get; set; }
     public string Name { get; set; } = null!;
 
-    /// <summary>null = global/seeded category; non-null = owned by a specific company.</summary>
+    /// <summary>null = global/seeded department; non-null = owned by a specific company.</summary>
     public int? UserId { get; set; }
 
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;

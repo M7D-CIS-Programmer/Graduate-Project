@@ -26,7 +26,7 @@ public class SavedJobsController : ControllerBase
 
         var saved = await _context.SavedJobs
             .Where(s => s.UserId == userId)
-            .Include(s => s.Job).ThenInclude(j => j.Category)
+            .Include(s => s.Job).ThenInclude(j => j.Department)
             .OrderByDescending(s => s.SavedAt)
             .Select(s => new SavedJobDto(
                 s.Id,
@@ -40,7 +40,7 @@ public class SavedJobsController : ControllerBase
                 s.Job.SalaryMax,
                 s.Job.IsSalaryNegotiable,
                 s.Job.Status,
-                s.Job.Category.Name,
+                s.Job.Department.Name,
                 s.SavedAt
             ))
             .ToListAsync();

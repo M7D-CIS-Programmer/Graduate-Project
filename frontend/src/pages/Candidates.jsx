@@ -63,19 +63,19 @@ const Candidates = () => {
         }
     };
 
-    const filterCategories = [
+    const filterSections = [
         { id: 'type', title: t('jobType'), options: [t('fullTime'), t('partTime'), t('contract'), t('remote')] },
         { id: 'experience', title: t('experience'), options: ['1-3 Years', '3-5 Years', '5+ Years'] },
     ];
 
-    const handleFilterChange = (categoryId, option) => {
+    const handleFilterChange = (sectionId, option) => {
         setSelectedFilters(prev => {
-            const currentSelected = prev[categoryId];
+            const currentSelected = prev[sectionId];
             const isSelected = currentSelected.includes(option);
 
             return {
                 ...prev,
-                [categoryId]: isSelected
+                [sectionId]: isSelected
                     ? currentSelected.filter(item => item !== option)
                     : [...currentSelected, option]
             };
@@ -123,7 +123,7 @@ const Candidates = () => {
                         <h2 style={{ fontSize: '1.25rem' }}>{t('filters')}</h2>
                     </div>
 
-                    {filterCategories.map(cat => (
+                    {filterSections.map(cat => (
                         <div key={cat.id} className="filter-section">
                             <h3 className="filter-title">{cat.title}</h3>
                             <div className="filter-options">
@@ -156,7 +156,7 @@ const Candidates = () => {
                             <Search size={20} color="var(--primary)" />
                             <input
                                 type="text"
-                                placeholder={t('candidatePlaceholder')}
+                                placeholder={t('searchCandidates') || 'Search candidates...'}
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 style={{ background: 'none', border: 'none', color: 'white', outline: 'none', width: '100%', paddingLeft: '10px' }}
@@ -220,13 +220,13 @@ const Candidates = () => {
                                     </div>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--primary)', fontWeight: '600' }}>
                                         {t('viewProfile')}
-                                        <ChevronRight size={18} className={dir === 'rtl' ? 'rotate-180' : ''} />
+                                        <ChevronRight size={18} style={{ transform: dir === 'rtl' ? 'rotate(180deg)' : 'none' }} />
                                     </div>
                                 </div>
                             </div>
                         )) : (
                             <div style={{ textAlign: 'center', padding: '3rem', width: '100%' }}>
-                                <p style={{ color: 'var(--text-muted)' }}>No candidates found matching your criteria.</p>
+                                <p style={{ color: 'var(--text-muted)' }}>{t('noCandidatesFound') || 'No candidates found matching your criteria.'}</p>
                             </div>
                         )}
                     </div>

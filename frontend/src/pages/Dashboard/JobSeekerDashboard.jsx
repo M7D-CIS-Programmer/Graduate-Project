@@ -43,7 +43,7 @@ ChartJS.register(
 
 const JobSeekerDashboard = () => {
     const { theme } = useTheme();
-    const { t } = useLanguage();
+    const { t, dir } = useLanguage();
     const { user } = useAuth();
     const navigate = useNavigate();
     const { data: allApplications = [], isLoading } = useApplications();
@@ -57,7 +57,7 @@ const JobSeekerDashboard = () => {
         { label: t('appliedJobs'), value: userApplications.length, icon: <Briefcase />, color: '#6366f1' },
         { label: t('interviews'), value: userApplications.filter(a => a.candidateStatus === 'Shortlisted').length, icon: <CheckCircle />, color: '#10b981' },
         { label: t('pending'), value: userApplications.filter(a => a.candidateStatus === 'Applied').length, icon: <Clock />, color: '#f59e0b' },
-        { label: 'Following', value: followedCompanies.length, icon: <Building />, color: '#06b6d4', link: '/profile?tab=following' },
+        { label: t('following'), value: followedCompanies.length, icon: <Building />, color: '#06b6d4', link: '/profile?tab=following' },
     ];
 
     const chartData = useMemo(() => {
@@ -98,7 +98,7 @@ const JobSeekerDashboard = () => {
     if (isLoading) return <Spinner />;
 
     return (
-        <div className="dashboard-container">
+        <div className="dashboard-container" dir={dir}>
             <div className="dashboard-header">
                 <div>
                     <h1 className="dashboard-title">{t('welcomeBack')}, {user?.name}!</h1>
@@ -199,7 +199,7 @@ const JobSeekerDashboard = () => {
                                     <p>{activity.company} • {activity.time}</p>
                                 </div>
                                 <span className={`status-badge ${activity.status.toLowerCase()}`}>
-                                    {activity.status}
+                                    {t(activity.status.toLowerCase()) || activity.status}
                                 </span>
                             </div>
                         ))}

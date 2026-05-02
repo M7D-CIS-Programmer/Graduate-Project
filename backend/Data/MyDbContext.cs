@@ -14,7 +14,7 @@ namespace aabu_project.Data
         public DbSet<Skill> Skills { get; set; }
         public DbSet<Education> Educations { get; set; }
         public DbSet<Job> Jobs { get; set; }
-        public DbSet<Category> Categories { get; set; }
+        public DbSet<Department> Departments { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<ApplicationJob> ApplicationJobs { get; set; }
         public DbSet<Role> Roles { get; set; }
@@ -26,14 +26,14 @@ namespace aabu_project.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // Seed Categories — global (UserId = null), visible to all users
+            // Seed Departments — global (UserId = null), visible to all users
             var seedDate = new DateTimeOffset(2024, 1, 1, 0, 0, 0, TimeSpan.Zero);
-            modelBuilder.Entity<Category>().HasData(
-                new Category { Id = 1, Name = "Technology", CreatedAt = seedDate },
-                new Category { Id = 2, Name = "Design",     CreatedAt = seedDate },
-                new Category { Id = 3, Name = "Marketing",  CreatedAt = seedDate },
-                new Category { Id = 4, Name = "Finance",    CreatedAt = seedDate },
-                new Category { Id = 5, Name = "Healthcare", CreatedAt = seedDate }
+            modelBuilder.Entity<Department>().HasData(
+                new Department { Id = 1, Name = "Technology", CreatedAt = seedDate },
+                new Department { Id = 2, Name = "Design",     CreatedAt = seedDate },
+                new Department { Id = 3, Name = "Marketing",  CreatedAt = seedDate },
+                new Department { Id = 4, Name = "Finance",    CreatedAt = seedDate },
+                new Department { Id = 5, Name = "Healthcare", CreatedAt = seedDate }
             );
 
             // Seed Users
@@ -56,12 +56,12 @@ namespace aabu_project.Data
 
             // Seed Jobs
             modelBuilder.Entity<Job>().HasData(
-                new Job { Id = 1, UserId = 3, Title = "Senior React Developer", Description = "Build amazing UIs for our enterprise platform used by thousands of clients worldwide.", Type = "Full Time", WorkMode = "Remote", Responsibilities = "Develop and maintain React applications, collaborate with backend teams, conduct code reviews, mentor junior developers.", Requirements = "5+ years React, TypeScript, Redux, REST APIs", CategoryId = 1, SalaryMin = 120000, SalaryMax = 160000, Status = "Active", Location = "Remote", Company = "Dubai Tech Solutions" },
-                new Job { Id = 2, UserId = 3, Title = "UI/UX Designer", Description = "Design clean, intuitive interfaces for web and mobile applications.", Type = "Full Time", WorkMode = "On-site", Responsibilities = "Create wireframes, prototypes, and high-fidelity designs. Conduct user research and usability testing.", Requirements = "3+ years experience, Figma, Adobe XD, user research skills", CategoryId = 2, SalaryMin = 100000, SalaryMax = 140000, Status = "Active", Location = "Abu Dhabi", Company = "Creative Studio UAE" },
-                new Job { Id = 3, UserId = 3, Title = "Backend .NET Developer", Description = "Develop and maintain scalable ASP.NET Core APIs for our cloud platform.", Type = "Full Time", WorkMode = "Hybrid", Responsibilities = "Design RESTful APIs, optimize database queries, implement security best practices.", Requirements = "4+ years .NET, C#, Entity Framework, SQL Server", CategoryId = 1, SalaryMin = 110000, SalaryMax = 150000, Status = "Active", Location = "Dubai", Company = "Tech Corp" },
-                new Job { Id = 4, UserId = 3, Title = "Digital Marketing Manager", Description = "Lead our digital marketing efforts across all channels.", Type = "Full Time", WorkMode = "On-site", Responsibilities = "Manage SEO/SEM campaigns, oversee social media strategy, analyze performance metrics.", Requirements = "5+ years digital marketing, Google Ads, Meta Ads, analytics tools", CategoryId = 3, SalaryMin = 90000, SalaryMax = 120000, Status = "Active", Location = "Sharjah", Company = "Growth Agency" },
-                new Job { Id = 5, UserId = 3, Title = "Financial Analyst", Description = "Analyze financial data and provide insights to support business decisions.", Type = "Full Time", WorkMode = "On-site", Responsibilities = "Prepare financial reports, build forecasting models, monitor KPIs.", Requirements = "CFA or CPA preferred, Excel, Power BI, 3+ years experience", CategoryId = 4, SalaryMin = 95000, SalaryMax = 130000, Status = "Active", Location = "Dubai", Company = "Finance Global" },
-                new Job { Id = 6, UserId = 3, Title = "Mobile Developer (React Native)", Description = "Build cross-platform mobile apps for iOS and Android.", Type = "Contract", WorkMode = "Remote", Responsibilities = "Develop features, integrate APIs, optimize app performance.", Requirements = "3+ years React Native, TypeScript, push notifications, app store publishing", CategoryId = 1, SalaryMin = 80000, SalaryMax = 110000, Status = "Active", Location = "Remote", Company = "App Builders" }
+                new Job { Id = 1, UserId = 3, Title = "Senior React Developer", Description = "Build amazing UIs for our enterprise platform used by thousands of clients worldwide.", Type = "Full Time", WorkMode = "Remote", Responsibilities = "Develop and maintain React applications, collaborate with backend teams, conduct code reviews, mentor junior developers.", Requirements = "5+ years React, TypeScript, Redux, REST APIs", DepartmentId = 1, SalaryMin = 120000, SalaryMax = 160000, Status = "Active", Location = "Remote", Company = "Dubai Tech Solutions" },
+                new Job { Id = 2, UserId = 3, Title = "UI/UX Designer", Description = "Design clean, intuitive interfaces for web and mobile applications.", Type = "Full Time", WorkMode = "On-site", Responsibilities = "Create wireframes, prototypes, and high-fidelity designs. Conduct user research and usability testing.", Requirements = "3+ years experience, Figma, Adobe XD, user research skills", DepartmentId = 2, SalaryMin = 100000, SalaryMax = 140000, Status = "Active", Location = "Abu Dhabi", Company = "Creative Studio UAE" },
+                new Job { Id = 3, UserId = 3, Title = "Backend .NET Developer", Description = "Develop and maintain scalable ASP.NET Core APIs for our cloud platform.", Type = "Full Time", WorkMode = "Hybrid", Responsibilities = "Design RESTful APIs, optimize database queries, implement security best practices.", Requirements = "4+ years .NET, C#, Entity Framework, SQL Server", DepartmentId = 1, SalaryMin = 110000, SalaryMax = 150000, Status = "Active", Location = "Dubai", Company = "Tech Corp" },
+                new Job { Id = 4, UserId = 3, Title = "Digital Marketing Manager", Description = "Lead our digital marketing efforts across all channels.", Type = "Full Time", WorkMode = "On-site", Responsibilities = "Manage SEO/SEM campaigns, oversee social media strategy, analyze performance metrics.", Requirements = "5+ years digital marketing, Google Ads, Meta Ads, analytics tools", DepartmentId = 3, SalaryMin = 90000, SalaryMax = 120000, Status = "Active", Location = "Sharjah", Company = "Growth Agency" },
+                new Job { Id = 5, UserId = 3, Title = "Financial Analyst", Description = "Analyze financial data and provide insights to support business decisions.", Type = "Full Time", WorkMode = "On-site", Responsibilities = "Prepare financial reports, build forecasting models, monitor KPIs.", Requirements = "CFA or CPA preferred, Excel, Power BI, 3+ years experience", DepartmentId = 4, SalaryMin = 95000, SalaryMax = 130000, Status = "Active", Location = "Dubai", Company = "Finance Global" },
+                new Job { Id = 6, UserId = 3, Title = "Mobile Developer (React Native)", Description = "Build cross-platform mobile apps for iOS and Android.", Type = "Contract", WorkMode = "Remote", Responsibilities = "Develop features, integrate APIs, optimize app performance.", Requirements = "3+ years React Native, TypeScript, push notifications, app store publishing", DepartmentId = 1, SalaryMin = 80000, SalaryMax = 110000, Status = "Active", Location = "Remote", Company = "App Builders" }
             );
 
             // Seed Resumes
@@ -174,10 +174,10 @@ namespace aabu_project.Data
                 .IsUnique()
                 .HasDatabaseName("UX_FollowCompany_UserId_CompanyId");
 
-            // Category → User (nullable FK; null = global category)
-            modelBuilder.Entity<Category>()
+            // Department → User (nullable FK; null = global department)
+            modelBuilder.Entity<Department>()
                 .HasOne(c => c.User)
-                .WithMany(u => u.Categories)
+                .WithMany(u => u.Departments)
                 .HasForeignKey(c => c.UserId)
                 .OnDelete(DeleteBehavior.SetNull);
 

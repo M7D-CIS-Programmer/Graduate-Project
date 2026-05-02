@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import {
     Building2, Plus, Pencil, Trash2, Check, X,
-    Briefcase, Calendar, Loader2, AlertCircle, FolderOpen
+    Briefcase, Calendar, Loader2, AlertCircle, FolderOpen, Eye
 } from 'lucide-react';
-import { useMyCategories, useCreateCategory, useUpdateCategory, useDeleteCategory } from '../../hooks/useCategories';
+import { useMyDepartments, useCreateDepartment, useUpdateDepartment, useDeleteDepartment } from '../../hooks/useDepartments';
+import { useNavigate } from 'react-router-dom';
 import { useToast } from '../../context/ToastContext';
 import { useLanguage } from '../../context/LanguageContext';
 import './Dashboard.css';
@@ -28,11 +29,12 @@ const formatDate = (iso, lang) => {
 const Departments = () => {
     const { t, dir, language }   = useLanguage();
     const { addToast } = useToast();
+    const navigate = useNavigate();
 
-    const { data: departments = [], isLoading, isError } = useMyCategories();
-    const { mutate: create, isPending: isCreating } = useCreateCategory();
-    const { mutate: update, isPending: isUpdating } = useUpdateCategory();
-    const { mutate: remove, isPending: isDeleting } = useDeleteCategory();
+    const { data: departments = [], isLoading, isError } = useMyDepartments();
+    const { mutate: create, isPending: isCreating } = useCreateDepartment();
+    const { mutate: update, isPending: isUpdating } = useUpdateDepartment();
+    const { mutate: remove, isPending: isDeleting } = useDeleteDepartment();
 
     const [newName,     setNewName]     = useState('');
     const [editingId,   setEditingId]   = useState(null);
@@ -321,6 +323,13 @@ const Departments = () => {
                                                 style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', background: 'rgba(99,102,241,.1)', border: '1px solid rgba(99,102,241,.25)', color: 'var(--primary)', padding: '0.4rem 0.85rem', borderRadius: 8, fontSize: '0.8rem', fontWeight: 500, cursor: 'pointer', whiteSpace: 'nowrap' }}
                                             >
                                                 <Pencil size={14} /> {t('edit')}
+                                            </button>
+                                            <button
+                                                onClick={() => navigate(`/jobs?departmentId=${dept.id}`)}
+                                                title={t('viewJobs')}
+                                                style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', background: 'rgba(16,185,129,.1)', border: '1px solid rgba(16,185,129,.25)', color: '#10b981', padding: '0.4rem 0.85rem', borderRadius: 8, fontSize: '0.8rem', fontWeight: 500, cursor: 'pointer', whiteSpace: 'nowrap' }}
+                                            >
+                                                <Eye size={14} /> {t('viewJobs')}
                                             </button>
                                             <button
                                                 onClick={() => confirmDelete(dept.id)}

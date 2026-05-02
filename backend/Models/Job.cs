@@ -12,7 +12,7 @@ public class Job
     public string WorkMode { get; set; } = null!;
     public string Responsibilities { get; set; } = null!;
     public string Requirements { get; set; } = null!;
-    public int CategoryId { get; set; }
+    public int DepartmentId { get; set; }
     public bool IsSalaryNegotiable { get; set; }
     public decimal? SalaryMin { get; set; }
     public decimal? SalaryMax { get; set; }
@@ -27,7 +27,7 @@ public class Job
 
     // Navigation
     public User User { get; set; } = null!;
-    public Category Category { get; set; } = null!;
+    public Department Department { get; set; } = null!;
     public ICollection<ApplicationJob> Applications { get; set; } = new List<ApplicationJob>();
     public ICollection<SavedJob> SavedJobs { get; set; } = new List<SavedJob>();
 }
