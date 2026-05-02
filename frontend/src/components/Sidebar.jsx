@@ -48,8 +48,6 @@ const Sidebar = ({ isOpen }) => {
         if (role === 'job seeker') {
             return [
                 { name: t('dashboard'),      icon: <LayoutDashboard size={20} />, path: '/dashboard/seeker' },
-                { name: t('myApplications'), icon: <Briefcase size={20} />,       path: '/dashboard/seeker/applications' },
-                { name: t('savedJobs'),      icon: <Bookmark size={20} />,        path: '/saved-jobs' },
                 { name: t('resumeBuilder'),  icon: <FileEdit size={20} />,        path: '/resume-builder' },
                 { name: t('jobMatching'),    icon: <Zap size={20} />,             path: '/job-matching' },
                 { name: t('interview'),      icon: <MessageSquare size={20} />,   path: '/interview' },
