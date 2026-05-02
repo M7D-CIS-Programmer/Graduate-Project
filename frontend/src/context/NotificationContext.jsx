@@ -11,14 +11,16 @@ export const NotificationProvider = ({ children }) => {
     const { addToast } = useToast();
     const { t } = useLanguage();
     const [unreadCount, setUnreadCount] = useState(0);
+    const [notifications, setNotifications] = useState([]);
     const [lastChecked, setLastChecked] = useState(null);
 
     const fetchUnreadCount = useCallback(async (showToast = false) => {
         if (!user?.id) return;
 
         try {
-            const notifications = await api.getNotificationsByUserId(user.id, user.role);
-            const count = notifications.filter(n => !n.isRead).length;
+            const data = await api.getNotificationsByUserId(user.id, user.role);
+            setNotifications(data);
+            const count = data.filter(n => !n.isRead).length;
             setUnreadCount(count);
 
             if (showToast && count > 0) {
@@ -30,17 +32,34 @@ export const NotificationProvider = ({ children }) => {
         }
     }, [user?.id, addToast, t]);
 
+    const markAsRead = async (notificationId) => {
+        try {
+            await api.markNotificationAsRead(notificationId);
+            setNotifications(prev => prev.map(n => n.id === notificationId ? { ...n, isRead: true } : n));
+            setUnreadCount(prev => Math.max(0, prev - 1));
+        } catch (error) {
+            console.error('Failed to mark notification as read:', error);
+        }
+    };
+
     // Initial fetch when user logs in or app loads
     useEffect(() => {
         if (user?.id) {
             fetchUnreadCount(true);
         } else {
             setUnreadCount(0);
+            setNotifications([]);
         }
     }, [user?.id]); // Only trigger when user object itself changes (login/logout)
 
     return (
-        <NotificationContext.Provider value={{ unreadCount, setUnreadCount, fetchUnreadCount }}>
+        <NotificationContext.Provider value={{ 
+            unreadCount, 
+            setUnreadCount, 
+            fetchUnreadCount, 
+            notifications, 
+            markAsRead 
+        }}>
             {children}
         </NotificationContext.Provider>
     );

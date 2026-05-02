@@ -27,7 +27,9 @@ const Navbar = ({ toggleSidebar }) => {
     const { user, logout } = useAuth();
     const { t, language, toggleLanguage, dir } = useLanguage();
     const { theme, toggleTheme } = useTheme();
-    const { unreadCount } = useNotifications();
+    const { unreadCount, notifications, markAsRead } = useNotifications();
+    const [showNotifications, setShowNotifications] = React.useState(false);
+    const notificationRef = React.useRef(null);
     const location = useLocation();
     const [searchQuery, setSearchQuery] = React.useState('');
     const navigate = useNavigate();
@@ -42,6 +44,9 @@ const Navbar = ({ toggleSidebar }) => {
         const handleClickOutside = (event) => {
             if (searchRef.current && !searchRef.current.contains(event.target)) {
                 setShowResults(false);
+            }
+            if (notificationRef.current && !notificationRef.current.contains(event.target)) {
+                setShowNotifications(false);
             }
         };
         document.addEventListener('mousedown', handleClickOutside);
@@ -226,12 +231,63 @@ const Navbar = ({ toggleSidebar }) => {
                             <MessageSquare size={20} />
                             <span>{t('msgMessages')}</span>
                         </Link>
-                        <Link to="/notifications" className="nav-icon-btn notification-btn" title={t('notifications')}>
-                            <Bell size={20} />
-                            {unreadCount > 0 && (
-                                <span className="notification-badge">{unreadCount}</span>
+                        <div className="nav-dropdown-container" ref={notificationRef}>
+                            <button 
+                                className={`nav-icon-btn notification-btn ${showNotifications ? 'active' : ''}`} 
+                                onClick={() => setShowNotifications(!showNotifications)}
+                                title={t('notifications')}
+                            >
+                                <Bell size={20} />
+                                {unreadCount > 0 && (
+                                    <span className="notification-badge">{unreadCount}</span>
+                                )}
+                            </button>
+
+                            {showNotifications && (
+                                <div className="nav-dropdown notification-dropdown glass shadow-xl">
+                                    <div className="dropdown-header">
+                                        <h3>{t('notifications')}</h3>
+                                        {unreadCount > 0 && (
+                                            <span className="unread-dot-label">{unreadCount} new</span>
+                                        )}
+                                    </div>
+                                    <div className="dropdown-list">
+                                        {notifications.length > 0 ? (
+                                            notifications.slice(0, 5).map((notif) => (
+                                                <div 
+                                                    key={notif.id} 
+                                                    className={`dropdown-item ${!notif.isRead ? 'unread' : ''}`}
+                                                    onClick={() => {
+                                                        if (!notif.isRead) markAsRead(notif.id);
+                                                        if (notif.link) navigate(notif.link);
+                                                        setShowNotifications(false);
+                                                    }}
+                                                >
+                                                    <div className="item-content">
+                                                        <p className="item-message">{notif.message}</p>
+                                                        <span className="item-time">
+                                                            {new Date(notif.createdAt).toLocaleDateString()}
+                                                        </span>
+                                                    </div>
+                                                    {!notif.isRead && <span className="unread-dot"></span>}
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <div className="empty-dropdown">
+                                                {t('noNotifications')}
+                                            </div>
+                                        )}
+                                    </div>
+                                    <Link 
+                                        to="/notifications" 
+                                        className="dropdown-footer"
+                                        onClick={() => setShowNotifications(false)}
+                                    >
+                                        {t('viewAll')}
+                                    </Link>
+                                </div>
                             )}
-                        </Link>
+                        </div>
                     </>
                 )}
 

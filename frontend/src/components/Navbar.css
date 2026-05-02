@@ -327,6 +327,129 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
+/* Notification Dropdown */
+.nav-dropdown-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.notification-dropdown {
+    position: absolute;
+    top: calc(100% + 15px);
+    right: 0;
+    width: 320px;
+    padding: 0;
+    overflow: hidden;
+    z-index: 1000;
+}
+
+.layout-wrapper.rtl .notification-dropdown {
+    right: auto;
+    left: 0;
+}
+
+.dropdown-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--border-color);
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.dropdown-header h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0;
+    color: var(--text-main);
+}
+
+.unread-dot-label {
+    font-size: 0.75rem;
+    color: var(--primary);
+    font-weight: 600;
+}
+
+.dropdown-list {
+    max-height: 360px;
+    overflow-y: auto;
+}
+
+.dropdown-item {
+    padding: 1rem 1.25rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    cursor: pointer;
+    transition: var(--transition);
+    border-bottom: 1px solid var(--border-color);
+    position: relative;
+    text-align: left;
+}
+
+.layout-wrapper.rtl .dropdown-item {
+    text-align: right;
+    flex-direction: row-reverse;
+}
+
+.dropdown-item:hover {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.dropdown-item.unread {
+    background: rgba(99, 102, 241, 0.05);
+}
+
+.item-content {
+    flex: 1;
+}
+
+.item-message {
+    margin: 0 0 0.4rem 0;
+    font-size: 0.875rem;
+    line-height: 1.4;
+    color: var(--text-main);
+}
+
+.item-time {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.unread-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--primary);
+    border-radius: 50%;
+    margin-top: 5px;
+    flex-shrink: 0;
+}
+
+.dropdown-footer {
+    display: block;
+    padding: 0.85rem;
+    text-align: center;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--primary);
+    text-decoration: none;
+    transition: var(--transition);
+    background: rgba(99, 102, 241, 0.05);
+}
+
+.dropdown-footer:hover {
+    background: rgba(99, 102, 241, 0.1);
+    color: var(--primary-dark);
+}
+
+.empty-dropdown {
+    padding: 2.5rem 1rem;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+}
+
 /* Search Dropdown Styles */
 .search-dropdown {
     position: absolute;
