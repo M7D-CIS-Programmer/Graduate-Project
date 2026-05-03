@@ -368,8 +368,7 @@ export const LanguageProvider = ({ children }) => {
             pleaseUploadPdf: "Please upload a PDF file.",
             scannedPdfError: "Scanned PDFs cannot be analysed — please use a text-based PDF.",
             cvErrorGeneral: "An error occurred. Please try again.",
-
-            myJobs: "Jobs & Departments",
+            departmentsAndJobs: "Departments & Jobs",
 
             postedDate: "Posted Date",
             manage: "Manage",
@@ -1141,11 +1140,10 @@ export const LanguageProvider = ({ children }) => {
             pleaseUploadPdf: "يرجى رفع ملف PDF.",
             scannedPdfError: "لا يمكن تحليل ملفات PDF الممسوحة ضوئياً - يرجى استخدام ملف PDF نصي.",
             cvErrorGeneral: "حدث خطأ. يرجى المحاولة مرة أخرى.",
-            myJobs: "الوظائف و الأقسام",
+            departmentsAndJobs: "الأقسام والوظائف",
 
             postedDate: "تاريخ النشر",
             coverLetter: "ملاحظة",
-            myJobs: "وظائفي",
             manage: "إدارة",
             views: "المشاهدات",
             active: "نشط",

@@ -32,73 +32,55 @@ const Sidebar = ({ isOpen }) => {
 
     const isEmployerHome = location.pathname === '/employer-home';
 
-    // Base items for everyone
-    const baseItems = [
-        isEmployerHome
-            ? { name: t('findCandidates'), icon: <Users size={20} />, path: '/candidates' }
-            : { name: t('findJobs'), icon: <Briefcase size={20} />, path: '/jobs' },
-        { name: t('companies'), icon: <Building2 size={20} />, path: '/companies' },
-    ];
-
-    // Role-specific items
-    const getRoleItems = () => {
-        if (!user || !user.role) return [];
-
-        const role = user.role.toLowerCase();
+    const getNavItems = () => {
+        const role = user?.role?.toLowerCase() || '';
+        const items = [];
 
         if (role === 'job seeker') {
-            return [
-                { name: t('dashboard'),     icon: <LayoutDashboard size={20} />, path: '/dashboard/seeker' },
-                { name: t('resumeBuilder'), icon: <FileEdit size={20} />,        path: '/resume-builder' },
-                { name: t('jobMatching'),   icon: <Zap size={20} />,             path: '/job-matching' },
-                { name: t('interview'),     icon: <MessageSquare size={20} />,   path: '/interview' },
-                { name: t('contactUs'),     icon: <Mail size={20} />,            path: '/contact' },
-            ];
+            items.push({ name: t('dashboard'), icon: <LayoutDashboard size={20} />, path: '/dashboard/seeker' });
+            items.push({ name: t('findJobs'), icon: <Briefcase size={20} />, path: '/jobs' });
+            items.push({ name: t('companies'), icon: <Building2 size={20} />, path: '/companies' });
+            items.push({ name: t('jobMatching'), icon: <Zap size={20} />, path: '/job-matching' });
+            items.push({ name: t('resumeBuilder'), icon: <FileEdit size={20} />, path: '/resume-builder' });
+            items.push({ name: t('interview'), icon: <MessageSquare size={20} />, path: '/interview' });
+            items.push({ name: t('profile'), icon: <UserIcon size={20} />, path: '/profile' });
+            items.push({ name: t('contactUs'), icon: <Mail size={20} />, path: '/contact' });
+            items.push({ name: t('settings'), icon: <Settings size={20} />, path: '/settings' });
+        } 
+        else if (role === 'employer' || role === 'company') {
+            items.push({ name: t('dashboard'), icon: <LayoutDashboard size={20} />, path: '/dashboard/employer' });
+            items.push({ name: t('findCandidates'), icon: <Users size={20} />, path: '/candidates' });
+            items.push({ name: t('companies'), icon: <Building2 size={20} />, path: '/companies' });
+            items.push({ name: t('departmentsAndJobs'), icon: <Briefcase size={20} />, path: '/dashboard/employer/jobs' });
+            items.push({ name: t('postAJob'), icon: <PlusCircle size={20} />, path: '/jobs/post' });
+            items.push({ name: t('candidates'), icon: <Users size={20} />, path: '/dashboard/employer/applicants' });
+            items.push({ name: t('jobMatching'), icon: <Zap size={20} />, path: '/job-matching' });
+            items.push({ name: t('fraudDetection'), icon: <ShieldAlert size={20} />, path: '/cv-fraud-check' });
+            items.push({ name: t('profile'), icon: <UserIcon size={20} />, path: '/profile' });
+            items.push({ name: t('contactUs'), icon: <Mail size={20} />, path: '/contact' });
+            items.push({ name: t('settings'), icon: <Settings size={20} />, path: '/settings' });
+        } 
+        else if (role === 'admin') {
+            items.push({ name: t('adminDashboard'), icon: <LayoutDashboard size={20} />, path: '/dashboard/admin' });
+            items.push({ name: t('platformSettings'), icon: <Settings size={20} />, path: '/dashboard/admin/settings' });
+            items.push({ name: t('manageUsers'), icon: <Users size={20} />, path: '/dashboard/admin/users' });
+            items.push({ name: t('manageCompanies'), icon: <Building2 size={20} />, path: '/dashboard/admin/companies' });
+            items.push({ name: t('manageJobs'), icon: <Briefcase size={20} />, path: '/dashboard/admin/jobs' });
+            items.push({ name: t('contactMessages') || 'Contact Messages', icon: <Mail size={20} />, path: '/dashboard/admin/contact-messages' });
+            items.push({ name: t('settings'), icon: <Settings size={20} />, path: '/settings' });
+        } 
+        else {
+            items.push({ name: t('findJobs'), icon: <Briefcase size={20} />, path: '/jobs' });
+            items.push({ name: t('companies'), icon: <Building2 size={20} />, path: '/companies' });
+            items.push({ name: t('aboutUs'), icon: <FileText size={20} />, path: '/about' });
+            items.push({ name: t('contactUs'), icon: <Mail size={20} />, path: '/contact' });
         }
 
-        if (role === 'employer' || role === 'company') {
-            return [
-                { name: t('dashboard'), icon: <LayoutDashboard size={20} />, path: '/dashboard/employer' },
-                { name: t('departmentsAndJobs'), icon: <Briefcase size={20} />, path: '/dashboard/employer/jobs' },
-                { name: t('postAJob'), icon: <PlusCircle size={20} />, path: '/jobs/post' },
-                { name: t('candidates'), icon: <Users size={20} />, path: '/dashboard/employer/applicants' },
-                { name: t('jobMatching'), icon: <Zap size={20} />, path: '/job-matching' },
-                { name: t('fraudDetection'), icon: <ShieldAlert size={20} />, path: '/cv-fraud-check' },
-                { name: t('contactUs'), icon: <Mail size={20} />, path: '/contact' },
-            ];
-        }
-
-        if (role === 'admin') {
-            return [
-                { name: t('adminDashboard'),     icon: <LayoutDashboard size={20} />, path: '/dashboard/admin' },
-                { name: t('manageUsers'),         icon: <Users size={20} />,           path: '/dashboard/admin/users' },
-                { name: t('manageJobs'),          icon: <Briefcase size={20} />,       path: '/dashboard/admin/jobs' },
-                { name: t('manageCompanies'),     icon: <Building2 size={20} />,       path: '/dashboard/admin/companies' },
-                { name: t('contactMessages') || 'Contact Messages', icon: <Mail size={20} />, path: '/dashboard/admin/contact-messages' },
-                { name: t('platformSettings'),   icon: <Settings size={20} />,         path: '/dashboard/admin/settings' },
-            ];
-        }
-
-        return [];
+        return items;
     };
 
     const userRole = user?.role?.toLowerCase() || '';
-
-    const navItems = [
-        ...getRoleItems(),
-        ...(['employer', 'company', 'admin'].includes(userRole) ? [] : baseItems),
-        ...(user && userRole !== 'admin' ? [
-            { 
-                name: t('profile'), 
-                icon: <UserIcon size={20} />, 
-                path: '/profile' 
-            }
-        ] : user ? [] : [
-            { name: t('aboutUs'), icon: <FileText size={20} />, path: '/about' },
-            { name: t('contactUs'), icon: <Mail size={20} />, path: '/contact' }
-        ]),
-        { name: t('settings'), icon: <Settings size={20} />, path: '/settings' }
-    ];
+    const navItems = getNavItems();
 
     return (
         <aside className={`sidebar glass ${isOpen ? 'open' : ''}`}>
