@@ -11,145 +11,146 @@ namespace aabu_project.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            // ── Experiences: StartDate / EndDate already altered by earlier migration.
+            //    AlterColumn is safe to run again (idempotent in SQL Server because it
+            //    only changes the column definition when the type actually differs).
             migrationBuilder.AlterColumn<string>(
                 name: "StartDate",
                 table: "Experiences",
                 type: "nvarchar(max)",
                 nullable: false,
-                oldClrType: typeof(DateTime),
-                oldType: "datetime2");
+                oldClrType: typeof(string),
+                oldType: "nvarchar(max)");
 
             migrationBuilder.AlterColumn<string>(
                 name: "EndDate",
                 table: "Experiences",
                 type: "nvarchar(max)",
                 nullable: true,
-                oldClrType: typeof(DateTime),
-                oldType: "datetime2",
+                oldClrType: typeof(string),
+                oldType: "nvarchar(max)",
                 oldNullable: true);
 
-            migrationBuilder.AddColumn<DateTimeOffset>(
-                name: "CreatedAt",
-                table: "Categories",
-                type: "datetimeoffset",
-                nullable: false,
-                defaultValue: new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)));
+            // ── Categories.CreatedAt — added by 20260430200000_AddUserOwnershipToCategories.
+            //    Guard with IF NOT EXISTS so re-running is safe.
+            migrationBuilder.Sql("""
+                IF NOT EXISTS (
+                    SELECT 1 FROM sys.columns
+                    WHERE object_id = OBJECT_ID(N'[Categories]') AND name = N'CreatedAt'
+                )
+                BEGIN
+                    ALTER TABLE [Categories] ADD [CreatedAt] datetimeoffset NOT NULL
+                        DEFAULT '0001-01-01T00:00:00.0000000+00:00';
+                END
+                """);
 
-            migrationBuilder.AddColumn<int>(
-                name: "UserId",
-                table: "Categories",
-                type: "int",
-                nullable: true);
+            // ── Categories.UserId — same guard.
+            migrationBuilder.Sql("""
+                IF NOT EXISTS (
+                    SELECT 1 FROM sys.columns
+                    WHERE object_id = OBJECT_ID(N'[Categories]') AND name = N'UserId'
+                )
+                BEGIN
+                    ALTER TABLE [Categories] ADD [UserId] int NULL;
+                END
+                """);
 
-            migrationBuilder.CreateTable(
-                name: "Messages",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ApplicationJobId = table.Column<int>(type: "int", nullable: false),
-                    SenderId = table.Column<int>(type: "int", nullable: false),
-                    Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    SentAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    IsRead = table.Column<bool>(type: "bit", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Messages", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Messages_ApplicationJobs_ApplicationJobId",
-                        column: x => x.ApplicationJobId,
-                        principalTable: "ApplicationJobs",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Messages_Users_SenderId",
-                        column: x => x.SenderId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
+            // ── Messages table — created by 20260501120000_AddMessagesTable.
+            migrationBuilder.Sql("""
+                IF NOT EXISTS (SELECT 1 FROM sysobjects WHERE name = N'Messages' AND xtype = 'U')
+                BEGIN
+                    CREATE TABLE [Messages] (
+                        [Id]               int              IDENTITY(1,1) NOT NULL,
+                        [ApplicationJobId] int              NOT NULL,
+                        [SenderId]         int              NOT NULL,
+                        [Content]          nvarchar(max)    NOT NULL,
+                        [SentAt]           datetimeoffset   NOT NULL,
+                        [IsRead]           bit              NOT NULL,
+                        CONSTRAINT [PK_Messages] PRIMARY KEY ([Id]),
+                        CONSTRAINT [FK_Messages_ApplicationJobs_ApplicationJobId]
+                            FOREIGN KEY ([ApplicationJobId]) REFERENCES [ApplicationJobs]([Id])
+                            ON DELETE CASCADE,
+                        CONSTRAINT [FK_Messages_Users_SenderId]
+                            FOREIGN KEY ([SenderId]) REFERENCES [Users]([Id])
+                            ON DELETE NO ACTION
+                    );
+                END
+                """);
 
-            migrationBuilder.UpdateData(
-                table: "Categories",
-                keyColumn: "Id",
-                keyValue: 1,
-                columns: new[] { "CreatedAt", "UserId" },
-                values: new object[] { new DateTimeOffset(new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null });
+            // ── Seed data for Categories (only update rows where CreatedAt is still the default).
+            migrationBuilder.Sql("""
+                UPDATE [Categories] SET [CreatedAt] = '2024-01-01T00:00:00.0000000+00:00', [UserId] = NULL
+                WHERE [Id] IN (1,2,3,4,5) AND [CreatedAt] = '0001-01-01T00:00:00.0000000+00:00';
+                """);
 
-            migrationBuilder.UpdateData(
-                table: "Categories",
-                keyColumn: "Id",
-                keyValue: 2,
-                columns: new[] { "CreatedAt", "UserId" },
-                values: new object[] { new DateTimeOffset(new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null });
+            // ── Indexes — create only if absent.
+            migrationBuilder.Sql("""
+                IF NOT EXISTS (SELECT 1 FROM sys.indexes
+                    WHERE object_id = OBJECT_ID(N'[Categories]') AND name = N'IX_Categories_UserId')
+                BEGIN
+                    CREATE INDEX [IX_Categories_UserId] ON [Categories]([UserId]);
+                END
+                """);
 
-            migrationBuilder.UpdateData(
-                table: "Categories",
-                keyColumn: "Id",
-                keyValue: 3,
-                columns: new[] { "CreatedAt", "UserId" },
-                values: new object[] { new DateTimeOffset(new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null });
+            migrationBuilder.Sql("""
+                IF NOT EXISTS (SELECT 1 FROM sys.indexes
+                    WHERE object_id = OBJECT_ID(N'[Messages]') AND name = N'IX_Messages_ApplicationJobId')
+                BEGIN
+                    CREATE INDEX [IX_Messages_ApplicationJobId] ON [Messages]([ApplicationJobId]);
+                END
+                """);
 
-            migrationBuilder.UpdateData(
-                table: "Categories",
-                keyColumn: "Id",
-                keyValue: 4,
-                columns: new[] { "CreatedAt", "UserId" },
-                values: new object[] { new DateTimeOffset(new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null });
+            migrationBuilder.Sql("""
+                IF NOT EXISTS (SELECT 1 FROM sys.indexes
+                    WHERE object_id = OBJECT_ID(N'[Messages]') AND name = N'IX_Messages_SenderId')
+                BEGIN
+                    CREATE INDEX [IX_Messages_SenderId] ON [Messages]([SenderId]);
+                END
+                """);
 
-            migrationBuilder.UpdateData(
-                table: "Categories",
-                keyColumn: "Id",
-                keyValue: 5,
-                columns: new[] { "CreatedAt", "UserId" },
-                values: new object[] { new DateTimeOffset(new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Categories_UserId",
-                table: "Categories",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Messages_ApplicationJobId",
-                table: "Messages",
-                column: "ApplicationJobId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Messages_SenderId",
-                table: "Messages",
-                column: "SenderId");
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_Categories_Users_UserId",
-                table: "Categories",
-                column: "UserId",
-                principalTable: "Users",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.SetNull);
+            // ── FK Categories → Users — create only if absent.
+            migrationBuilder.Sql("""
+                IF NOT EXISTS (SELECT 1 FROM sys.foreign_keys
+                    WHERE name = N'FK_Categories_Users_UserId')
+                BEGIN
+                    ALTER TABLE [Categories]
+                        ADD CONSTRAINT [FK_Categories_Users_UserId]
+                        FOREIGN KEY ([UserId]) REFERENCES [Users]([Id])
+                        ON DELETE SET NULL;
+                END
+                """);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_Categories_Users_UserId",
-                table: "Categories");
+            migrationBuilder.Sql("""
+                IF EXISTS (SELECT 1 FROM sys.foreign_keys WHERE name = N'FK_Categories_Users_UserId')
+                    ALTER TABLE [Categories] DROP CONSTRAINT [FK_Categories_Users_UserId];
+                """);
 
-            migrationBuilder.DropTable(
-                name: "Messages");
+            migrationBuilder.Sql("""
+                IF EXISTS (SELECT 1 FROM sysobjects WHERE name = N'Messages' AND xtype = 'U')
+                    DROP TABLE [Messages];
+                """);
 
-            migrationBuilder.DropIndex(
-                name: "IX_Categories_UserId",
-                table: "Categories");
+            migrationBuilder.Sql("""
+                IF EXISTS (SELECT 1 FROM sys.indexes
+                    WHERE object_id = OBJECT_ID(N'[Categories]') AND name = N'IX_Categories_UserId')
+                    DROP INDEX [IX_Categories_UserId] ON [Categories];
+                """);
 
-            migrationBuilder.DropColumn(
-                name: "CreatedAt",
-                table: "Categories");
+            migrationBuilder.Sql("""
+                IF EXISTS (SELECT 1 FROM sys.columns
+                    WHERE object_id = OBJECT_ID(N'[Categories]') AND name = N'CreatedAt')
+                    ALTER TABLE [Categories] DROP COLUMN [CreatedAt];
+                """);
 
-            migrationBuilder.DropColumn(
-                name: "UserId",
-                table: "Categories");
+            migrationBuilder.Sql("""
+                IF EXISTS (SELECT 1 FROM sys.columns
+                    WHERE object_id = OBJECT_ID(N'[Categories]') AND name = N'UserId')
+                    ALTER TABLE [Categories] DROP COLUMN [UserId];
+                """);
 
             migrationBuilder.AlterColumn<DateTime>(
                 name: "StartDate",

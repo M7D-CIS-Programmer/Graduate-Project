@@ -19,10 +19,15 @@ import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
+import {
+    validateName, validateEmail, validatePhone,
+    validateUrl, validateLinkedIn, validateGitHub
+} from '../utils/validators';
 import './User.css';
 
 const EditProfile = () => {
-    const { t, dir } = useLanguage();
+    const { t, dir, language } = useLanguage();
+    const lang = language || 'en';
     const { user: currentUser, updateUser } = useAuth();
     const { addToast } = useToast();
     const navigate = useNavigate();
@@ -43,6 +48,7 @@ const EditProfile = () => {
     });
 
     const [isSaving, setIsSaving] = useState(false);
+    const [errors, setErrors] = useState({});
 
     useEffect(() => {
         if (!currentUser) {
@@ -65,6 +71,49 @@ const EditProfile = () => {
         });
     }, [currentUser, navigate]);
 
+    const validateAll = () => {
+        const e = {};
+        const nameErr = validateName(formData.name, lang);
+        if (nameErr) e.name = nameErr;
+
+        const emailErr = validateEmail(formData.email, lang);
+        if (emailErr) e.email = emailErr;
+
+        const phoneErr = validatePhone(formData.phone, lang);
+        if (phoneErr) e.phone = phoneErr;
+
+        const websiteErr = validateUrl(formData.website, lang);
+        if (websiteErr) e.website = websiteErr;
+
+        const linkedinErr = validateLinkedIn(formData.linkedin, lang);
+        if (linkedinErr) e.linkedin = linkedinErr;
+
+        const githubErr = validateGitHub(formData.github, lang);
+        if (githubErr) e.github = githubErr;
+
+        if (formData.bio && formData.bio.trim().length > 1000) {
+            e.bio = lang === 'ar'
+                ? 'النبذة الشخصية طويلة جداً (الحد الأقصى 1000 حرف)'
+                : 'Bio is too long (max 1000 characters)';
+        }
+
+        setErrors(e);
+        return Object.keys(e).length === 0;
+    };
+
+    // Live blur validation
+    const handleBlur = (field) => {
+        const e = { ...errors };
+        const check = (key, fn) => { const err = fn(); err ? (e[key] = err) : delete e[key]; };
+        if (field === 'name')     check('name',     () => validateName(formData.name, lang));
+        if (field === 'email')    check('email',    () => validateEmail(formData.email, lang));
+        if (field === 'phone')    check('phone',    () => validatePhone(formData.phone, lang));
+        if (field === 'website')  check('website',  () => validateUrl(formData.website, lang));
+        if (field === 'linkedin') check('linkedin', () => validateLinkedIn(formData.linkedin, lang));
+        if (field === 'github')   check('github',   () => validateGitHub(formData.github, lang));
+        setErrors(e);
+    };
+
     const handlePhotoChange = async (e) => {
         const file = e.target.files[0];
         if (!file) return;
@@ -84,18 +133,25 @@ const EditProfile = () => {
 
     const handleSave = async (e) => {
         e.preventDefault();
+        if (!validateAll()) {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            return;
+        }
         setIsSaving(true);
+        // Convert empty optional strings to null so the backend's [StringLength]
+        // attributes never see an empty string on nullable fields.
+        const orNull = (v) => (v && v.trim()) ? v.trim() : null;
         try {
             const payload = {
-                name: formData.name,
-                email: formData.email,
-                location: formData.location,
-                website: formData.website,
-                phone: formData.phone,
-                description: formData.bio,
-                linkedIn: formData.linkedin,
-                github: formData.github,
-                industry: formData.industry,
+                name:        formData.name.trim(),
+                email:       formData.email.trim(),
+                location:    orNull(formData.location),
+                website:     orNull(formData.website),
+                phone:       orNull(formData.phone),
+                description: orNull(formData.bio),
+                linkedIn:    orNull(formData.linkedin),
+                github:      orNull(formData.github),
+                industry:    orNull(formData.industry),
             };
 
             await updateUser(payload);
@@ -159,16 +215,18 @@ const EditProfile = () => {
                             label={t('fullName')}
                             value={formData.name}
                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                            onBlur={() => handleBlur('name')}
+                            error={errors.name}
                             icon={User}
-                            required
                         />
                         <Input
                             label={t('email')}
                             value={formData.email}
                             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                            onBlur={() => handleBlur('email')}
+                            error={errors.email}
                             icon={Mail}
                             type="email"
-                            required
                         />
                         
                         {(formData.role === 'Employer' || formData.role === 'Company') && (
@@ -229,6 +287,8 @@ const EditProfile = () => {
                             label={t('website')}
                             value={formData.website}
                             onChange={(e) => setFormData({ ...formData, website: e.target.value })}
+                            onBlur={() => handleBlur('website')}
+                            error={errors.website}
                             icon={Globe}
                             placeholder="https://example.com"
                         />
@@ -236,19 +296,26 @@ const EditProfile = () => {
                             label={t('phone')}
                             value={formData.phone}
                             onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                            onBlur={() => handleBlur('phone')}
+                            error={errors.phone}
                             icon={Phone}
                             type="tel"
                         />
                     </div>
 
                     <div className="input-group">
-                        <label className="input-label">{t('aboutMe')}</label>
+                        <label className="input-label" style={{ display: 'flex', justifyContent: 'space-between' }}>
+                            {t('aboutMe')}
+                            <span style={{ fontSize: '0.75rem', color: formData.bio?.length > 900 ? '#ef4444' : 'var(--text-muted)' }}>
+                                {formData.bio?.length || 0}/1000
+                            </span>
+                        </label>
                         <textarea
                             style={{
                                 width: '100%',
                                 minHeight: '150px',
                                 background: 'rgba(255, 255, 255, 0.05)',
-                                border: '1px solid var(--border-color)',
+                                border: `1px solid ${errors.bio ? '#ef4444' : 'var(--border-color)'}`,
                                 borderRadius: '12px',
                                 padding: '1rem',
                                 color: 'var(--text-primary)',
@@ -256,10 +323,11 @@ const EditProfile = () => {
                                 fontFamily: 'inherit',
                                 transition: 'var(--transition)'
                             }}
-                            className="focus:border-primary"
+                            maxLength={1000}
                             value={formData.bio}
                             onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
-                        ></textarea>
+                        />
+                        {errors.bio && <p style={{ color: '#ef4444', fontSize: '0.8rem', marginTop: '0.25rem' }}>{errors.bio}</p>}
                     </div>
 
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
@@ -267,15 +335,19 @@ const EditProfile = () => {
                             label={t('linkedin')}
                             value={formData.linkedin}
                             onChange={(e) => setFormData({ ...formData, linkedin: e.target.value })}
+                            onBlur={() => handleBlur('linkedin')}
+                            error={errors.linkedin}
                             icon={Linkedin}
-                            placeholder="LinkedIn Profile URL"
+                            placeholder="https://linkedin.com/in/username"
                         />
                         <Input
                             label={t('github')}
                             value={formData.github}
                             onChange={(e) => setFormData({ ...formData, github: e.target.value })}
+                            onBlur={() => handleBlur('github')}
+                            error={errors.github}
                             icon={Github}
-                            placeholder="GitHub Profile URL"
+                            placeholder="https://github.com/username"
                         />
                     </div>
                 </form>

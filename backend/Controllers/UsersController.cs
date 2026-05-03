@@ -64,6 +64,11 @@ public class UsersController : ControllerBase
         if (!isValid)
             return Unauthorized(new { message = "Invalid email or password" });
 
+        // Block suspended accounts before issuing a token
+        if (string.Equals(user.Status, "Suspended", StringComparison.OrdinalIgnoreCase))
+            return StatusCode(403, new { error = "ACCOUNT_SUSPENDED",
+                message = "Your account has been temporarily suspended by the administrator. Please contact support for assistance." });
+
         // Generate JWT token
         var token = _authService.GenerateJwtToken(user);
 

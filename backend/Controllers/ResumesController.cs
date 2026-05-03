@@ -24,12 +24,16 @@ public class ResumesController(MyDbContext context) : ControllerBase
             Phone = dto.Phone,
             Location = dto.Location,
             Bio = dto.Bio,
+            LinkedIn = dto.LinkedIn,
+            GitHub = dto.GitHub,
+            Website = dto.Website,
             Experiences = dto.Experiences.Select(e => new Experience
             {
                 JobName = e.JobName,
                 CompanyName = e.CompanyName,
                 StartDate = e.StartDate,
-                EndDate = e.EndDate
+                EndDate = e.EndDate,
+                Description = e.Description
             }).ToList(),
             Educations = dto.Educations.Select(e => new Education
             {
@@ -77,6 +81,9 @@ public class ResumesController(MyDbContext context) : ControllerBase
         res.Phone = dto.Phone;
         res.Location = dto.Location;
         res.Bio = dto.Bio;
+        res.LinkedIn = dto.LinkedIn;
+        res.GitHub = dto.GitHub;
+        res.Website = dto.Website;
 
         // Update Experiences (Clear and Re-add for simplicity)
         Context.Experiences.RemoveRange(res.Experiences);
@@ -86,6 +93,7 @@ public class ResumesController(MyDbContext context) : ControllerBase
             CompanyName = e.CompanyName,
             StartDate = e.StartDate,
             EndDate = e.EndDate,
+            Description = e.Description,
             ResumeId = id
         }).ToList();
 
@@ -159,13 +167,17 @@ public class ResumesController(MyDbContext context) : ControllerBase
             Phone = resume.Phone,
             Location = resume.Location,
             Bio = resume.Bio,
+            LinkedIn = resume.LinkedIn,
+            GitHub = resume.GitHub,
+            Website = resume.Website,
             Experiences = resume.Experiences.Select(e => new ExperienceViewDto
             {
                 Id = e.Id,
                 JobName = e.JobName,
                 CompanyName = e.CompanyName,
                 StartDate = e.StartDate,
-                EndDate = e.EndDate
+                EndDate = e.EndDate,
+                Description = e.Description
             }).ToList(),
             Educations = resume.Educations.Select(e => new EducationViewDto
             {

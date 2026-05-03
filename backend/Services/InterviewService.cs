@@ -10,16 +10,18 @@ namespace aabu_project.Services
 
     internal sealed class InterviewSession
     {
-        public string SessionId          { get; set; } = string.Empty;
-        public string JobTitle           { get; set; } = string.Empty;
-        public string JobDescription     { get; set; } = string.Empty;
-        public int    CurrentQuestion    { get; set; }   // 1-based, current question shown
-        public int    TotalQuestions     { get; set; } = 5;
-        public string LastQuestion       { get; set; } = string.Empty;
+        public string SessionId       { get; set; } = string.Empty;
+        public string JobTitle        { get; set; } = string.Empty;
+        public string JobDescription  { get; set; } = string.Empty;
+        public int    CurrentQuestion { get; set; }   // 1-based
+        public int    TotalQuestions  { get; set; } = 5;
+        public string LastQuestion    { get; set; } = string.Empty;
+        /// <summary>"ar" | "en"</summary>
+        public string Lang            { get; set; } = "en";
         public List<QuestionSummaryDto> History { get; set; } = new();
     }
 
-    // ── Gemini response shapes (internal only) ────────────────────────────────
+    // ── Gemini response shapes ────────────────────────────────────────────────
 
     internal sealed class GeminiQuestionDto
     {
@@ -35,10 +37,10 @@ namespace aabu_project.Services
 
     internal sealed class GeminiFinalDto
     {
-        public double        OverallScore { get; set; }
-        public string        Summary      { get; set; } = string.Empty;
-        public List<string>  Strengths    { get; set; } = new();
-        public List<string>  Improvements { get; set; } = new();
+        public double       OverallScore { get; set; }
+        public string       Summary      { get; set; } = string.Empty;
+        public List<string> Strengths    { get; set; } = new();
+        public List<string> Improvements { get; set; } = new();
     }
 
     // ── Service ───────────────────────────────────────────────────────────────
@@ -51,7 +53,7 @@ namespace aabu_project.Services
         private readonly string       _geminiUrl;
         private readonly ILogger<InterviewService> _logger;
 
-        private const int MaxJobChars = 600; // keep prompts tight
+        private const int MaxJobChars = 600;
 
         private static readonly JsonSerializerOptions JsonOpts =
             new() { PropertyNameCaseInsensitive = true };
@@ -67,22 +69,29 @@ namespace aabu_project.Services
             _cache   = cache;
             _apiKey  = configuration["GeminiSettings:ApiKey"] ?? string.Empty;
 
-            var model   = configuration["GeminiSettings:ModelName"] ?? "gemini-1.5-flash";
-            var baseUrl = configuration["GeminiSettings:BaseUrl"]   ?? "https://generativelanguage.googleapis.com/v1beta/models";
+            var model   = configuration["GeminiSettings:ModelName"] ?? "gemini-2.5-flash";
+            var baseUrl = configuration["GeminiSettings:BaseUrl"]
+                          ?? "https://generativelanguage.googleapis.com/v1beta/models";
             _geminiUrl  = $"{baseUrl}/{model}:generateContent";
         }
 
         // ── Start ─────────────────────────────────────────────────────────────
 
-        public async Task<InterviewResponseDto> StartAsync(string jobTitle, string jobDescription)
+        public async Task<InterviewResponseDto> StartAsync(
+            string jobTitle, string jobDescription, string lang)
         {
             if (string.IsNullOrWhiteSpace(_apiKey))
                 throw new InvalidOperationException(
                     "Gemini API key not configured. Set GeminiSettings:ApiKey.");
 
+            lang = LangHelper.Normalize(lang);
+
             var jobDesc = Truncate(jobDescription, MaxJobChars);
+            var langInst = LangHelper.GetInstruction(lang);
 
             var prompt = $$"""
+                {{langInst}}
+
                 You are a professional technical interviewer conducting a job interview.
 
                 Position: {{jobTitle}}
@@ -93,24 +102,33 @@ namespace aabu_project.Services
 
                 Return ONLY valid JSON (no markdown, no code fences):
                 { "question": "..." }
+
+                The value of "question" must be in the language specified above.
                 """;
 
-            var raw      = await CallGeminiAsync(prompt);
-            var parsed   = ParseJson<GeminiQuestionDto>(raw) ?? new GeminiQuestionDto { Question = "Tell me about your experience relevant to this role." };
+            var raw    = await CallGeminiAsync(prompt);
+            var parsed = ParseJson<GeminiQuestionDto>(raw)
+                ?? new GeminiQuestionDto
+                {
+                    Question = lang == "ar"
+                        ? "أخبرني عن خبرتك المهنية المتعلقة بهذه الوظيفة."
+                        : "Tell me about your experience relevant to this role."
+                };
 
             var sessionId = Guid.NewGuid().ToString("N")[..12];
             var session   = new InterviewSession
             {
-                SessionId        = sessionId,
-                JobTitle         = jobTitle.Trim(),
-                JobDescription   = jobDescription.Trim(),
-                CurrentQuestion  = 1,
-                LastQuestion     = parsed.Question
+                SessionId       = sessionId,
+                JobTitle        = jobTitle.Trim(),
+                JobDescription  = jobDescription.Trim(),
+                CurrentQuestion = 1,
+                LastQuestion    = parsed.Question,
+                Lang            = lang
             };
 
             _cache.Set(CacheKey(sessionId), session, TimeSpan.FromMinutes(30));
-
-            _logger.LogInformation("Interview started. Session={Session}, Job={Job}", sessionId, jobTitle);
+            _logger.LogInformation(
+                "Interview started. Session={S} Job={J} Lang={L}", sessionId, jobTitle, lang);
 
             return new InterviewResponseDto
             {
@@ -124,30 +142,41 @@ namespace aabu_project.Services
 
         // ── Answer ────────────────────────────────────────────────────────────
 
-        public async Task<InterviewResponseDto> AnswerAsync(string sessionId, string answer)
+        public async Task<InterviewResponseDto> AnswerAsync(
+            string sessionId, string answer, string lang)
         {
-            if (!_cache.TryGetValue(CacheKey(sessionId), out InterviewSession? session) || session is null)
+            if (!_cache.TryGetValue(CacheKey(sessionId), out InterviewSession? session)
+                || session is null)
                 throw new KeyNotFoundException(
                     "Interview session not found or expired. Please start a new interview.");
 
+            // Always use the session's language — the lang param from the answer
+            // is a convenience; session language is authoritative.
+            var sessionLang = string.IsNullOrWhiteSpace(session.Lang)
+                ? LangHelper.Normalize(lang)
+                : session.Lang;
+
+            var langInst      = LangHelper.GetInstruction(sessionLang);
             var questionAsked = session.LastQuestion;
             var qNum          = session.CurrentQuestion;
-            var isLastQuestion = qNum >= session.TotalQuestions;
+            var isLast        = qNum >= session.TotalQuestions;
 
-            // ── Evaluate the answer ──────────────────────────────────────────
             string feedbackText;
             double score;
             string nextQuestion = string.Empty;
 
-            if (!isLastQuestion)
+            if (!isLast)
             {
                 var evalPrompt = $$"""
+                    {{langInst}}
+
                     You are interviewing a candidate for the role of {{session.JobTitle}}.
 
                     Question {{qNum}} of {{session.TotalQuestions}}: "{{questionAsked}}"
                     Candidate answered: "{{Truncate(answer, 800)}}"
 
                     Evaluate the answer (1-2 sentences) and generate question {{qNum + 1}}.
+                    All text values must be in the language specified above.
 
                     Return ONLY valid JSON (no markdown):
                     { "feedback": "...", "score": 7, "nextQuestion": "..." }
@@ -155,37 +184,42 @@ namespace aabu_project.Services
                     Score: 0-3=poor, 4-6=adequate, 7-8=good, 9-10=excellent
                     """;
 
-                var evalRaw  = await CallGeminiAsync(evalPrompt);
-                var eval     = ParseJson<GeminiEvaluationDto>(evalRaw)
-                    ?? new GeminiEvaluationDto { Feedback = "Answer received.", Score = 5, NextQuestion = "Tell me about a challenge you overcame." };
+                var evalRaw = await CallGeminiAsync(evalPrompt);
+                var eval    = ParseJson<GeminiEvaluationDto>(evalRaw)
+                    ?? DefaultEval(sessionLang);
 
                 feedbackText = eval.Feedback;
                 score        = Math.Clamp(eval.Score, 0, 10);
                 nextQuestion = string.IsNullOrWhiteSpace(eval.NextQuestion)
-                    ? "Can you describe a relevant project or achievement?"
+                    ? DefaultNextQuestion(sessionLang)
                     : eval.NextQuestion;
             }
             else
             {
-                // Last question: only evaluate, no next question
                 var evalPrompt = $$"""
+                    {{langInst}}
+
                     Final evaluation for {{session.JobTitle}} candidate.
                     Question: "{{questionAsked}}"
                     Answer: "{{Truncate(answer, 800)}}"
+                    All text values must be in the language specified above.
 
                     Return ONLY valid JSON:
                     { "feedback": "...", "score": 7 }
                     """;
 
-                var evalRaw  = await CallGeminiAsync(evalPrompt);
-                var eval     = ParseJson<GeminiEvaluationDto>(evalRaw)
-                    ?? new GeminiEvaluationDto { Feedback = "Thank you for your answer.", Score = 6 };
+                var evalRaw = await CallGeminiAsync(evalPrompt);
+                var eval    = ParseJson<GeminiEvaluationDto>(evalRaw)
+                    ?? new GeminiEvaluationDto
+                    {
+                        Feedback = sessionLang == "ar" ? "شكراً على إجابتك." : "Thank you for your answer.",
+                        Score    = 6
+                    };
 
                 feedbackText = eval.Feedback;
                 score        = Math.Clamp(eval.Score, 0, 10);
             }
 
-            // Persist this Q&A in session history
             session.History.Add(new QuestionSummaryDto
             {
                 Question = questionAsked,
@@ -194,13 +228,10 @@ namespace aabu_project.Services
                 Score    = score
             });
 
-            // ── Final report ─────────────────────────────────────────────────
-            if (isLastQuestion)
+            if (isLast)
             {
-                _logger.LogInformation("Interview complete. Session={Session}", sessionId);
-                var report = await GenerateFinalReportAsync(session);
-
-                // Clean up session from cache
+                _logger.LogInformation("Interview complete. Session={S}", sessionId);
+                var report = await GenerateFinalReportAsync(session, sessionLang);
                 _cache.Remove(CacheKey(sessionId));
 
                 return new InterviewResponseDto
@@ -219,7 +250,6 @@ namespace aabu_project.Services
                 };
             }
 
-            // ── Continue interview ────────────────────────────────────────────
             session.CurrentQuestion++;
             session.LastQuestion = nextQuestion;
             _cache.Set(CacheKey(sessionId), session, TimeSpan.FromMinutes(30));
@@ -238,16 +268,18 @@ namespace aabu_project.Services
 
         // ── Final Report ──────────────────────────────────────────────────────
 
-        private async Task<GeminiFinalDto> GenerateFinalReportAsync(InterviewSession session)
+        private async Task<GeminiFinalDto> GenerateFinalReportAsync(
+            InterviewSession session, string lang)
         {
-            var avgScore = session.History.Count > 0
-                ? session.History.Average(h => h.Score)
-                : 5;
-
+            var avgScore    = session.History.Count > 0
+                ? session.History.Average(h => h.Score) : 5;
+            var langInst    = LangHelper.GetInstruction(lang);
             var historyText = string.Join("\n", session.History.Select((h, i) =>
                 $"Q{i + 1}: {h.Question}\nA: {Truncate(h.Answer, 200)}\nScore: {h.Score}/10"));
 
             var prompt = $$"""
+                {{langInst}}
+
                 You are an interviewer who just finished a technical interview for {{session.JobTitle}}.
 
                 Interview summary:
@@ -256,6 +288,8 @@ namespace aabu_project.Services
                 Average score: {{avgScore:F1}}/10
 
                 Provide a professional final assessment.
+                All text values must be in the language specified above.
+
                 Return ONLY valid JSON (no markdown):
                 {
                   "overallScore": 72,
@@ -264,7 +298,7 @@ namespace aabu_project.Services
                   "improvements": ["...", "..."]
                 }
 
-                overallScore: integer 0-100. Derive it from the average score ({{avgScore:F1}}/10 → scale to 0-100).
+                overallScore: integer 0-100 (scale from {{avgScore:F1}}/10).
                 summary: 2-3 sentences overall assessment.
                 strengths/improvements: 2-3 items each, specific and actionable.
                 """;
@@ -272,13 +306,7 @@ namespace aabu_project.Services
             var raw    = await CallGeminiAsync(prompt);
             var result = ParseJson<GeminiFinalDto>(raw);
 
-            return result ?? new GeminiFinalDto
-            {
-                OverallScore = Math.Round(avgScore * 10),
-                Summary      = "The candidate demonstrated relevant knowledge for this role.",
-                Strengths    = ["Engaged with all questions", "Provided relevant answers"],
-                Improvements = ["Could elaborate more on technical details", "Consider adding concrete examples"]
-            };
+            return result ?? DefaultFinalReport(avgScore, lang);
         }
 
         // ── Gemini HTTP ───────────────────────────────────────────────────────
@@ -287,8 +315,9 @@ namespace aabu_project.Services
         {
             var body = new
             {
-                contents = new[] { new { parts = new[] { new { text = prompt } } } },
-                generationConfig = new { temperature = 0.4, maxOutputTokens = 1200, thinkingConfig = new { thinkingBudget = 0 } }
+                contents         = new[] { new { parts = new[] { new { text = prompt } } } },
+                generationConfig = new { temperature = 0.4, maxOutputTokens = 1200,
+                                         thinkingConfig = new { thinkingBudget = 0 } }
             };
 
             var content  = new StringContent(JsonSerializer.Serialize(body), Encoding.UTF8, "application/json");
@@ -312,9 +341,9 @@ namespace aabu_project.Services
                 _logger.LogError("Gemini {Code}: {Body}", code, raw);
                 throw code switch
                 {
-                    429 => new InvalidOperationException("QUOTA_EXCEEDED"),
+                    429        => new InvalidOperationException("QUOTA_EXCEEDED"),
                     401 or 403 => new UnauthorizedAccessException("Invalid Gemini API key."),
-                    _ => new InvalidOperationException($"Gemini returned {code}: {raw}")
+                    _          => new InvalidOperationException($"Gemini returned {code}: {raw}")
                 };
             }
 
@@ -341,8 +370,6 @@ namespace aabu_project.Services
         private static T? ParseJson<T>(string text) where T : class
         {
             text = text.Trim();
-
-            // Strip markdown fences
             var fence = Regex.Match(text, @"```(?:json)?\s*([\s\S]*?)```", RegexOptions.IgnoreCase);
             if (fence.Success) text = fence.Groups[1].Value.Trim();
             else
@@ -352,7 +379,6 @@ namespace aabu_project.Services
                 if (s >= 0 && e > s) text = text[s..(e + 1)];
             }
 
-            // Normalise common snake_case keys
             text = text
                 .Replace("\"next_question\"",  "\"nextQuestion\"")
                 .Replace("\"overall_score\"",  "\"overallScore\"");
@@ -370,5 +396,33 @@ namespace aabu_project.Services
         }
 
         private static string CacheKey(string sessionId) => $"interview:{sessionId}";
+
+        private static string DefaultNextQuestion(string lang) => lang == "ar"
+            ? "هل يمكنك وصف مشروع أو إنجاز مهني مميز قمت به؟"
+            : "Can you describe a relevant project or professional achievement?";
+
+        private static GeminiEvaluationDto DefaultEval(string lang) => new()
+        {
+            Feedback     = lang == "ar" ? "تم استلام إجابتك." : "Answer received.",
+            Score        = 5,
+            NextQuestion = DefaultNextQuestion(lang)
+        };
+
+        private static GeminiFinalDto DefaultFinalReport(double avgScore, string lang) =>
+            lang == "ar"
+            ? new GeminiFinalDto
+            {
+                OverallScore = Math.Round(avgScore * 10),
+                Summary      = "أظهر المرشح معرفة ذات صلة بالمنصب المتقدم إليه.",
+                Strengths    = ["تفاعل مع جميع الأسئلة", "قدّم إجابات ملائمة"],
+                Improvements = ["يمكن التوسع أكثر في التفاصيل التقنية", "إضافة أمثلة ملموسة سيقوي الإجابات"]
+            }
+            : new GeminiFinalDto
+            {
+                OverallScore = Math.Round(avgScore * 10),
+                Summary      = "The candidate demonstrated relevant knowledge for this role.",
+                Strengths    = ["Engaged with all questions", "Provided relevant answers"],
+                Improvements = ["Could elaborate more on technical details", "Consider adding concrete examples"]
+            };
     }
 }

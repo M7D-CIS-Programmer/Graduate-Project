@@ -4,14 +4,18 @@ namespace aabu_project.Dtos
 
     public class StartInterviewDto
     {
-        public string JobTitle       { get; set; } = string.Empty;
-        public string JobDescription { get; set; } = string.Empty;
+        public string  JobTitle       { get; set; } = string.Empty;
+        public string  JobDescription { get; set; } = string.Empty;
+        /// <summary>"ar" | "en" (default "en")</summary>
+        public string? Language       { get; set; }
     }
 
     public class AnswerInterviewDto
     {
-        public string SessionId { get; set; } = string.Empty;
-        public string Answer    { get; set; } = string.Empty;
+        public string  SessionId { get; set; } = string.Empty;
+        public string  Answer    { get; set; } = string.Empty;
+        /// <summary>"ar" | "en" — must match the session's language.</summary>
+        public string? Language  { get; set; }
     }
 
     // ── Response ──────────────────────────────────────────────────────────────

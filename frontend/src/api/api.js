@@ -10,13 +10,23 @@ export const getImageUrl = (path) => {
     return `${origin}/${path}`;
 };
 
+// Sentinel thrown when the backend returns 403 ACCOUNT_SUSPENDED.
+// Callers and the AuthContext watch for this to show the suspension screen.
+export class SuspendedError extends Error {
+    constructor() {
+        super('ACCOUNT_SUSPENDED');
+        this.name = 'SuspendedError';
+    }
+}
+
 const handleResponse = async (res) => {
     if (!res.ok) {
         const raw = await res.text();
         let message = res.statusText;
+        let errorCode = null;
         try {
             const parsed = JSON.parse(raw);
-            // Backend returns { error } (our API) or { message } or ProblemDetails { title, errors }
+            errorCode = parsed.error;
             message = parsed.error
                 || parsed.message
                 || parsed.title
@@ -25,6 +35,13 @@ const handleResponse = async (res) => {
                 || res.statusText;
         } catch {
             message = raw || res.statusText;
+        }
+        // Surface suspension as a typed error so the app can react globally.
+        // Also dispatch a window event so AuthContext can intercept it even
+        // when the throw happens inside a React Query mutation callback.
+        if (res.status === 403 && errorCode === 'ACCOUNT_SUSPENDED') {
+            window.dispatchEvent(new CustomEvent('accountSuspended'));
+            throw new SuspendedError();
         }
         throw new Error(message);
     }
@@ -140,25 +157,41 @@ export const api = {
     sendMessage:      (applicationId, senderId, content) => post(`${BASE_URL}/Messages`, { applicationJobId: applicationId, senderId, content }),
     markMessagesRead: (applicationId, userId) => put(`${BASE_URL}/Messages/read/${applicationId}/${userId}`),
 
+    // Contact Us
+    submitContactMessage: (data) => post(`${BASE_URL}/contact`, data),
+    getContactMessages: (params = {}) => {
+        const p = new URLSearchParams();
+        if (params.q)        p.append('q',        params.q);
+        if (params.status)   p.append('status',   params.status);
+        if (params.page)     p.append('page',     params.page);
+        if (params.pageSize) p.append('pageSize', params.pageSize);
+        const qs = p.toString();
+        return get(`${BASE_URL}/contact${qs ? `?${qs}` : ''}`);
+    },
+    getContactMessage:          (id)           => get(`${BASE_URL}/contact/${id}`),
+    updateContactMessageStatus: (id, status)   => put(`${BASE_URL}/contact/${id}/status`, { status }),
+    deleteContactMessage:       (id)           => del(`${BASE_URL}/contact/${id}`),
+
     // Search
     search: (query, role, userId, lang) => get(`${BASE_URL}/Search?q=${query}&role=${role || ''}&userId=${userId || ''}&lang=${lang || 'en'}`),
 
     // Support Chatbot
-    sendSupportMessage: (message, userId = null) =>
-        post(`${BASE_URL}/support/chat`, { message, userId }),
+    sendSupportMessage: (message, userId = null, role = null, language = 'en') =>
+        post(`${BASE_URL}/support/chat`, { message, userId, role, language }),
 
-    // Interview AI
-    startInterview: (jobTitle, jobDescription) =>
-        post(`${BASE_URL}/interview/start`, { jobTitle, jobDescription }),
-    answerInterview: (sessionId, answer) =>
-        post(`${BASE_URL}/interview/answer`, { sessionId, answer }),
+    // Interview AI — language controls the response language for all AI text
+    startInterview: (jobTitle, jobDescription, language = 'en') =>
+        post(`${BASE_URL}/interview/start`, { jobTitle, jobDescription, language }),
+    answerInterview: (sessionId, answer, language = 'en') =>
+        post(`${BASE_URL}/interview/answer`, { sessionId, answer, language }),
 
-    // Unified Job Matching Engine — single Gemini call, semantic + synonym-aware
-    matchCvToJob: (file, jobTitle, jobDescription) => {
+    // Unified Job Matching Engine — language param controls AI response language
+    matchCvToJob: (file, jobTitle, jobDescription, language = 'en') => {
         const form = new FormData();
         form.append('file', file);
         form.append('jobTitle', jobTitle);
         form.append('jobDescription', jobDescription);
+        form.append('language', language);
         const headers = {};
         const token = sessionStorage.getItem('token');
         if (token) headers['Authorization'] = `Bearer ${token}`;
@@ -166,12 +199,13 @@ export const api = {
             .then(handleResponse);
     },
 
-    // CV vs Job Analysis — multipart/form-data (do NOT set Content-Type; browser sets boundary)
-    analyzeCv: (file, jobTitle, jobDescription) => {
+    // CV vs Job Analysis
+    analyzeCv: (file, jobTitle, jobDescription, language = 'en') => {
         const form = new FormData();
         form.append('file', file);
         form.append('jobTitle', jobTitle);
         form.append('jobDescription', jobDescription);
+        form.append('language', language);
         const headers = {};
         const token = sessionStorage.getItem('token');
         if (token) headers['Authorization'] = `Bearer ${token}`;
@@ -179,11 +213,12 @@ export const api = {
             .then(handleResponse);
     },
 
-    // Deep semantic analysis — PDF + job description
-    semanticAnalyzeCv: (file, jobDescription) => {
+    // Deep semantic analysis
+    semanticAnalyzeCv: (file, jobDescription, language = 'en') => {
         const form = new FormData();
         form.append('file', file);
         form.append('jobDescription', jobDescription);
+        form.append('language', language);
         const headers = {};
         const token = sessionStorage.getItem('token');
         if (token) headers['Authorization'] = `Bearer ${token}`;
@@ -191,10 +226,11 @@ export const api = {
             .then(handleResponse);
     },
 
-    // CV integrity & fraud detection — PDF only
-    detectCvFraud: (file) => {
+    // CV integrity & fraud detection
+    detectCvFraud: (file, language = 'en') => {
         const form = new FormData();
         form.append('file', file);
+        form.append('language', language);
         const headers = {};
         const token = sessionStorage.getItem('token');
         if (token) headers['Authorization'] = `Bearer ${token}`;
@@ -202,9 +238,9 @@ export const api = {
             .then(handleResponse);
     },
 
-    // Aggregate hiring recommendation — JSON body (outputs of the two calls above + match score)
-    generateHiringRecommendation: (semanticAnalysis, fraudResult, matchScore) =>
-        post(`${BASE_URL}/cv/hiring-recommendation`, { semanticAnalysis, fraudResult, matchScore }),
+    // Aggregate hiring recommendation
+    generateHiringRecommendation: (semanticAnalysis, fraudResult, matchScore, language = 'en') =>
+        post(`${BASE_URL}/cv/hiring-recommendation`, { semanticAnalysis, fraudResult, matchScore, language }),
 
     // Fast local-only text match score — no PDF, no Gemini (used for bulk candidate ranking)
     getMatchScore: (cvText, jobTitle, jobDescription) =>

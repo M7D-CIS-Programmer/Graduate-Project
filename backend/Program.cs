@@ -5,6 +5,7 @@ using System.Text;
 using aabu_project.Data;
 using aabu_project.Services;
 using aabu_project.Dtos;
+using aabu_project.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<MyDbContext>(options =>
@@ -65,8 +66,16 @@ builder.Services
         };
     });
 
+// Register the suspension check filter so it can be resolved via DI
+builder.Services.AddScoped<CheckSuspendedFilter>();
+
 // Add services to the container.
-builder.Services.AddControllers()
+builder.Services.AddControllers(options =>
+    {
+        // Apply the suspension check globally — any authenticated request from a
+        // suspended user is rejected with 403 ACCOUNT_SUSPENDED before the action runs.
+        options.Filters.AddService<CheckSuspendedFilter>();
+    })
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;

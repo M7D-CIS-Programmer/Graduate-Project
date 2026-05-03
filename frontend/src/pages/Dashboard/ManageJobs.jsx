@@ -30,18 +30,31 @@ const ManageJobs = () => {
     const { data: rawData = [], isLoading, error } = useJobs();
     const jobs = Array.isArray(rawData) ? rawData : (rawData?.$values || []);
 
-    const { mutate: updateJobStatus } = useUpdateJobStatus();
-    const { mutate: deleteJob } = useDeleteJob();
+    const { mutate: updateJobStatus, isPending: isStatusPending } = useUpdateJobStatus();
+    const { mutate: deleteJob, isPending: isDeletePending } = useDeleteJob();
 
-    const handleApprove = (id) => {
-        updateJobStatus({ id, status: 'Active' });
+    const handleApprove = (job) => {
+        updateJobStatus({ id: job.id, status: 'Active' }, {
+            onSuccess: () =>
+                addToast(t('jobApproved') || `"${job.title}" has been approved`, 'success'),
+            onError: (err) =>
+                addToast(err.message || t('actionFailed') || 'Action failed', 'error'),
+        });
     };
 
-    const handleSuspend = (id) => {
-        const job = jobs.find(j => j.id === id);
-        if (!job) return;
+    const handleSuspend = (job) => {
         const newStatus = job.status === 'Suspended' ? 'Active' : 'Suspended';
-        updateJobStatus({ id, status: newStatus });
+        updateJobStatus({ id: job.id, status: newStatus }, {
+            onSuccess: () =>
+                addToast(
+                    newStatus === 'Suspended'
+                        ? (t('jobSuspended') || `"${job.title}" has been suspended`)
+                        : (t('jobActivated') || `"${job.title}" has been activated`),
+                    newStatus === 'Suspended' ? 'warning' : 'success'
+                ),
+            onError: (err) =>
+                addToast(err.message || t('actionFailed') || 'Action failed', 'error'),
+        });
     };
 
     const handleDeleteClick = (job) => {
@@ -224,8 +237,9 @@ const ManageJobs = () => {
                                             {job.status === 'Pending Approval' && (
                                                 <button
                                                     className="btn-icon success"
-                                                    title={t('approve')}
-                                                    onClick={() => handleApprove(job.id)}
+                                                    title={t('approve') || 'Approve'}
+                                                    onClick={() => handleApprove(job)}
+                                                    disabled={isStatusPending}
                                                 >
                                                     <CheckCircle size={18} />
                                                 </button>
@@ -234,8 +248,10 @@ const ManageJobs = () => {
                                             {job.status !== 'Pending Approval' && (
                                                 <button
                                                     className="btn-icon warning"
-                                                    title={job.status === 'Suspended' ? t('activate') : t('suspend')}
-                                                    onClick={() => handleSuspend(job.id)}
+                                                    title={job.status === 'Suspended' ? (t('activate') || 'Activate') : (t('suspend') || 'Suspend')}
+                                                    onClick={() => handleSuspend(job)}
+                                                    disabled={isStatusPending}
+                                                    style={{ color: job.status === 'Suspended' ? '#10b981' : '#f59e0b' }}
                                                 >
                                                     {job.status === 'Suspended' ? <CheckCircle size={18} /> : <XCircle size={18} />}
                                                 </button>
@@ -245,6 +261,7 @@ const ManageJobs = () => {
                                                 className="btn-icon danger"
                                                 title={t('delete')}
                                                 onClick={() => handleDeleteClick(job)}
+                                                disabled={isDeletePending}
                                             >
                                                 <Trash2 size={18} />
                                             </button>
@@ -266,8 +283,8 @@ const ManageJobs = () => {
                                 <button className="btn-outline" onClick={() => setIsDeleteModalOpen(false)}>
                                     {t('cancel') || 'Cancel'}
                                 </button>
-                                <button className="btn-danger" onClick={confirmDelete}>
-                                    {t('delete') || 'Delete'}
+                                <button className="btn-danger" onClick={confirmDelete} disabled={isDeletePending}>
+                                    {isDeletePending ? (t('deleting') || 'Deleting…') : (t('delete') || 'Delete')}
                                 </button>
                             </>
                         }

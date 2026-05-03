@@ -27,7 +27,7 @@ const cap = (s) => s ? s.charAt(0).toUpperCase() + s.slice(1) : '';
 // ─────────────────────────────────────────────────────────────────────────────
 
 const SemanticAnalyzer = () => {
-    const { dir } = useLanguage();
+    const { dir, language } = useLanguage();
     const fileInputRef = useRef(null);
 
     const [file, setFile]       = useState(null);
@@ -75,7 +75,7 @@ const SemanticAnalyzer = () => {
         setLoading(true);
 
         try {
-            const data = await api.semanticAnalyzeCv(file, jobDesc.trim());
+            const data = await api.semanticAnalyzeCv(file, jobDesc.trim(), language);
             setResult(data);
         } catch (err) {
             const msg = err.message || '';

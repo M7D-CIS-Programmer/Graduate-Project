@@ -10,6 +10,9 @@ public class ResumeCreateDto
     public string? Phone { get; set; }
     public string? Location { get; set; }
     public string? Bio { get; set; }
+    public string? LinkedIn { get; set; }
+    public string? GitHub { get; set; }
+    public string? Website { get; set; }
     public List<ExperienceCreateDto> Experiences { get; set; } = new();
     public List<EducationCreateDto> Educations { get; set; } = new();
     public List<SkillCreateDto> Skills { get; set; } = new();
@@ -22,6 +25,7 @@ public class ExperienceCreateDto
     public string CompanyName { get; set; } = null!;
     public string StartDate { get; set; } = null!;
     public string? EndDate { get; set; }
+    public string? Description { get; set; }
 }
 
 public class EducationCreateDto
@@ -48,6 +52,9 @@ public class ResumeViewDto
     public string? Phone { get; set; }
     public string? Location { get; set; }
     public string? Bio { get; set; }
+    public string? LinkedIn { get; set; }
+    public string? GitHub { get; set; }
+    public string? Website { get; set; }
     public List<ExperienceViewDto> Experiences { get; set; } = new();
     public List<EducationViewDto> Educations { get; set; } = new();
     public List<SkillViewDto> Skills { get; set; } = new();
@@ -60,6 +67,7 @@ public class ExperienceViewDto
     public string CompanyName { get; set; } = null!;
     public string StartDate { get; set; } = null!;
     public string? EndDate { get; set; }
+    public string? Description { get; set; }
 }
 
 public class EducationViewDto

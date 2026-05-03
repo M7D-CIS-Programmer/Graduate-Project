@@ -368,7 +368,9 @@ export const LanguageProvider = ({ children }) => {
             pleaseUploadPdf: "Please upload a PDF file.",
             scannedPdfError: "Scanned PDFs cannot be analysed — please use a text-based PDF.",
             cvErrorGeneral: "An error occurred. Please try again.",
+
             myJobs: "Jobs & Departments",
+
             postedDate: "Posted Date",
             manage: "Manage",
             views: "Views",
@@ -655,6 +657,7 @@ export const LanguageProvider = ({ children }) => {
             analyzeBtn: "Analyze Match",
             analyzing: "Analyzing...",
             analysisResult: "Analysis Result",
+            contactMessages: "Contact messages  ",
             cvAnalyzingFor: "Analyzing for:",
             matchPercentage: "Job Match Score",
             cvMissingSkills: "Missing Skills",
@@ -743,6 +746,7 @@ export const LanguageProvider = ({ children }) => {
             companyFollowed: "Company followed successfully",
             companyUnfollowed: "Company unfollowed successfully",
             companyNotFound: "Company not found",
+            coverLetter: "Note",
             companyNotFoundMsg: "This profile does not exist or is not a company account.",
             backToCompanies: "Back to Companies",
             openPositions: "Open Positions",
@@ -916,6 +920,7 @@ export const LanguageProvider = ({ children }) => {
             forEmployers: "لأصحاب العمل",
             forJobSeekers: "للباحثين عن عمل",
             explore: "استكشف",
+            contactMessages: "الرسائل الوارده",
             // New Translations
             noAppliedJobsYet: "لم تقدم على أي وظيفة بعد",
             filters: "الفلاتر",
@@ -1137,7 +1142,10 @@ export const LanguageProvider = ({ children }) => {
             scannedPdfError: "لا يمكن تحليل ملفات PDF الممسوحة ضوئياً - يرجى استخدام ملف PDF نصي.",
             cvErrorGeneral: "حدث خطأ. يرجى المحاولة مرة أخرى.",
             myJobs: "الوظائف و الأقسام",
+
             postedDate: "تاريخ النشر",
+            coverLetter: "ملاحظة",
+            myJobs: "وظائفي",
             manage: "إدارة",
             views: "المشاهدات",
             active: "نشط",

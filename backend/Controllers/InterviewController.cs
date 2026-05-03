@@ -27,7 +27,8 @@ public class InterviewController : ControllerBase
 
         try
         {
-            var result = await _service.StartAsync(dto.JobTitle.Trim(), dto.JobDescription.Trim());
+            var result = await _service.StartAsync(
+                dto.JobTitle.Trim(), dto.JobDescription.Trim(), dto.Language ?? "en");
             return Ok(result);
         }
         catch (TimeoutException ex)
@@ -71,7 +72,8 @@ public class InterviewController : ControllerBase
 
         try
         {
-            var result = await _service.AnswerAsync(dto.SessionId.Trim(), dto.Answer.Trim());
+            var result = await _service.AnswerAsync(
+                dto.SessionId.Trim(), dto.Answer.Trim(), dto.Language ?? "en");
             return Ok(result);
         }
         catch (KeyNotFoundException ex)

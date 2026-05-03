@@ -6,8 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 [Route("api/support")]
 public class SupportController : ControllerBase
 {
-    private readonly ISupportService _support;
-    private readonly ILogger<SupportController> _logger;
+    private readonly ISupportService             _support;
+    private readonly ILogger<SupportController>  _logger;
 
     public SupportController(ISupportService support, ILogger<SupportController> logger)
     {
@@ -15,7 +15,7 @@ public class SupportController : ControllerBase
         _logger  = logger;
     }
 
-    /// <summary>POST /api/support/chat — AI-powered platform support chatbot.</summary>
+    /// <summary>POST /api/support/chat — AI-powered role-aware platform support chatbot.</summary>
     [HttpPost("chat")]
     public async Task<IActionResult> Chat([FromBody] SupportChatRequestDto dto)
     {
@@ -25,9 +25,12 @@ public class SupportController : ControllerBase
         if (dto.Message.Trim().Length > 1000)
             return BadRequest(new { error = "Message is too long (max 1000 characters)." });
 
+        var role = dto.Role?.Trim()     ?? string.Empty;
+        var lang = dto.Language?.Trim() ?? "en";
+
         try
         {
-            var result = await _support.ChatAsync(dto.Message);
+            var result = await _support.ChatAsync(dto.Message, role, lang);
             return Ok(result);
         }
         catch (TimeoutException ex)

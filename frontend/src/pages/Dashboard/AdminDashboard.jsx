@@ -221,9 +221,14 @@ const AdminDashboard = () => {
                                     </p>
                                 </div>
                                 <div style={{ display: 'flex', gap: '0.5rem', opacity: 0.7 }}>
-                                    <Link 
-                                        to={rawUsers.find(ru => ru.id === user.id)?.role === 'Employer' ? `/profile/${user.id}` : `/resume/${user.id}`}
-                                        className="btn-icon primary" 
+                                    <Link
+                                        to={(() => {
+                                            const role = (rawUsers.find(ru => ru.id === user.id)?.role || '').toLowerCase();
+                                            return (role === 'employer' || role === 'company')
+                                                ? `/companies/${user.id}`
+                                                : `/candidate/${user.id}`;
+                                        })()}
+                                        className="btn-icon primary"
                                         title={t('viewProfile')}
                                     >
                                         <Eye size={16} />
