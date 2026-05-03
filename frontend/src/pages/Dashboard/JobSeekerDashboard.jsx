@@ -165,7 +165,7 @@ const JobSeekerDashboard = () => {
                                 scales: {
                                     y: {
                                         beginAtZero: true,
-                                        grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                                        grid: { color: theme === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)' },
                                         ticks: { 
                                             stepSize: 1,
                                             color: 'var(--text-muted)' 
@@ -191,7 +191,7 @@ const JobSeekerDashboard = () => {
                     <div className="activity-list">
                         {recentActivity.map((activity) => (
                             <div key={activity.id} className="activity-item">
-                                <div className="activity-icon" style={{ backgroundColor: `${activity.color}15`, color: activity.color }}>
+                                <div className="activity-icon" style={{ backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)', color: activity.color }}>
                                     {activity.icon}
                                 </div>
                                 <div className="activity-details">

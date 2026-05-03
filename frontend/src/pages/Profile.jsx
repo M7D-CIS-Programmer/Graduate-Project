@@ -80,11 +80,19 @@ const Profile = () => {
         fetchUserData();
     }, [id, isOwnProfile, currentUser]);
 
+    useEffect(() => {
+        // Redirect Admin users to Settings since they don't have a public profile
+        if (isOwnProfile && currentUser?.role?.toLowerCase() === 'admin') {
+            navigate('/settings');
+        }
+    }, [isOwnProfile, currentUser, navigate]);
+
     if (isLoading) return <Spinner />;
     if (!userData) return <div className="user-page-container">{t('userNotFound')}</div>;
 
     const profilePhoto = getImageUrl(userData.profilePicture || userData.photo);
     const isEmployer = userData.role === 'Employer' || userData.role === 'Company';
+    const isAdmin = userData.role?.toLowerCase() === 'admin';
 
     return (
         <div className="user-page-container" dir={dir}>
@@ -92,37 +100,40 @@ const Profile = () => {
                 <div>
                     <h1 className="dashboard-title">{isOwnProfile ? t('myProfile') || 'My Profile' : t('userProfile')}</h1>
                     <p style={{ color: 'var(--text-muted)' }}>
-                        {isEmployer ? t('employerProfile') || 'Employer Account' : t('jobSeekerProfile') || 'Job Seeker Account'}
+                        {isEmployer ? t('employerProfile') || 'Employer Account' 
+                          : isAdmin ? t('adminProfile') || 'Administrator Account'
+                          : t('jobSeekerProfile') || 'Job Seeker Account'}
                     </p>
                 </div>
                 {isOwnProfile && (
                     <div style={{ display: 'flex', gap: '1rem' }}>
-                    <Button onClick={() => navigate('/profile/edit')}>
-                        <Edit size={18} />
-                        {t('editProfile') || 'Edit Profile'}
-                    </Button>
+                        <Button onClick={() => navigate('/profile/edit')}>
+                            <Edit size={18} />
+                            {t('editProfile') || 'Edit Profile'}
+                        </Button>
+                    </div>
+                )}
+            </div>
+
+            {/* Only show tabs if there is more than one available (e.g., Job Seeker's own profile) */}
+            {isOwnProfile && currentUser?.role === 'Job Seeker' && (
+                <div className="profile-tabs glass">
+                    <button 
+                        className={`profile-tab-btn ${activeTab === 'bio' ? 'active' : ''}`}
+                        onClick={() => handleTabChange('bio')}
+                    >
+                        <User size={18} />
+                        {t('bio') || 'Bio'}
+                    </button>
+                    <button 
+                        className={`profile-tab-btn ${activeTab === 'following' ? 'active' : ''}`}
+                        onClick={() => handleTabChange('following')}
+                    >
+                        <Building size={18} />
+                        {t('following') || 'Following'}
+                    </button>
                 </div>
             )}
-        </div>
-
-        <div className="profile-tabs glass">
-            <button 
-                className={`profile-tab-btn ${activeTab === 'bio' ? 'active' : ''}`}
-                onClick={() => handleTabChange('bio')}
-            >
-                <User size={18} />
-                {t('bio') || 'Bio'}
-            </button>
-            {isOwnProfile && currentUser?.role === 'Job Seeker' && (
-                <button 
-                    className={`profile-tab-btn ${activeTab === 'following' ? 'active' : ''}`}
-                    onClick={() => handleTabChange('following')}
-                >
-                    <Building size={18} />
-                    {t('following') || 'Following'}
-                </button>
-            )}
-        </div>
 
             <div className="profile-layout">
                 <aside className="profile-card-left">
@@ -179,7 +190,9 @@ const Profile = () => {
                             <div className="dashboard-section">
                                 <h3 className="section-title">
                                     <User size={20} />
-                                    {isEmployer ? t('aboutCompany') || 'About Company' : t('aboutMe')}
+                                    {isEmployer ? t('aboutCompany') || 'About Company' 
+                                      : isAdmin ? t('aboutAdmin') || 'Administrator Bio'
+                                      : t('aboutMe')}
                                 </h3>
                                 <p className="profile-bio-text">
                                     {userData.description || userData.bio || t('noDescriptionProvided') || 'No description provided yet.'}

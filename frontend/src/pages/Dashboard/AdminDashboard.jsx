@@ -165,6 +165,7 @@ const AdminDashboard = () => {
                                 padding: '0.25rem 0.5rem',
                                 borderRadius: '100px'
                             }}>
+                                < MoreVertical size={14} style={{ display: 'none' }} />
                                 <TrendingUp size={14} />
                                 {stat.trend}
                             </span>
@@ -201,7 +202,7 @@ const AdminDashboard = () => {
                     <div className="activity-list">
                         {recentUsers.map(user => (
                             <div key={user.id} className="activity-item">
-                                <div className="activity-icon" style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--text-main)' }}>
+                                <div className="activity-icon" style={{ background: theme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)', color: 'var(--text-main)' }}>
                                     <Users size={20} />
                                 </div>
                                 <div className="activity-content">

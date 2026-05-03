@@ -167,10 +167,10 @@ const ManageCompanies = () => {
                         </thead>
                         <tbody>
                             {filteredCompanies.map(company => (
-                                <tr key={company.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                                <tr key={company.id} style={{ borderBottom: '1px solid var(--border-color)' }}>
                                     <td style={{ padding: '1rem' }}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                                            <div style={{ width: '40px', height: '40px', borderRadius: '8px', background: 'rgba(255, 255, 255, 0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                            <div style={{ width: '40px', height: '40px', borderRadius: '8px', background: 'var(--bg-dark)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid var(--border-color)' }}>
                                                 <Building2 size={20} color="var(--primary)" />
                                             </div>
                                             <div>
@@ -185,7 +185,7 @@ const ManageCompanies = () => {
                                     <td style={{ padding: '1rem', color: 'var(--text-muted)' }}>{new Date(company.createdAt).toLocaleDateString()}</td>
                                     <td style={{ padding: '1rem', textAlign: 'center' }}>
                                         <span style={{
-                                            background: 'rgba(15, 23, 42, 0.5)',
+                                            background: 'var(--bg-dark)',
                                             padding: '0.2rem 0.6rem',
                                             borderRadius: '100px',
                                             fontSize: '0.8rem',

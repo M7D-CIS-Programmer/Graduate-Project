@@ -77,11 +77,11 @@
 }
 
 .stat-card h3 {
-    color: #fff;
+    color: var(--text-main);
 }
 
 .stat-card p {
-    color: #fff;
+    color: var(--text-muted);
 }
 
 .stat-card:hover {

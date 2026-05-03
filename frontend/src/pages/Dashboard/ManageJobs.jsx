@@ -168,7 +168,7 @@ const ManageJobs = () => {
                         </thead>
                         <tbody>
                             {filteredJobs.map(job => (
-                                <tr key={job.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                                <tr key={job.id} style={{ borderBottom: '1px solid var(--border-color)' }}>
                                     <td style={{ padding: '1rem' }}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                                             <div style={{ background: 'rgba(99, 102, 241, 0.1)', color: 'var(--primary)', padding: '0.5rem', borderRadius: '8px' }}>
@@ -189,7 +189,7 @@ const ManageJobs = () => {
                                     <td style={{ padding: '1rem', color: 'var(--text-muted)' }}>{formatFriendlyDate(job.postedDate, language)}</td>
                                     <td style={{ padding: '1rem', textAlign: 'center' }}>
                                         <span style={{
-                                            background: 'rgba(15, 23, 42, 0.5)',
+                                            background: 'var(--bg-dark)',
                                             padding: '0.2rem 0.6rem',
                                             borderRadius: '100px',
                                             fontSize: '0.8rem',

@@ -161,7 +161,7 @@ const EmployerDashboard = () => {
                     <div className="activity-list">
                         {recentApplicants.map(applicant => (
                             <div key={applicant.id} className="activity-item">
-                                <div className="activity-icon" style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--text-main)' }}>
+                                <div className="activity-icon" style={{ background: theme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)', color: 'var(--text-main)' }}>
                                     <Users size={20} />
                                 </div>
                                 <div className="activity-content">
@@ -226,7 +226,7 @@ const EmployerDashboard = () => {
                                 },
                                 scales: {
                                     y: {
-                                        grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                                        grid: { color: theme === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)' },
                                         ticks: { color: 'var(--text-muted)' }
                                     },
                                     x: {
