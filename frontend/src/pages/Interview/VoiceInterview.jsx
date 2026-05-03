@@ -43,7 +43,7 @@ const FeedbackToast = ({ feedback, score, t }) => (
  *   onBack  – callback to return to mode-selection screen
  */
 const VoiceInterview = ({ onBack }) => {
-    const { dir, t } = useLanguage();
+    const { dir, t, language } = useLanguage();
     const voice   = useVoiceInterview();
 
     // ── Phase state ────────────────────────────────────────────────────────
@@ -96,7 +96,7 @@ const VoiceInterview = ({ onBack }) => {
         setError('');
         setLoading(true);
         try {
-            const res = await api.startInterview(jobTitle.trim(), jobDesc.trim());
+            const res = await api.startInterview(jobTitle.trim(), jobDesc.trim(), language);
             setSessionId(res.sessionId);
             setQNum(res.questionNumber);
             setQTotal(res.totalQuestions);
@@ -120,7 +120,7 @@ const VoiceInterview = ({ onBack }) => {
         voice.stopRecording();
 
         try {
-            const res = await api.answerInterview(sessionId, answer);
+            const res = await api.answerInterview(sessionId, answer, language);
 
             voice.resetTranscript();
 

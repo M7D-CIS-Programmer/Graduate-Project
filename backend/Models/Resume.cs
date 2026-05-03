@@ -11,6 +11,9 @@ public class Resume
     public string? Phone { get; set; }
     public string? Location { get; set; }
     public string? Bio { get; set; }
+    public string? LinkedIn { get; set; }
+    public string? GitHub { get; set; }
+    public string? Website { get; set; }
 
     // Navigation
     public User User { get; set; } = null!;

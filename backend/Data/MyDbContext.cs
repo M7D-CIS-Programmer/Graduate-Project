@@ -21,6 +21,7 @@ namespace aabu_project.Data
         public DbSet<SavedJob> SavedJobs { get; set; }
         public DbSet<FollowCompany> FollowCompanies { get; set; }
         public DbSet<Message> Messages { get; set; }
+        public DbSet<ContactMessage> ContactMessages { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

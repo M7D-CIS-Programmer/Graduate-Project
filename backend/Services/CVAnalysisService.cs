@@ -95,14 +95,16 @@ namespace aabu_project.Services
         // ── Main Analysis — Hybrid Pipeline ───────────────────────────────────────
 
         public async Task<CVAnalysisResponseDto> AnalyzeCvAsync(
-            string cvText, string jobTitle, string jobDescription)
+            string cvText, string jobTitle, string jobDescription, string lang = "en")
         {
             if (string.IsNullOrWhiteSpace(_apiKey))
                 throw new InvalidOperationException(
                     "Gemini API key is not configured. Set GeminiSettings:ApiKey in appsettings.json.");
 
+            lang = LangHelper.Normalize(lang);
+
             // ── 1. Cache check (SHA-256 of all inputs) ────────────────────────────
-            var cacheKey = ComputeCacheKey(cvText, jobTitle, jobDescription);
+            var cacheKey = ComputeCacheKey(cvText, jobTitle + "|lang:" + lang, jobDescription);
 
             if (_cache.TryGetValue(cacheKey, out CVAnalysisResponseDto? cached) && cached is not null)
             {
@@ -115,10 +117,18 @@ namespace aabu_project.Services
             var local = _localAnalyzer.Analyze(cvText, jobTitle, jobDescription);
 
             // ── 3. Gemini — insights ONLY, minimal prompt ─────────────────────────
-            //    We send skill lists (~150 chars), NOT the full CV (~8 000 chars)
-            var prompt  = BuildInsightPrompt(jobTitle, local.MatchedSkills, local.MissingSkills);
-            var rawText = await CallGeminiAsync(prompt);
-            var insights = ParseInsights(rawText);
+            var prompt  = BuildInsightPrompt(jobTitle, local.MatchedSkills, local.MissingSkills, lang);
+            GeminiInsightsDto insights;
+            try
+            {
+                var rawText = await CallGeminiAsync(prompt);
+                insights = ParseInsights(rawText);
+            }
+            catch (InvalidOperationException ex) when (ex.Message == "QUOTA_EXCEEDED")
+            {
+                _logger.LogWarning("Gemini quota exceeded — using local fallback for analyze.");
+                insights = FallbackInsights();
+            }
 
             // ── 4. Merge: local numbers + AI advisor narrative ────────────────────
             var result = new CVAnalysisResponseDto
@@ -157,24 +167,25 @@ namespace aabu_project.Services
         private static string BuildInsightPrompt(
             string jobTitle,
             List<string> matchedSkills,
-            List<string> missingSkills)
+            List<string> missingSkills,
+            string lang)
         {
             var matched = matchedSkills.Count > 0
-                ? string.Join(", ", matchedSkills)
-                : "none identified";
-
+                ? string.Join(", ", matchedSkills) : "none identified";
             var missing = missingSkills.Count > 0
-                ? string.Join(", ", missingSkills)
-                : "none identified";
+                ? string.Join(", ", missingSkills) : "none identified";
+            var langInst = LangHelper.GetInstruction(lang);
 
             return $$"""
-                You are a strict CV advisor. Your ONLY job is to provide improvement feedback.
+                {{langInst}}
 
-                ⚠️ CRITICAL RULES — NEVER break these:
+                You are a strict CV advisor. Your ONLY job is to provide improvement feedback.
+                All text values in your JSON response must be in the language specified above.
+
+                ⚠️ CRITICAL RULES:
                 - Do NOT rewrite the CV
-                - Do NOT generate new CV content or paragraphs
-                - Do NOT rephrase the user's existing text
-                - ONLY identify what is weak and suggest what to add or fix
+                - Do NOT generate new CV content
+                - ONLY identify weaknesses and suggest improvements
 
                 Context:
                 Job Title: {{jobTitle}}
@@ -183,21 +194,14 @@ namespace aabu_project.Services
 
                 Return ONLY valid JSON (no markdown, no code fences):
                 {
-                  "weak_sections": [
-                    "Specific section name + why it is weak (e.g., Experience section lacks measurable achievements)",
-                    "..."
-                  ],
-                  "improvement_suggestions": [
-                    "Specific actionable step (e.g., Add Docker and Kubernetes to skills section)",
-                    "..."
-                  ]
+                  "weak_sections": ["..."],
+                  "improvement_suggestions": ["..."]
                 }
 
-                Advisor rules:
-                - weak_sections: name the CV section and explain the weakness. 2-4 items.
-                - improvement_suggestions: tell WHAT to add/fix, not HOW to write it. 2-4 items.
-                - Use short action phrases like "Add...", "Include...", "Quantify...", "Remove..."
-                - Be specific to the job title and skill gaps above.
+                Rules:
+                - weak_sections: 2-4 items, name the section and explain the weakness.
+                - improvement_suggestions: 2-4 items, short action phrases (Add..., Include..., Quantify...).
+                - JSON keys stay in English. Values must be in the language above.
                 """;
         }
 
@@ -336,13 +340,14 @@ namespace aabu_project.Services
         private const int MaxJobCharsForSemantic  = 2_000;
 
         public async Task<SemanticCVAnalysisResponseDto> SemanticAnalyzeCvAsync(
-            string cvText, string jobDescription)
+            string cvText, string jobDescription, string lang = "en")
         {
             if (string.IsNullOrWhiteSpace(_apiKey))
                 throw new InvalidOperationException(
                     "Gemini API key is not configured. Set GeminiSettings:ApiKey in appsettings.json.");
 
-            var cacheKey = ComputeCacheKey(cvText, "semantic", jobDescription);
+            lang = LangHelper.Normalize(lang);
+            var cacheKey = ComputeCacheKey(cvText, "semantic|lang:" + lang, jobDescription);
 
             if (_cache.TryGetValue(cacheKey, out SemanticCVAnalysisResponseDto? cached) && cached is not null)
             {
@@ -353,7 +358,7 @@ namespace aabu_project.Services
             var truncatedCv  = cvText.Length  > MaxCvCharsForSemantic  ? cvText[..MaxCvCharsForSemantic]  : cvText;
             var truncatedJob = jobDescription.Length > MaxJobCharsForSemantic ? jobDescription[..MaxJobCharsForSemantic] : jobDescription;
 
-            var prompt   = BuildSemanticPrompt(truncatedCv, truncatedJob);
+            var prompt   = BuildSemanticPrompt(truncatedCv, truncatedJob, lang);
             var rawText  = await CallGeminiSemanticAsync(prompt);
             var result   = ParseSemanticInsights(rawText);
 
@@ -363,11 +368,14 @@ namespace aabu_project.Services
             return result;
         }
 
-        private static string BuildSemanticPrompt(string cvText, string jobDescription) => $$"""
-            You are an expert AI CV Analyst inside a recruitment system.
+        private static string BuildSemanticPrompt(
+            string cvText, string jobDescription, string lang) => $$"""
+            {{LangHelper.GetInstruction(lang)}}
 
-            Your task:
-            Analyze the candidate CV against the Job Description and extract ONLY deep semantic insights.
+            You are an expert AI CV Analyst inside a recruitment system.
+            All text values in your JSON response must be in the language specified above.
+
+            Your task: Analyze the candidate CV against the Job Description and extract ONLY deep semantic insights.
 
             You are NOT allowed to:
             - Perform simple keyword counting
@@ -387,23 +395,22 @@ namespace aabu_project.Services
             Candidate CV:
             {{cvText}}
 
-            Return ONLY valid JSON — no markdown fences, no extra text:
+            Return ONLY valid JSON — no markdown fences, no extra text.
+            JSON keys must stay in English. String values must be in the language above:
             {
-              "semanticMatchAnalysis": "Explain how well the candidate fits the role in a meaningful way",
+              "semanticMatchAnalysis": "...",
               "keyMatchingAreas": ["..."],
               "missingCriticalSkills": ["..."],
               "experienceQuality": "low | medium | high",
               "consistencyCheck": "pass | warning | fail",
               "fraudIndicators": ["..."],
-              "overallInsight": "short professional conclusion"
+              "overallInsight": "..."
             }
 
             RULES:
             - Be strict and realistic
-            - Do not exaggerate candidate strengths
-            - Do not assume missing data
-            - Focus on logic and meaning, not keywords
-            - fraudIndicators must be an empty array [] if nothing suspicious is found
+            - fraudIndicators must be [] if nothing suspicious is found
+            - experienceQuality and consistencyCheck values are always English enum strings
             """;
 
         private async Task<string> CallGeminiSemanticAsync(string prompt)
@@ -495,13 +502,15 @@ namespace aabu_project.Services
 
         private const int MaxCvCharsForFraud = 6_000;
 
-        public async Task<CVFraudDetectionResponseDto> DetectCvFraudAsync(string cvText)
+        public async Task<CVFraudDetectionResponseDto> DetectCvFraudAsync(
+            string cvText, string lang = "en")
         {
             if (string.IsNullOrWhiteSpace(_apiKey))
                 throw new InvalidOperationException(
                     "Gemini API key is not configured. Set GeminiSettings:ApiKey in appsettings.json.");
 
-            var cacheKey = ComputeCacheKey(cvText, "fraud", string.Empty);
+            lang = LangHelper.Normalize(lang);
+            var cacheKey = ComputeCacheKey(cvText, "fraud|lang:" + lang, string.Empty);
 
             if (_cache.TryGetValue(cacheKey, out CVFraudDetectionResponseDto? cached) && cached is not null)
             {
@@ -511,7 +520,7 @@ namespace aabu_project.Services
 
             var truncatedCv = cvText.Length > MaxCvCharsForFraud ? cvText[..MaxCvCharsForFraud] : cvText;
 
-            var prompt  = BuildFraudPrompt(truncatedCv);
+            var prompt  = BuildFraudPrompt(truncatedCv, lang);
             var rawText = await CallGeminiFraudAsync(prompt);
             var result  = ParseFraudResponse(rawText);
 
@@ -521,8 +530,11 @@ namespace aabu_project.Services
             return result;
         }
 
-        private static string BuildFraudPrompt(string cvText) => $$"""
+        private static string BuildFraudPrompt(string cvText, string lang) => $$"""
+            {{LangHelper.GetInstruction(lang)}}
+
             You are a CV Integrity & Fraud Detection AI.
+            All text values in your JSON response must be in the language specified above.
 
             Your task is to detect inconsistencies or unrealistic claims in the CV below.
 
@@ -537,24 +549,21 @@ namespace aabu_project.Services
             CV TEXT:
             {{cvText}}
 
-            Return ONLY valid JSON — no markdown fences, no extra text:
+            Return ONLY valid JSON — no markdown fences, no extra text.
+            JSON keys must stay in English. String values must be in the language above.
+            Enum values (riskLevel, finalVerdict) are always English:
             {
               "isSuspicious": true,
               "riskLevel": "low | medium | high",
               "issuesFound": [
-                {
-                  "issue": "description of the issue",
-                  "reason": "why it is suspicious"
-                }
+                { "issue": "...", "reason": "..." }
               ],
               "finalVerdict": "trusted | questionable | likely_fake"
             }
 
             RULES:
-            - Do not assume guilt without concrete evidence from the CV text
-            - Be analytical and logical — base every issue on text you can quote
-            - If nothing suspicious is found: isSuspicious=false, riskLevel="low", issuesFound=[], finalVerdict="trusted"
-            - Focus on consistency of timeline and the plausibility of skill claims
+            - Do not assume guilt without concrete evidence
+            - If nothing suspicious: isSuspicious=false, riskLevel="low", issuesFound=[], finalVerdict="trusted"
             """;
 
         private async Task<string> CallGeminiFraudAsync(string prompt)
@@ -660,7 +669,8 @@ namespace aabu_project.Services
                 return cached;
             }
 
-            var prompt  = BuildHiringPrompt(request);
+            var lang    = LangHelper.Normalize(request.Language);
+            var prompt  = BuildHiringPrompt(request, lang);
             var rawText = await CallGeminiHiringAsync(prompt);
             var result  = ParseHiringResponse(rawText);
 
@@ -670,56 +680,58 @@ namespace aabu_project.Services
             return result;
         }
 
-        private static string BuildHiringPrompt(HiringRecommendationRequestDto req)
+        private static string BuildHiringPrompt(HiringRecommendationRequestDto req, string lang)
         {
-            var sem   = req.SemanticAnalysis;
-            var fraud = req.FraudResult;
+            var sem        = req.SemanticAnalysis;
+            var fraud      = req.FraudResult;
+            var langInst   = LangHelper.GetInstruction(lang);
 
             var fraudSummary = fraud.IsSuspicious
                 ? $"SUSPICIOUS — {fraud.RiskLevel} risk. Verdict: {fraud.FinalVerdict}. " +
                   $"Issues: {string.Join("; ", fraud.IssuesFound.Select(i => i.Issue))}"
                 : $"CLEAN — {fraud.FinalVerdict}. No issues found.";
 
-            var keyAreas  = sem.KeyMatchingAreas.Count  > 0 ? string.Join(", ", sem.KeyMatchingAreas)  : "none";
-            var missing   = sem.MissingCriticalSkills.Count > 0 ? string.Join(", ", sem.MissingCriticalSkills) : "none";
-            var fraudFlags = sem.FraudIndicators.Count > 0 ? string.Join(", ", sem.FraudIndicators) : "none";
+            var keyAreas   = sem.KeyMatchingAreas.Count  > 0 ? string.Join(", ", sem.KeyMatchingAreas)  : "none";
+            var missing    = sem.MissingCriticalSkills.Count > 0 ? string.Join(", ", sem.MissingCriticalSkills) : "none";
+            var fraudFlags = sem.FraudIndicators.Count  > 0 ? string.Join(", ", sem.FraudIndicators) : "none";
 
             return $$"""
+                {{langInst}}
+
                 You are a Senior Recruitment AI Advisor.
+                All text values in your JSON response must be in the language specified above.
 
                 Combine the structured inputs below into a final hiring recommendation.
 
                 RULES:
                 - Trust the system match score for the numeric dimension
-                - Trust the AI modules ONLY for reasoning and risk signals
                 - Be objective and HR-like — no sentiment, no guessing
-                - finalScore must be a number between 0 and 100
-                - finalDecision must be exactly one of: strong_hire, hire, neutral, reject
-                - riskAssessment must be exactly one of: low, medium, high
+                - finalScore: number 0-100
+                - finalDecision: exactly one of: strong_hire, hire, neutral, reject (always English)
+                - riskAssessment: exactly one of: low, medium, high (always English)
+                - reasoning and recommendation text values: in the language above
 
                 INPUT DATA:
-
                 System Match Score: {{req.MatchScore}}/100
 
-                Semantic Analysis Summary:
-                  Match Analysis : {{sem.SemanticMatchAnalysis}}
-                  Key Matching Areas : {{keyAreas}}
-                  Missing Critical Skills : {{missing}}
-                  Experience Quality : {{sem.ExperienceQuality}}
-                  Consistency Check : {{sem.ConsistencyCheck}}
-                  Semantic Fraud Indicators : {{fraudFlags}}
-                  Overall Insight : {{sem.OverallInsight}}
+                Semantic Analysis:
+                  Match Analysis: {{sem.SemanticMatchAnalysis}}
+                  Key Matching Areas: {{keyAreas}}
+                  Missing Critical Skills: {{missing}}
+                  Experience Quality: {{sem.ExperienceQuality}}
+                  Consistency Check: {{sem.ConsistencyCheck}}
+                  Fraud Indicators: {{fraudFlags}}
+                  Overall Insight: {{sem.OverallInsight}}
 
-                Fraud Detection Summary:
-                  {{fraudSummary}}
+                Fraud Detection: {{fraudSummary}}
 
                 Return ONLY valid JSON — no markdown fences, no extra text:
                 {
                   "finalDecision": "strong_hire | hire | neutral | reject",
                   "finalScore": <number 0-100>,
-                  "reasoning": "clear explanation combining all three factors",
+                  "reasoning": "...",
                   "riskAssessment": "low | medium | high",
-                  "recommendation": "specific actionable next step for the hiring team"
+                  "recommendation": "..."
                 }
                 """;
         }
@@ -806,14 +818,16 @@ namespace aabu_project.Services
         private const int MaxJobCharsForMatch = 2_000;
 
         public async Task<JobMatchResponseDto> MatchCvToJobAsync(
-            string cvText, string jobTitle, string jobDescription)
+            string cvText, string jobTitle, string jobDescription, string lang = "en")
         {
             if (string.IsNullOrWhiteSpace(_apiKey))
                 throw new InvalidOperationException(
                     "Gemini API key is not configured. Set GeminiSettings:ApiKey in appsettings.json.");
 
+            lang = LangHelper.Normalize(lang);
+
             // ── 1. Cache check ────────────────────────────────────────────────────
-            var cacheKey = ComputeCacheKey(cvText, "match|" + jobTitle, jobDescription);
+            var cacheKey = ComputeCacheKey(cvText, "match|lang:" + lang + "|" + jobTitle, jobDescription);
 
             if (_cache.TryGetValue(cacheKey, out JobMatchResponseDto? cached) && cached is not null)
             {
@@ -829,10 +843,29 @@ namespace aabu_project.Services
             var truncJob = jobDescription.Length > MaxJobCharsForMatch ? jobDescription[..MaxJobCharsForMatch] : jobDescription;
 
             // ── 4. Single unified Gemini call ─────────────────────────────────────
-            var prompt  = BuildUnifiedMatchPrompt(jobTitle, truncJob, truncCv,
-                                                  local.MatchedSkills, local.MissingSkills);
-            var rawText = await CallGeminiUnifiedAsync(prompt);
-            var result  = ParseMatchResult(rawText);
+            var prompt = BuildUnifiedMatchPrompt(jobTitle, truncJob, truncCv,
+                                                 local.MatchedSkills, local.MissingSkills, lang);
+            JobMatchResponseDto result;
+            try
+            {
+                var rawText = await CallGeminiUnifiedAsync(prompt);
+                result = ParseMatchResult(rawText);
+            }
+            catch (InvalidOperationException ex) when (ex.Message == "QUOTA_EXCEEDED")
+            {
+                _logger.LogWarning("Gemini quota exceeded — using local fallback for match.");
+                result = new JobMatchResponseDto
+                {
+                    MatchScore             = local.MatchPercentage,
+                    MatchedSkills          = local.MatchedSkills.Take(10).ToList(),
+                    MissingSkills          = local.MissingSkills.Take(10).ToList(),
+                    Summary                = lang == "ar"
+                        ? "تحليل الذكاء الاصطناعي غير متاح مؤقتًا. النتائج مبنية على مطابقة الكلمات المفتاحية."
+                        : "AI analysis temporarily unavailable. Results are based on keyword matching.",
+                    WeakSections           = [],
+                    ImprovementSuggestions = []
+                };
+            }
 
             // ── 5. Safety anchor — prevent falsely high scores on zero skill match ─
             //    If the local keyword pass found zero overlapping skills, halve Gemini's
@@ -865,13 +898,19 @@ namespace aabu_project.Services
             string jobDescription,
             string cvText,
             List<string> localMatched,
-            List<string> localMissing)
+            List<string> localMissing,
+            string lang)
         {
             var hintMatched = localMatched.Count > 0 ? string.Join(", ", localMatched) : "none detected";
             var hintMissing = localMissing.Count > 0 ? string.Join(", ", localMissing) : "none detected";
+            var langInst    = LangHelper.GetInstruction(lang);
 
             return $$"""
+                {{langInst}}
+
                 You are an AI Job Matching Engine. Your task is to analyze the candidate CV and the Job Description TOGETHER in a single unified flow — not separately.
+                All text values in your JSON response must be in the language specified above.
+                JSON keys and numeric/boolean values stay in English.
 
                 SYNONYM EQUIVALENCE — treat each group as the same technology:
                 - JavaScript / JS / ECMAScript / Node.js / NodeJS

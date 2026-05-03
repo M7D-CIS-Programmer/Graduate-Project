@@ -1,17 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import {
-    Send,
-    Mic,
-    User,
-    Bot,
-    X,
-    MoreVertical,
-    Paperclip,
-    Smile,
-    RotateCcw,
-    Trash2,
-    Search
-} from 'lucide-react';
+import { Send, User, Bot, X, Trash2 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
@@ -21,60 +9,103 @@ import Button from '../components/ui/Button';
 import Modal from '../components/ui/Modal';
 import './Chatbot.css';
 
+// ── Normalise the role string to what the backend expects ─────────────────────
+const normalizeRole = (raw) => {
+    if (!raw) return '';
+    const r = raw.toLowerCase().trim();
+    if (r === 'employer' || r === 'company') return 'company';
+    if (r.includes('seeker') || r === 'job seeker') return 'jobseeker';
+    return '';
+};
+
+// ── Role badge component ──────────────────────────────────────────────────────
+const RoleBadge = ({ role }) => {
+    if (!role) return null;
+    const isCompany = role === 'company';
+    return (
+        <span style={{
+            fontSize: '0.7rem',
+            fontWeight: 600,
+            padding: '2px 8px',
+            borderRadius: 999,
+            background: isCompany ? 'rgba(16,185,129,0.15)' : 'rgba(99,102,241,0.15)',
+            color: isCompany ? '#10b981' : '#6366f1',
+            border: `1px solid ${isCompany ? 'rgba(16,185,129,0.3)' : 'rgba(99,102,241,0.3)'}`,
+            marginLeft: '0.5rem',
+        }}>
+            {isCompany ? '🏢 Company' : '👤 Job Seeker'}
+        </span>
+    );
+};
+
+// ── Suggestions per role ──────────────────────────────────────────────────────
+const getSuggestions = (role, t) => {
+    if (role === 'company') return [
+        'How do I post a job?',
+        'How to view my applicants?',
+        'How does the AI hiring report work?',
+    ];
+    if (role === 'jobseeker') return [
+        t('howToApply') || 'How to apply for a job?',
+        'How does the CV analyzer work?',
+        'How to practice for interviews?',
+    ];
+    return [
+        t('howToApply') || 'How to apply?',
+        t('buildResume') || 'Build Resume',
+        'What is InsightCV?',
+    ];
+};
+
+// ── Main Component ────────────────────────────────────────────────────────────
+
 const Chatbot = () => {
     const { t, dir, language } = useLanguage();
     const { theme } = useTheme();
     const { user } = useAuth();
-    const lastSentRef = useRef(0); // simple rate-limit: 2 s between sends
+
+    const role = normalizeRole(user?.role);
+    const lastSentRef = useRef(0);
+
     const [messages, setMessages] = useState(() => {
         const saved = localStorage.getItem('chat_history');
         return saved ? JSON.parse(saved) : [
             {
                 id: 1,
-                text: t('chatbotWelcome') || 'Hello! I am your InsightCV assistant. How can I help you today?',
+                text: t('chatbotWelcome') || 'Hello! I\'m the InsightCV assistant. How can I help you today?',
                 sender: 'bot',
                 timestamp: new Date().toISOString()
             }
         ];
     });
-    const [input, setInput] = useState('');
-    const [isTyping, setIsTyping] = useState(false);
+
+    const [input, setInput]             = useState('');
+    const [isTyping, setIsTyping]       = useState(false);
     const [showClearConfirm, setShowClearConfirm] = useState(false);
     const messagesEndRef = useRef(null);
-    const inputRef = useRef(null);
-
-    const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    };
+    const inputRef       = useRef(null);
 
     useEffect(() => {
-        scrollToBottom();
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
         localStorage.setItem('chat_history', JSON.stringify(messages));
     }, [messages]);
 
-    const handleSend = async (e) => {
+    const handleSend = async (e, overrideText) => {
         if (e) e.preventDefault();
-        if (!input.trim()) return;
+        const text = (overrideText ?? input).trim();
+        if (!text) return;
 
-        // Simple rate-limit: at least 2 s between sends
         const now = Date.now();
         if (now - lastSentRef.current < 2000) return;
         lastSentRef.current = now;
 
-        const userMessage = {
-            id: now,
-            text: input.trim(),
-            sender: 'user',
-            timestamp: new Date().toISOString()
-        };
-
-        setMessages(prev => [...prev, userMessage]);
-        const sentText = input.trim();
+        const userMsg = { id: now, text, sender: 'user', timestamp: new Date().toISOString() };
+        setMessages(prev => [...prev, userMsg]);
         setInput('');
         setIsTyping(true);
 
         try {
-            const data = await api.sendSupportMessage(sentText, user?.id ?? null);
+            const data = await api.sendSupportMessage(text, user?.id ?? null, role || null, language);
             setMessages(prev => [...prev, {
                 id: Date.now() + 1,
                 text: data.reply,
@@ -82,14 +113,13 @@ const Chatbot = () => {
                 timestamp: new Date().toISOString()
             }]);
         } catch (error) {
-            console.error('Support chat error:', error);
             const msg = error.message || '';
-            const isOffline = msg.includes('Failed to fetch') || msg.includes('NetworkError') || msg.includes('404') || msg.includes('Not Found');
+            const isOffline = msg.includes('Failed to fetch') || msg.includes('NetworkError');
             setMessages(prev => [...prev, {
                 id: Date.now() + 2,
                 text: isOffline
-                    ? '⚠️ Cannot reach the server. Please make sure the backend is running, then try again.'
-                    : (msg || "Sorry, I'm having trouble connecting right now. Please try again."),
+                    ? '⚠️ Cannot reach the server. Please check the backend is running.'
+                    : (msg || "Sorry, I'm having trouble connecting. Please try again."),
                 sender: 'bot',
                 timestamp: new Date().toISOString()
             }]);
@@ -98,29 +128,22 @@ const Chatbot = () => {
         }
     };
 
-    const clearChat = () => {
-        setShowClearConfirm(true);
-    };
-
     const handleConfirmClear = () => {
         setMessages([{
-            id: 1,
-            text: t('chatbotWelcome') || 'Hello! I am your InsightCV assistant. How can I help you today?',
+            id: Date.now(),
+            text: t('chatbotWelcome') || 'Hello! I\'m the InsightCV assistant. How can I help you today?',
             sender: 'bot',
             timestamp: new Date().toISOString()
         }]);
         setShowClearConfirm(false);
     };
 
-    const suggestedQuestions = [
-        t('howToApply') || "How to apply?",
-        t('buildResume') || "Build Resume",
-        t('findCompanies') || "Find Companies"
-    ];
+    const suggestions = getSuggestions(role, t);
+    const showSuggestions = messages.length < 3;
 
     return (
         <div className={`chatbot-page ${dir} ${theme}-theme`}>
-            {/* Chat Header */}
+            {/* Header */}
             <header className="chat-header glass">
                 <div className="header-info">
                     <div className="bot-avatar">
@@ -128,12 +151,17 @@ const Chatbot = () => {
                         <span className="online-indicator"></span>
                     </div>
                     <div>
-                        <h2>InsightCV Bot</h2>
-                        <span className="status-text">{isTyping ? t('typing') || 'Typing...' : t('online') || 'Online'}</span>
+                        <h2 style={{ display: 'flex', alignItems: 'center' }}>
+                            InsightCV Bot
+                            <RoleBadge role={role} />
+                        </h2>
+                        <span className="status-text">
+                            {isTyping ? t('typing') || 'Typing…' : t('online') || 'Online'}
+                        </span>
                     </div>
                 </div>
                 <div className="header-actions">
-                    <button className="header-btn" title={t('clearChat')} onClick={clearChat}>
+                    <button className="header-btn" title={t('clearChat')} onClick={() => setShowClearConfirm(true)}>
                         <Trash2 size={20} />
                     </button>
                     <button className="header-btn" title={t('close')} onClick={() => window.history.back()}>
@@ -142,7 +170,7 @@ const Chatbot = () => {
                 </div>
             </header>
 
-            {/* Messages Area */}
+            {/* Messages */}
             <main className="messages-area">
                 <div className="messages-container">
                     {messages.map((msg) => (
@@ -152,7 +180,7 @@ const Chatbot = () => {
                             </div>
                             <div className="message-bubble-container">
                                 <div className="message-bubble">
-                                    <p>{msg.text}</p>
+                                    <p style={{ whiteSpace: 'pre-line' }}>{msg.text}</p>
                                 </div>
                                 <span className="message-time">
                                     {formatFriendlyDate(msg.timestamp, language)}
@@ -160,16 +188,13 @@ const Chatbot = () => {
                             </div>
                         </div>
                     ))}
+
                     {isTyping && (
                         <div className="message-wrapper bot">
-                            <div className="message-avatar">
-                                <Bot size={18} />
-                            </div>
+                            <div className="message-avatar"><Bot size={18} /></div>
                             <div className="message-bubble-container">
                                 <div className="typing-indicator">
-                                    <span></span>
-                                    <span></span>
-                                    <span></span>
+                                    <span /><span /><span />
                                 </div>
                             </div>
                         </div>
@@ -177,10 +202,14 @@ const Chatbot = () => {
                     <div ref={messagesEndRef} />
                 </div>
 
-                {messages.length < 3 && (
+                {showSuggestions && (
                     <div className="suggestions-container">
-                        {suggestedQuestions.map((q, i) => (
-                            <button key={i} className="suggestion-btn glass" onClick={() => { setInput(q); handleSend(); }}>
+                        {suggestions.map((q, i) => (
+                            <button
+                                key={i}
+                                className="suggestion-btn glass"
+                                onClick={() => handleSend(null, q)}
+                            >
                                 {q}
                             </button>
                         ))}
@@ -188,19 +217,15 @@ const Chatbot = () => {
                 )}
             </main>
 
-            {/* Input Area */}
+            {/* Input */}
             <footer className="chat-footer glass">
-                <div className="input-actions">
-                    <button className="footer-action-btn"><Smile size={20} /></button>
-                    <button className="footer-action-btn"><Paperclip size={20} /></button>
-                </div>
                 <form className="chat-input-wrapper" onSubmit={handleSend}>
                     <input
                         ref={inputRef}
                         type="text"
-                        placeholder={t('chatPlaceholder') || 'Type your message...'}
+                        placeholder={t('chatPlaceholder') || 'Type your question…'}
                         value={input}
-                        onChange={(e) => setInput(e.target.value)}
+                        onChange={e => setInput(e.target.value)}
                         autoFocus
                     />
                     <button type="submit" className="send-btn" disabled={!input.trim() || isTyping}>
@@ -209,7 +234,7 @@ const Chatbot = () => {
                 </form>
             </footer>
 
-            {/* Clear Chat Confirmation Modal */}
+            {/* Clear Chat Modal */}
             <Modal
                 isOpen={showClearConfirm}
                 onClose={() => setShowClearConfirm(false)}
@@ -217,16 +242,10 @@ const Chatbot = () => {
                 type="danger"
                 footer={
                     <>
-                        <Button
-                            variant="outline"
-                            onClick={() => setShowClearConfirm(false)}
-                        >
+                        <Button variant="outline" onClick={() => setShowClearConfirm(false)}>
                             {t('cancel') || 'Cancel'}
                         </Button>
-                        <Button
-                            variant="danger"
-                            onClick={handleConfirmClear}
-                        >
+                        <Button variant="danger" onClick={handleConfirmClear}>
                             {t('clear') || 'Clear'}
                         </Button>
                     </>
@@ -238,11 +257,10 @@ const Chatbot = () => {
                         {t('confirmClearChatTitle') || 'Are you sure?'}
                     </p>
                     <p style={{ color: 'var(--text-muted)' }}>
-                        {t('confirmClearChatDesc') || 'This will permanently delete all messages in this conversation. This action cannot be undone.'}
+                        {t('confirmClearChatDesc') || 'This will permanently delete all messages.'}
                     </p>
                 </div>
             </Modal>
-
         </div>
     );
 };

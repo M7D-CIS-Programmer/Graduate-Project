@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { BrowserRouter as Router, Routes, Route, Navigate, useParams } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useParams, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { LanguageProvider } from './context/LanguageContext';
 import { ToastProvider } from './context/ToastContext';
@@ -46,7 +46,9 @@ import HiringReport from './pages/CVAnalyzer/HiringReport';
 import Departments from './pages/Dashboard/Departments';
 import Interview from './pages/Interview/Interview';
 import AICandidateInsights from './pages/Dashboard/AICandidateInsights';
+import ContactMessages from './pages/Dashboard/ContactMessages';
 import Messages from './pages/Messages/Messages';
+import SuspendedPage from './pages/SuspendedPage';
 import Spinner from './components/ui/Spinner';
 
 const ConditionalHome = () => {
@@ -66,7 +68,15 @@ const ChatRedirect = () => {
 };
 
 const AuthInitializer = ({ children }) => {
-  const { loading } = useAuth();
+  const { loading, isSuspended, handleSuspension } = useAuth();
+  const location = useLocation();
+
+  // Listen for the global 'accountSuspended' event dispatched by api.js
+  // whenever any request gets a 403 ACCOUNT_SUSPENDED response.
+  useEffect(() => {
+    window.addEventListener('accountSuspended', handleSuspension);
+    return () => window.removeEventListener('accountSuspended', handleSuspension);
+  }, [handleSuspension]);
 
   if (loading) {
     return (
@@ -81,6 +91,10 @@ const AuthInitializer = ({ children }) => {
       </div>
     );
   }
+
+  // Suspended users can still reach /contact so they can submit a support request.
+  // Every other route shows the suspension screen.
+  if (isSuspended && location.pathname !== '/contact') return <SuspendedPage />;
 
   return children;
 };
@@ -136,6 +150,7 @@ function App() {
                   <Route path="/dashboard/admin/jobs" element={<ManageJobs />} />
                   <Route path="/dashboard/admin/companies" element={<ManageCompanies />} />
                   <Route path="/dashboard/admin/settings" element={<PlatformSettings />} />
+                  <Route path="/dashboard/admin/contact-messages" element={<ContactMessages />} />
 
                   {/* Job Management */}
                   <Route path="/jobs" element={<JobListings />} />

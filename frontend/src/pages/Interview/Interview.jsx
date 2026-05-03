@@ -124,7 +124,7 @@ const FeedbackBubble = ({ feedback, score, t }) => (
 // ── main component ─────────────────────────────────────────────────────────────
 
 const Interview = () => {
-    const { t, dir } = useLanguage();
+    const { t, dir, language } = useLanguage();
     const chatEndRef = useRef(null);
 
     // ── mode selection (null = picker, 'chat' = existing flow, 'voice' = new) ──
@@ -158,7 +158,7 @@ const Interview = () => {
         setError('');
         setLoading(true);
         try {
-            const res = await api.startInterview(jobTitle.trim(), jobDesc.trim());
+            const res = await api.startInterview(jobTitle.trim(), jobDesc.trim(), language);
             setSessionId(res.sessionId);
             setQNum(res.questionNumber);
             setQTotal(res.totalQuestions);
@@ -187,7 +187,7 @@ const Interview = () => {
         setAnswer('');
 
         try {
-            const res = await api.answerInterview(sessionId, ans);
+            const res = await api.answerInterview(sessionId, ans, language);
 
             const newMsgs = [];
 

@@ -20,9 +20,11 @@ import { api } from '../api/api';
 import { useAuth } from '../context/AuthContext';
 import { useCreateJob, useUpdateJob, useJob } from '../hooks/useJobs';
 import { useDepartments } from '../hooks/useDepartments';
+import { validateShortText, validateDescription, validateSalary } from '../utils/validators';
 
 export default function JobPost() {
-    const { t, dir } = useLanguage();
+    const { t, dir, language } = useLanguage();
+    const lang = language || 'en';
     const navigate = useNavigate();
     const { user } = useAuth();
     const [searchParams] = useSearchParams();
@@ -34,6 +36,7 @@ export default function JobPost() {
 
     const [step, setStep] = useState(1);
     const [isSubmitted, setIsSubmitted] = useState(false);
+    const [errors, setErrors] = useState({});
     const [formData, setFormData] = useState({
         title: '',
         company: '',
@@ -80,23 +83,67 @@ export default function JobPost() {
         }));
     };
 
+    // ── Per-step validation ────────────────────────────────────────────────────
+
+    const validateStep1 = () => {
+        const e = {};
+
+        const titleErr = validateShortText(formData.title, lang === 'ar' ? 'المسمى الوظيفي' : 'Job title', 2, 120, lang);
+        if (titleErr) e.title = titleErr;
+
+        const companyErr = validateShortText(formData.company, lang === 'ar' ? 'اسم الشركة' : 'Company name', 2, 100, lang);
+        if (companyErr) e.company = companyErr;
+
+        if (!formData.departmentId)
+            e.departmentId = lang === 'ar' ? 'يرجى اختيار القسم' : 'Please select a department';
+
+        if (!formData.location)
+            e.location = lang === 'ar' ? 'يرجى اختيار الموقع' : 'Please select a location';
+
+        // Salary only validated if at least one is filled and not negotiable
+        if (!formData.isNegotiable) {
+            const salaryErrors = validateSalary(formData.salaryMin, formData.salaryMax, lang);
+            Object.assign(e, salaryErrors);
+        }
+
+        setErrors(e);
+        return Object.keys(e).length === 0;
+    };
+
+    const validateStep2 = () => {
+        const e = {};
+
+        const descErr = validateDescription(
+            formData.description,
+            lang === 'ar' ? 'وصف الوظيفة' : 'Job description',
+            30, 5000, lang
+        );
+        if (descErr) e.description = descErr;
+
+        setErrors(e);
+        return Object.keys(e).length === 0;
+    };
+
     const handleNext = () => {
+        const valid = step === 1 ? validateStep1() : validateStep2();
+        if (!valid) {
+            window.scrollTo(0, 0);
+            return;
+        }
+        setErrors({});
         setStep(prev => prev + 1);
         window.scrollTo(0, 0);
     };
 
     const handlePrev = () => {
+        setErrors({});
         setStep(prev => prev - 1);
         window.scrollTo(0, 0);
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        if (step < 3) {
-            handleNext();
-            return;
-        }
+        if (step < 3) { handleNext(); return; }
 
         try {
             // Find department ID by name
@@ -183,6 +230,10 @@ export default function JobPost() {
         );
     }
 
+    const ErrMsg = ({ field }) => errors[field]
+        ? <p style={{ color: '#ef4444', fontSize: '0.8rem', marginTop: '0.25rem' }}>{errors[field]}</p>
+        : null;
+
     return (
         <div className={`job-post-container ${dir}`}>
             <div className="job-post-header">
@@ -218,8 +269,9 @@ export default function JobPost() {
                                     value={formData.title}
                                     onChange={handleInputChange}
                                     placeholder={t('jobTitlePlaceholder')}
-                                    required
+                                    style={errors.title ? { borderColor: '#ef4444' } : {}}
                                 />
+                                <ErrMsg field="title" />
                             </div>
                             <div className="form-group">
                                 <label>{t('companyName')}</label>
@@ -229,22 +281,24 @@ export default function JobPost() {
                                     value={formData.company}
                                     onChange={handleInputChange}
                                     placeholder={t('companyPlaceholder')}
-                                    required
+                                    style={errors.company ? { borderColor: '#ef4444' } : {}}
                                 />
+                                <ErrMsg field="company" />
                             </div>
-                             <div className="form-group">
+                            <div className="form-group">
                                 <label>{t('department')}</label>
                                 <select
                                     name="departmentId"
                                     value={formData.departmentId}
                                     onChange={handleInputChange}
-                                    required
+                                    style={errors.departmentId ? { borderColor: '#ef4444' } : {}}
                                 >
                                     <option value="">{t('selectDepartment')}</option>
                                     {departments.map(dept => (
                                         <option key={dept.id} value={dept.id}>{dept.name}</option>
                                     ))}
                                 </select>
+                                <ErrMsg field="departmentId" />
                             </div>
                             <div className="form-group">
                                 <label>{t('jobType')}</label>
@@ -278,13 +332,14 @@ export default function JobPost() {
                                     name="location"
                                     value={formData.location}
                                     onChange={handleInputChange}
-                                    required
+                                    style={errors.location ? { borderColor: '#ef4444' } : {}}
                                 >
                                     <option value="">{t('selectLocation') || 'Select Location'}</option>
                                     {jordanCities.map(city => (
                                         <option key={city} value={city}>{t(city.toLowerCase().replace("'", ''))}</option>
                                     ))}
                                 </select>
+                                <ErrMsg field="location" />
                             </div>
                             <div className="form-group">
                                 <label>{t('minSalary') || 'Minimum Salary'}</label>
@@ -294,7 +349,10 @@ export default function JobPost() {
                                     value={formData.salaryMin}
                                     onChange={handleInputChange}
                                     placeholder="e.g. 2000"
+                                    min="0"
+                                    style={errors.salaryMin ? { borderColor: '#ef4444' } : {}}
                                 />
+                                <ErrMsg field="salaryMin" />
                             </div>
                             <div className="form-group">
                                 <label>{t('maxSalary') || 'Maximum Salary'}</label>
@@ -304,7 +362,10 @@ export default function JobPost() {
                                     value={formData.salaryMax}
                                     onChange={handleInputChange}
                                     placeholder="e.g. 3500"
+                                    min="0"
+                                    style={errors.salaryMax ? { borderColor: '#ef4444' } : {}}
                                 />
+                                <ErrMsg field="salaryMax" />
                             </div>
                             <div className="form-group checkbox-group">
                                 <input
@@ -328,8 +389,9 @@ export default function JobPost() {
                                     value={formData.description}
                                     onChange={handleInputChange}
                                     placeholder={t('jobDescriptionPlaceholder')}
-                                    required
+                                    style={errors.description ? { borderColor: '#ef4444' } : {}}
                                 />
+                                <ErrMsg field="description" />
                             </div>
                             <div className="form-group full-width">
                                 <label>{t('responsibilities')}</label>
@@ -431,8 +493,8 @@ export default function JobPost() {
                         )}
 
                         {step < 3 && (
-                            <button type="button" className="btn-primary" onClick={handleNext}>
-                                {t('nextStep') || "Next"} <ChevronRight size={20} />
+                            <button type="button" className="btn-primary" onClick={(e) => { e.preventDefault(); handleNext(); }}>
+                                {t('nextStep') || 'Next'} <ChevronRight size={20} />
                             </button>
                         )}
                         {step === 3 && (

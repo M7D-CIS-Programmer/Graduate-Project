@@ -161,6 +161,11 @@ public class JobsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreateJob(JobCreateDto dto)
     {
+        // Cross-field: salary min must not exceed max
+        if (!dto.IsSalaryNegotiable && dto.SalaryMin.HasValue && dto.SalaryMax.HasValue
+            && dto.SalaryMin > dto.SalaryMax)
+            return BadRequest(new { error = "Minimum salary must be less than or equal to maximum salary." });
+
         var job = new Job
         {
             UserId = dto.UserId,
@@ -195,6 +200,11 @@ public class JobsController : ControllerBase
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateJob(int id, JobUpdateDto updated)
     {
+        // Cross-field: salary min must not exceed max
+        if (!updated.IsSalaryNegotiable && updated.SalaryMin.HasValue && updated.SalaryMax.HasValue
+            && updated.SalaryMin > updated.SalaryMax)
+            return BadRequest(new { error = "Minimum salary must be less than or equal to maximum salary." });
+
         var job = await _context.Jobs.FindAsync(id);
 
         if (job == null)

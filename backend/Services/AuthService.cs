@@ -216,11 +216,13 @@ namespace aabu_project.Services
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
+            var roleName = user.Roles?.FirstOrDefault()?.RoleName ?? "Job Seeker";
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Email, user.Email),
                 new Claim(ClaimTypes.Name, user.Name),
+                new Claim(ClaimTypes.Role, roleName),
             };
 
             var token = new JwtSecurityToken(

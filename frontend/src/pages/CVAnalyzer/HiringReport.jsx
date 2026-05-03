@@ -62,7 +62,7 @@ const STEPS = (t) => [
 // ─────────────────────────────────────────────────────────────────────────────
 
 const HiringReport = () => {
-    const { dir, t } = useLanguage();
+    const { dir, t, language } = useLanguage();
     const fileInputRef = useRef(null);
 
     const [file, setFile]         = useState(null);
@@ -115,21 +115,21 @@ const HiringReport = () => {
         try {
             // Step 1 — match score
             setStep(0);
-            const basic = await api.analyzeCv(file, jobTitle.trim(), jobDesc.trim());
+            const basic = await api.analyzeCv(file, jobTitle.trim(), jobDesc.trim(), language);
             const matchScore = basic.matchScore ?? 0;
 
             // Step 2 — semantic analysis
             setStep(1);
-            const semanticAnalysis = await api.semanticAnalyzeCv(file, jobDesc.trim());
+            const semanticAnalysis = await api.semanticAnalyzeCv(file, jobDesc.trim(), language);
 
             // Step 3 — fraud detection
             setStep(2);
-            const fraudResult = await api.detectCvFraud(file);
+            const fraudResult = await api.detectCvFraud(file, language);
 
             // Step 4 — hiring recommendation
             setStep(3);
             const recommendation = await api.generateHiringRecommendation(
-                semanticAnalysis, fraudResult, matchScore
+                semanticAnalysis, fraudResult, matchScore, language
             );
 
             setResult({ matchScore, semanticAnalysis, fraudResult, recommendation });

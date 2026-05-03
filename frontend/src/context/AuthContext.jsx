@@ -1,28 +1,16 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { api } from '../api/api';
+import { api, SuspendedError } from '../api/api';
 
 const AuthContext = createContext();
 
-// ---------------------------------------------------------------------------
-// Storage helpers
-//
-// sessionStorage  → per-tab, survives page refresh, invisible to other tabs
-// localStorage    → shared across tabs, used only as a fallback for new tabs
-//                   or browser restarts (when sessionStorage is empty)
-//
-// Read order on every page load:
-//   1. sessionStorage['user']  – this tab already owns a session → use it
-//   2. localStorage['user']    – new tab / browser restart → promote to sessionStorage
-//   3. null                    – not logged in
-// ---------------------------------------------------------------------------
+// ── Storage helpers ────────────────────────────────────────────────────────────
 
 const readUser = () => {
   try {
     const tab = sessionStorage.getItem('user');
     if (tab) return JSON.parse(tab);
 
-    // New tab or browser restart — restore from localStorage and own the copy
     const persisted = localStorage.getItem('user');
     if (persisted) {
       const token = localStorage.getItem('token') || '';
@@ -42,6 +30,7 @@ const writeUser = (userData) => {
     name:           userData.name,
     email:          userData.email,
     role:           userData.role,
+    status:         userData.status         || 'Active',   // ← persisted so we can read it on load
     location:       userData.location,
     phone:          userData.phone,
     website:        userData.website        || '',
@@ -56,9 +45,7 @@ const writeUser = (userData) => {
     appliedJobs:    userData.appliedJobs    || [],
     notifications:  userData.notifications  || [],
   });
-  // Tab-specific copy (primary source of truth for this tab)
   sessionStorage.setItem('user', payload);
-  // Shared fallback — lets new tabs or browser restarts restore the last session
   localStorage.setItem('user', payload);
 };
 
@@ -74,15 +61,21 @@ const clearStorage = () => {
   localStorage.removeItem('token');
 };
 
-// ---------------------------------------------------------------------------
+// ── Provider ──────────────────────────────────────────────────────────────────
 
 export const AuthProvider = ({ children }) => {
   const queryClient = useQueryClient();
-  const [user, setUser] = useState(readUser);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser]           = useState(readUser);
+  const [loading, setLoading]     = useState(true);
+  // true when the backend has told us this session is suspended
+  const [isSuspended, setIsSuspended] = useState(false);
 
   useEffect(() => {
     setLoading(false);
+    // If the user was stored as suspended (e.g. page refresh after suspension),
+    // immediately show the suspension screen without waiting for an API call.
+    const stored = readUser();
+    if (stored?.status === 'Suspended') setIsSuspended(true);
   }, []);
 
   const login = (userData) => {
@@ -90,18 +83,37 @@ export const AuthProvider = ({ children }) => {
       ...userData,
       token:         userData.token,
       dashboardPath: userData.dashboardPath,
+      status:        userData.status || 'Active',
     };
-
     setUser(userToStore);
+    setIsSuspended(false);
     writeUser(userToStore);
     if (userData.token) writeToken(userData.token);
   };
 
-  const logout = () => {
+  const logout = useCallback(() => {
     setUser(null);
+    setIsSuspended(false);
     clearStorage();
     queryClient.clear();
-  };
+  }, [queryClient]);
+
+  // Called by any component that catches a SuspendedError from an API call.
+  // Updates local state so the suspension screen is shown immediately, then
+  // clears the session so no further authenticated requests are made.
+  const handleSuspension = useCallback(() => {
+    // Update stored user's status so a page refresh still shows the screen
+    const stored = readUser();
+    if (stored) {
+      writeUser({ ...stored, status: 'Suspended' });
+      setUser(u => u ? { ...u, status: 'Suspended' } : u);
+    }
+    setIsSuspended(true);
+    // Clear the token so no further API calls are made with the old JWT
+    sessionStorage.removeItem('token');
+    localStorage.removeItem('token');
+    queryClient.clear();
+  }, [queryClient]);
 
   const updateUser = async (newData) => {
     try {
@@ -112,18 +124,23 @@ export const AuthProvider = ({ children }) => {
         ...response,
         token:         user.token,
         dashboardPath: user.dashboardPath,
+        status:        user.status,
       };
       setUser(updatedUser);
       writeUser(updatedUser);
       return updatedUser;
     } catch (error) {
+      if (error instanceof SuspendedError) handleSuspension();
       console.error('Failed to update user', error);
       throw error;
     }
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, updateUser }}>
+    <AuthContext.Provider value={{
+      user, loading, login, logout, updateUser,
+      isSuspended, handleSuspension
+    }}>
       {children}
     </AuthContext.Provider>
   );
@@ -131,8 +148,7 @@ export const AuthProvider = ({ children }) => {
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (context === undefined) {
+  if (context === undefined)
     throw new Error('useAuth must be used within an AuthProvider');
-  }
   return context;
 };

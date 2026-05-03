@@ -9,6 +9,7 @@ public class Experience
     public string CompanyName { get; set; } = null!;
     public string StartDate { get; set; } = null!;
     public string? EndDate { get; set; }
+    public string? Description { get; set; }
 
     // Navigation
     public Resume Resume { get; set; } = null!;

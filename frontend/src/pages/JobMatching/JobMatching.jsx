@@ -79,7 +79,7 @@ const TagList = ({ items, variant }) =>
 // ── Main page ─────────────────────────────────────────────────────────────────
 
 const JobMatching = () => {
-    const { dir, t } = useLanguage();
+    const { dir, t, language } = useLanguage();
     const fileInputRef = useRef(null);
 
     const [file,     setFile]     = useState(null);
@@ -132,7 +132,7 @@ const JobMatching = () => {
         setLoading(true);
 
         try {
-            const data = await api.matchCvToJob(file, jobTitle.trim(), jobDesc.trim());
+            const data = await api.matchCvToJob(file, jobTitle.trim(), jobDesc.trim(), language);
             setResult(data);
         } catch (err) {
             const msg = err.message || '';

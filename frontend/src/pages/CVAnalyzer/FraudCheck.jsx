@@ -12,7 +12,7 @@ const MAX_FILE_MB = 10;
 // ─────────────────────────────────────────────────────────────────────────────
 
 const FraudCheck = () => {
-    const { t, dir } = useLanguage();
+    const { t, dir, language } = useLanguage();
     const fileInputRef = useRef(null);
 
     const [file, setFile] = useState(null);
@@ -69,7 +69,7 @@ const FraudCheck = () => {
         setLoading(true);
 
         try {
-            const data = await api.detectCvFraud(file);
+            const data = await api.detectCvFraud(file, language);
             setResult(data);
         } catch (err) {
             const msg = err.message || '';

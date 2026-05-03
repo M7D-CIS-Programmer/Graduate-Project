@@ -48,31 +48,34 @@ const Sidebar = ({ isOpen }) => {
 
         if (role === 'job seeker') {
             return [
-                { name: t('dashboard'), icon: <LayoutDashboard size={20} />, path: '/dashboard/seeker' },
-                { name: t('resumeBuilder'), icon: <FileEdit size={20} />, path: '/resume-builder' },
-                { name: t('jobMatching'), icon: <Zap size={20} />, path: '/job-matching' },
-                { name: t('interview'), icon: <MessageSquare size={20} />, path: '/interview' },
+                { name: t('dashboard'),     icon: <LayoutDashboard size={20} />, path: '/dashboard/seeker' },
+                { name: t('resumeBuilder'), icon: <FileEdit size={20} />,        path: '/resume-builder' },
+                { name: t('jobMatching'),   icon: <Zap size={20} />,             path: '/job-matching' },
+                { name: t('interview'),     icon: <MessageSquare size={20} />,   path: '/interview' },
+                { name: t('contactUs'),     icon: <Mail size={20} />,            path: '/contact' },
             ];
         }
 
         if (role === 'employer' || role === 'company') {
             return [
                 { name: t('dashboard'), icon: <LayoutDashboard size={20} />, path: '/dashboard/employer' },
-                { name: t('myJobs'), icon: <Briefcase size={20} />, path: '/dashboard/employer/jobs' },
+                { name: t('departmentsAndJobs'), icon: <Briefcase size={20} />, path: '/dashboard/employer/jobs' },
                 { name: t('postAJob'), icon: <PlusCircle size={20} />, path: '/jobs/post' },
                 { name: t('candidates'), icon: <Users size={20} />, path: '/dashboard/employer/applicants' },
                 { name: t('jobMatching'), icon: <Zap size={20} />, path: '/job-matching' },
                 { name: t('fraudDetection'), icon: <ShieldAlert size={20} />, path: '/cv-fraud-check' },
+                { name: t('contactUs'), icon: <Mail size={20} />, path: '/contact' },
             ];
         }
 
         if (role === 'admin') {
             return [
-                { name: t('adminDashboard'), icon: <LayoutDashboard size={20} />, path: '/dashboard/admin' },
-                { name: t('manageUsers'), icon: <Users size={20} />, path: '/dashboard/admin/users' },
-                { name: t('manageJobs'), icon: <Briefcase size={20} />, path: '/dashboard/admin/jobs' },
-                { name: t('manageCompanies'), icon: <Building2 size={20} />, path: '/dashboard/admin/companies' },
-                { name: t('platformSettings'), icon: <Settings size={20} />, path: '/dashboard/admin/settings' },
+                { name: t('adminDashboard'),     icon: <LayoutDashboard size={20} />, path: '/dashboard/admin' },
+                { name: t('manageUsers'),         icon: <Users size={20} />,           path: '/dashboard/admin/users' },
+                { name: t('manageJobs'),          icon: <Briefcase size={20} />,       path: '/dashboard/admin/jobs' },
+                { name: t('manageCompanies'),     icon: <Building2 size={20} />,       path: '/dashboard/admin/companies' },
+                { name: t('contactMessages') || 'Contact Messages', icon: <Mail size={20} />, path: '/dashboard/admin/contact-messages' },
+                { name: t('platformSettings'),   icon: <Settings size={20} />,         path: '/dashboard/admin/settings' },
             ];
         }
 

@@ -93,6 +93,9 @@ namespace aabu_project.Dtos
 
         /// <summary>Numeric match score (0-100) produced by the local hybrid pipeline.</summary>
         public double MatchScore { get; set; }
+
+        /// <summary>"ar" | "en" — controls language of all AI-generated text in the response.</summary>
+        public string? Language { get; set; }
     }
 
     public class HiringRecommendationResponseDto

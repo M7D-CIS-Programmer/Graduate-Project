@@ -21,7 +21,8 @@ public class CVAnalysisController : ControllerBase
     public async Task<IActionResult> Analyze(
         IFormFile file,
         [FromForm] string? jobTitle,
-        [FromForm] string? jobDescription)
+        [FromForm] string? jobDescription,
+        [FromForm] string? language)
     {
         // ── Input validation ─────────────────────────────────────────────────────
         if (file is null || file.Length == 0)
@@ -74,7 +75,7 @@ public class CVAnalysisController : ControllerBase
         // ── Gemini analysis ──────────────────────────────────────────────────────
         try
         {
-            var result = await _cvService.AnalyzeCvAsync(cvText, jobTitle, jobDescription);
+            var result = await _cvService.AnalyzeCvAsync(cvText, jobTitle, jobDescription, language ?? "en");
             return Ok(result);
         }
         catch (TimeoutException ex)
@@ -171,7 +172,7 @@ public class CVAnalysisController : ControllerBase
     /// <summary>POST /api/cv/fraud-check — Integrity and fraud detection on a CV.</summary>
     [HttpPost("fraud-check")]
     [Consumes("multipart/form-data")]
-    public async Task<IActionResult> FraudCheck(IFormFile file)
+    public async Task<IActionResult> FraudCheck(IFormFile file, [FromForm] string? language)
     {
         if (file is null || file.Length == 0)
             return BadRequest(new { error = "Please upload a PDF file." });
@@ -211,7 +212,7 @@ public class CVAnalysisController : ControllerBase
 
         try
         {
-            var result = await _cvService.DetectCvFraudAsync(cvText);
+            var result = await _cvService.DetectCvFraudAsync(cvText, language ?? "en");
             return Ok(result);
         }
         catch (TimeoutException ex)
@@ -252,7 +253,8 @@ public class CVAnalysisController : ControllerBase
     public async Task<IActionResult> Match(
         IFormFile file,
         [FromForm] string? jobTitle,
-        [FromForm] string? jobDescription)
+        [FromForm] string? jobDescription,
+        [FromForm] string? language)
     {
         if (file is null || file.Length == 0)
             return BadRequest(new { error = "Please upload a PDF file." });
@@ -301,7 +303,7 @@ public class CVAnalysisController : ControllerBase
 
         try
         {
-            var result = await _cvService.MatchCvToJobAsync(cvText, jobTitle, jobDescription);
+            var result = await _cvService.MatchCvToJobAsync(cvText, jobTitle, jobDescription, language ?? "en");
             return Ok(result);
         }
         catch (TimeoutException ex)
@@ -336,7 +338,8 @@ public class CVAnalysisController : ControllerBase
     [Consumes("multipart/form-data")]
     public async Task<IActionResult> SemanticAnalyze(
         IFormFile file,
-        [FromForm] string? jobDescription)
+        [FromForm] string? jobDescription,
+        [FromForm] string? language)
     {
         if (file is null || file.Length == 0)
             return BadRequest(new { error = "Please upload a PDF file." });
@@ -382,7 +385,7 @@ public class CVAnalysisController : ControllerBase
 
         try
         {
-            var result = await _cvService.SemanticAnalyzeCvAsync(cvText, jobDescription);
+            var result = await _cvService.SemanticAnalyzeCvAsync(cvText, jobDescription, language ?? "en");
             return Ok(result);
         }
         catch (TimeoutException ex)
