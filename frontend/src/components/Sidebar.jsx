@@ -84,13 +84,13 @@ const Sidebar = ({ isOpen }) => {
     const navItems = [
         ...getRoleItems(),
         ...(['employer', 'company', 'admin'].includes(userRole) ? [] : baseItems),
-        ...(user ? [
+        ...(user && userRole !== 'admin' ? [
             { 
                 name: t('profile'), 
                 icon: <UserIcon size={20} />, 
-                path: userRole === 'admin' ? '/settings' : '/profile' 
+                path: '/profile' 
             }
-        ] : [
+        ] : user ? [] : [
             { name: t('aboutUs'), icon: <FileText size={20} />, path: '/about' },
             { name: t('contactUs'), icon: <Mail size={20} />, path: '/contact' }
         ]),
