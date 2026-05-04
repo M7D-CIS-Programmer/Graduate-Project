@@ -50,7 +50,6 @@ const Sidebar = ({ isOpen }) => {
         else if (role === 'employer' || role === 'company') {
             items.push({ name: t('dashboard'), icon: <LayoutDashboard size={20} />, path: '/dashboard/employer' });
             items.push({ name: t('findCandidates'), icon: <Users size={20} />, path: '/candidates' });
-            items.push({ name: t('companies'), icon: <Building2 size={20} />, path: '/companies' });
             items.push({ name: t('departmentsAndJobs'), icon: <Briefcase size={20} />, path: '/dashboard/employer/jobs' });
             items.push({ name: t('postAJob'), icon: <PlusCircle size={20} />, path: '/jobs/post' });
             items.push({ name: t('candidates'), icon: <Users size={20} />, path: '/dashboard/employer/applicants' });
