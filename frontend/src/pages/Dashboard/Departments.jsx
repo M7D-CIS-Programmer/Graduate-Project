@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import {
     Building2, Plus, Pencil, Trash2, Check, X,
-    Briefcase, Calendar, Loader2, AlertCircle, FolderOpen, Eye, Search
+    Briefcase, Calendar, Loader2, AlertCircle, FolderOpen, Eye, Search, PlusCircle
 } from 'lucide-react';
 import { useMyDepartments, useCreateDepartment, useUpdateDepartment, useDeleteDepartment } from '../../hooks/useDepartments';
-import { useNavigate, NavLink } from 'react-router-dom';
+import { useNavigate, NavLink, Link } from 'react-router-dom';
 import { useToast } from '../../context/ToastContext';
 import { useLanguage } from '../../context/LanguageContext';
 import './Dashboard.css';
@@ -111,15 +111,22 @@ const Departments = () => {
                     </div>
                 </div>
 
-                <div className="dashboard-stats-brief">
-                    <div className="stat-brief-item">
-                        <span className="stat-brief-value">{departments.length}</span>
-                        <span className="stat-brief-label">{t('departments')}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
+                    <div className="dashboard-stats-brief">
+                        <div className="stat-brief-item">
+                            <span className="stat-brief-value">{departments.length}</span>
+                            <span className="stat-brief-label">{t('departments')}</span>
+                        </div>
+                        <div className="stat-brief-item">
+                            <span className="stat-brief-value">{totalJobs}</span>
+                            <span className="stat-brief-label">{t('totalJobs')}</span>
+                        </div>
                     </div>
-                    <div className="stat-brief-item">
-                        <span className="stat-brief-value">{totalJobs}</span>
-                        <span className="stat-brief-label">{t('totalJobs')}</span>
-                    </div>
+
+                    <Link to="/jobs/post" className="btn-primary" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.75rem 1.5rem' }}>
+                        <PlusCircle size={20} />
+                        {t('postNewJob')}
+                    </Link>
                 </div>
             </div>
 

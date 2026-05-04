@@ -18,7 +18,7 @@ import { api } from '../../api/api';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { useToast } from '../../context/ToastContext';
-import { useFollowedCompanies, useFollowCompany, useUnfollowCompany } from '../../hooks/useFollows';
+import { useFollowedCompanies, useFollowCompany, useUnfollowCompany, useCompanyFollowers } from '../../hooks/useFollows';
 import Button from '../../components/ui/Button';
 import Spinner from '../../components/ui/Spinner';
 import './CompanyProfileView.css';
@@ -30,9 +30,13 @@ const CompanyProfileView = () => {
     const { t, dir } = useLanguage();
     const { addToast } = useToast();
     const [isLocalFollowed, setIsLocalFollowed] = useState(false); // To handle optimistic UI
+    const [activeTab, setActiveTab] = useState('bio'); // 'bio' or 'followers'
     const { data: followedCompanies } = useFollowedCompanies();
     const { mutate: followCompany } = useFollowCompany();
     const { mutate: unfollowCompany } = useUnfollowCompany();
+
+    // Fetch company followers
+    const { data: followers = [], isLoading: followersLoading } = useCompanyFollowers(id);
 
     // Fetch company data
     const { data: company, isLoading, error } = useQuery({
@@ -251,67 +255,109 @@ const CompanyProfileView = () => {
 
                 {/* Main Content */}
                 <main className="cv-main">
-                    {/* About Section */}
-                    <section className="cv-section glass">
-                        <h2 className="cv-section-title">{t('aboutCompany') || 'About the Company'}</h2>
-                        {company.description ? (
-                            <p className="cv-description">{company.description}</p>
-                        ) : (
-                            <p className="cv-description cv-muted-text">
-                                {t('noDescription') || 'This company has not provided a description yet.'}
-                            </p>
-                        )}
-                    </section>
+                    {/* Tabs Navigation */}
 
-                    {/* Jobs Section */}
-                    <section id="company-jobs-section" className="cv-section glass">
-                        <div className="cv-section-header">
-                            <h2 className="cv-section-title">{t('openPositions') || 'Open Positions'}</h2>
-                            <span className="cv-badge">{activeJobs.length}</span>
-                        </div>
 
-                        <div className="cv-jobs-list">
-                            {jobsLoading ? (
-                                <Spinner />
-                            ) : activeJobs.length > 0 ? (
-                                activeJobs.map(job => (
-                                    <div
-                                        key={job.id}
-                                        className="cv-job-item"
-                                        onClick={() => navigate(`/jobs/${job.id}`)}
-                                        role="button"
-                                        tabIndex={0}
-                                        onKeyDown={e => e.key === 'Enter' && navigate(`/jobs/${job.id}`)}
-                                    >
-                                        <div className="cv-job-icon">
-                                            <Briefcase size={20} />
+                    {activeTab === 'bio' ? (
+                        <>
+                            {/* About Section */}
+                            <section className="cv-section glass">
+                                <h2 className="cv-section-title">{t('aboutCompany') || 'About the Company'}</h2>
+                                {company.description ? (
+                                    <p className="cv-description">{company.description}</p>
+                                ) : (
+                                    <p className="cv-description cv-muted-text">
+                                        {t('noDescription') || 'This company has not provided a description yet.'}
+                                    </p>
+                                )}
+                            </section>
+
+                            {/* Jobs Section */}
+                            <section id="company-jobs-section" className="cv-section glass">
+                                <div className="cv-section-header">
+                                    <h2 className="cv-section-title">{t('openPositions') || 'Open Positions'}</h2>
+                                    <span className="cv-badge">{activeJobs.length}</span>
+                                </div>
+
+                                <div className="cv-jobs-list">
+                                    {jobsLoading ? (
+                                        <Spinner />
+                                    ) : activeJobs.length > 0 ? (
+                                        activeJobs.map(job => (
+                                            <div
+                                                key={job.id}
+                                                className="cv-job-item"
+                                                onClick={() => navigate(`/jobs/${job.id}`)}
+                                                role="button"
+                                                tabIndex={0}
+                                                onKeyDown={e => e.key === 'Enter' && navigate(`/jobs/${job.id}`)}
+                                            >
+                                                <div className="cv-job-icon">
+                                                    <Briefcase size={20} />
+                                                </div>
+                                                <div className="cv-job-info">
+                                                    <h3 className="cv-job-title">{job.title}</h3>
+                                                    <div className="cv-job-meta">
+                                                        {job.workMode && (
+                                                            <span><MapPin size={13} /> {job.workMode}</span>
+                                                        )}
+                                                        {job.type && (
+                                                            <span><Briefcase size={13} /> {job.type}</span>
+                                                        )}
+                                                        {job.location && (
+                                                            <span><MapPin size={13} /> {job.location}</span>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                <ExternalLink size={16} className="cv-job-arrow" />
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <div className="cv-empty-jobs">
+                                            <Briefcase size={40} />
+                                            <p>{t('noJobsFound') || 'No open positions at the moment.'}</p>
+                                            <span>{t('checkBackLater') || 'Check back later for new opportunities.'}</span>
                                         </div>
-                                        <div className="cv-job-info">
-                                            <h3 className="cv-job-title">{job.title}</h3>
-                                            <div className="cv-job-meta">
-                                                {job.workMode && (
-                                                    <span><MapPin size={13} /> {job.workMode}</span>
-                                                )}
-                                                {job.type && (
-                                                    <span><Briefcase size={13} /> {job.type}</span>
-                                                )}
-                                                {job.location && (
-                                                    <span><MapPin size={13} /> {job.location}</span>
+                                    )}
+                                </div>
+                            </section>
+                        </>
+                    ) : (
+                        <section className="cv-section glass">
+                            <h2 className="cv-section-title">{t('followers') || 'Followers'}</h2>
+                            {followersLoading ? (
+                                <Spinner />
+                            ) : followers.length > 0 ? (
+                                <div className="cv-followers-grid">
+                                    {followers.map(follower => (
+                                        <div
+                                            key={follower.id}
+                                            className="cv-follower-card glass"
+                                            onClick={() => navigate(`/candidate/${follower.id}`)}
+                                        >
+                                            <div className="cv-follower-avatar">
+                                                {follower.profilePicture ? (
+                                                    <img src={follower.profilePicture} alt={follower.name} />
+                                                ) : (
+                                                    follower.name?.charAt(0)
                                                 )}
                                             </div>
+                                            <div className="cv-follower-info">
+                                                <h3>{follower.name}</h3>
+                                                <p>{follower.location || t('jobSeeker')}</p>
+                                            </div>
                                         </div>
-                                        <ExternalLink size={16} className="cv-job-arrow" />
-                                    </div>
-                                ))
+                                    ))}
+                                </div>
                             ) : (
-                                <div className="cv-empty-jobs">
-                                    <Briefcase size={40} />
-                                    <p>{t('noJobsFound') || 'No open positions at the moment.'}</p>
-                                    <span>{t('checkBackLater') || 'Check back later for new opportunities.'}</span>
+                                <div className="cv-empty-followers">
+                                    <Heart size={40} />
+                                    <p>{t('noFollowersYet') || 'No followers yet.'}</p>
+                                    <span>{t('beTheFirstToFollow') || 'Be the first to follow this company!'}</span>
                                 </div>
                             )}
-                        </div>
-                    </section>
+                        </section>
+                    )}
                 </main>
             </div>
         </div>

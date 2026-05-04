@@ -53,3 +53,11 @@ export const useUnfollowCompany = () => {
         }
     });
 };
+
+export const useCompanyFollowers = (companyId) => {
+    return useQuery({
+        queryKey: ['company-followers', companyId],
+        queryFn: () => api.getCompanyFollowers(companyId),
+        enabled: !!companyId,
+    });
+};

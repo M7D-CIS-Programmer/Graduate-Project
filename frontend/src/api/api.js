@@ -137,6 +137,7 @@ export const api = {
     followCompany:        (userId, companyId) => post(`${BASE_URL}/Follows/${userId}/follow/${companyId}`),
     unfollowCompany:      (userId, companyId) => del(`${BASE_URL}/Follows/${userId}/unfollow/${companyId}`),
     getFollowedCompanies: (userId)            => get(`${BASE_URL}/Follows/${userId}/following`),
+    getCompanyFollowers:  (companyId)         => get(`${BASE_URL}/Follows/${companyId}/followers`),
 
     // Resumes
     getResumeByUserId: (userId, viewerId) => get(`${BASE_URL}/Resumes/user/${userId}${viewerId ? `?viewerId=${viewerId}` : ''}`),

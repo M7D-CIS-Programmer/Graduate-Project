@@ -157,6 +157,7 @@
     padding: 4px 7px;
     font-size: 0.875rem;
     margin-left: 20px;
+    margin-right: 20px;
 }
 
 .search-input::placeholder {

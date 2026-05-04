@@ -89,7 +89,6 @@ public class FollowsController : ControllerBase
         return Ok(new { message = "Company unfollowed successfully." });
     }
 
-    // GET: api/follows/{userId}/following
     [HttpGet("{userId}/following")]
     public async Task<IActionResult> GetFollowedCompanies(int userId)
     {
@@ -122,5 +121,36 @@ public class FollowsController : ControllerBase
             .ToListAsync();
 
         return Ok(followedCompanies);
+    }
+
+    // GET: api/follows/{companyId}/followers
+    [HttpGet("{companyId}/followers")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetCompanyFollowers(int companyId)
+    {
+        var followers = await _context.FollowCompanies
+            .Where(f => f.CompanyId == companyId)
+            .Include(f => f.User)
+            .Select(f => new UserDto(
+                f.User.Id,
+                f.User.Name,
+                f.User.Email,
+                f.User.Location,
+                f.User.Website,
+                f.User.Phone,
+                f.User.Description,
+                f.User.LinkedIn,
+                f.User.Github,
+                f.User.Status,
+                "Job Seeker",
+                f.User.CreatedAt,
+                0,
+                f.User.Industry,
+                f.User.ProfilePicture,
+                0
+            ))
+            .ToListAsync();
+
+        return Ok(followers);
     }
 }

@@ -51,10 +51,10 @@ public class SearchController(MyDbContext context) : ControllerBase
             var messagesQuery = _context.ContactMessages.AsQueryable();
             foreach (var term in searchTerms)
             {
-                messagesQuery = messagesQuery.Where(m => m.Name.Contains(term) || m.Email.Contains(term) || m.Subject.Contains(term));
+                messagesQuery = messagesQuery.Where(m => m.FullName.Contains(term) || m.Email.Contains(term) || m.Subject.Contains(term));
             }
             response.ContactMessages = await messagesQuery
-                .Select(m => new SearchResultDto { Id = m.Id, Title = m.Subject, Description = m.Name, Type = "ContactMessage", Link = "/dashboard/admin/contact-messages" })
+                .Select(m => new SearchResultDto { Id = m.Id, Title = m.Subject, Description = m.FullName, Type = "ContactMessage", Link = "/dashboard/admin/contact-messages" })
                 .Take(5)
                 .ToListAsync();
         }

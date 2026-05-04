@@ -20,7 +20,7 @@ import {
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
-import { useFollowedCompanies, useUnfollowCompany } from '../hooks/useFollows';
+import { useFollowedCompanies, useUnfollowCompany, useCompanyFollowers } from '../hooks/useFollows';
 import { useQuery } from '@tanstack/react-query';
 import Button from '../components/ui/Button';
 import Spinner from '../components/ui/Spinner';
@@ -42,6 +42,9 @@ const Profile = () => {
 
     const { data: followedCompanies = [], isLoading: followingLoading } = useFollowedCompanies();
     const { mutate: unfollowCompany, isPending: isUnfollowing } = useUnfollowCompany();
+    
+    // Fetch followers for company profile
+    const { data: followers = [], isLoading: followersLoading } = useCompanyFollowers(userData?.id);
 
     const { data: allJobs = [] } = useQuery({
         queryKey: ['jobs'],
@@ -115,8 +118,8 @@ const Profile = () => {
                 )}
             </div>
 
-            {/* Only show tabs if there is more than one available (e.g., Job Seeker's own profile) */}
-            {isOwnProfile && currentUser?.role === 'Job Seeker' && (
+            {/* Tabs Navigation */}
+            {isOwnProfile && (
                 <div className="profile-tabs glass">
                     <button 
                         className={`profile-tab-btn ${activeTab === 'bio' ? 'active' : ''}`}
@@ -125,13 +128,23 @@ const Profile = () => {
                         <User size={18} />
                         {t('bio') || 'Bio'}
                     </button>
-                    <button 
-                        className={`profile-tab-btn ${activeTab === 'following' ? 'active' : ''}`}
-                        onClick={() => handleTabChange('following')}
-                    >
-                        <Building size={18} />
-                        {t('following') || 'Following'}
-                    </button>
+                    {currentUser?.role === 'Job Seeker' ? (
+                        <button 
+                            className={`profile-tab-btn ${activeTab === 'following' ? 'active' : ''}`}
+                            onClick={() => handleTabChange('following')}
+                        >
+                            <Building size={18} />
+                            {t('following') || 'Following'}
+                        </button>
+                    ) : (
+                        <button 
+                            className={`profile-tab-btn ${activeTab === 'followers' ? 'active' : ''}`}
+                            onClick={() => handleTabChange('followers')}
+                        >
+                            <Users size={18} />
+                            {t('followers') || 'Followers'}
+                        </button>
+                    )}
                 </div>
             )}
 
@@ -251,7 +264,7 @@ const Profile = () => {
                                 </div>
                             </div>
                         </>
-                    ) : (
+                    ) : activeTab === 'following' ? (
                         <div className="following-tab-content">
                             {followingLoading ? (
                                 <Spinner />
@@ -348,6 +361,74 @@ const Profile = () => {
                                             </div>
                                         );
                                     })}
+                                </div>
+                            )}
+                        </div>
+                    ) : (
+                        <div className="following-tab-content">
+                            {followersLoading ? (
+                                <Spinner />
+                            ) : followers.length === 0 ? (
+                                <div className="empty-state glass">
+                                    <Users size={56} className="empty-icon" />
+                                    <h3>{t('noFollowersYet')}</h3>
+                                    <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>
+                                        {t('yourFollowersWillShowHere')}
+                                    </p>
+                                </div>
+                            ) : (
+                                <div className="following-grid">
+                                    {followers.map(follower => (
+                                        <div 
+                                            key={follower.id} 
+                                            className="following-card glass"
+                                            onClick={() => navigate(`/candidate/${follower.id}`)}
+                                            style={{ cursor: 'pointer' }}
+                                        >
+                                            <div className="following-card-header">
+                                                <div className="company-logo-wrapper" style={{ borderRadius: '50%' }}>
+                                                    {follower.profilePicture ? (
+                                                        <img src={follower.profilePicture} alt={follower.name} />
+                                                    ) : (
+                                                        <div style={{ 
+                                                            width: '100%', 
+                                                            height: '100%', 
+                                                            background: 'linear-gradient(135deg, var(--primary), #818cf8)', 
+                                                            display: 'flex', 
+                                                            alignItems: 'center', 
+                                                            justifyContent: 'center',
+                                                            color: 'white',
+                                                            fontWeight: 'bold',
+                                                            fontSize: '1.2rem'
+                                                        }}>
+                                                            {follower.name?.charAt(0)}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className="company-info">
+                                                    <h3>{follower.name}</h3>
+                                                    <div className="company-meta">
+                                                        <span className="location-info">
+                                                            <MapPin size={12} />
+                                                            {follower.location || t('jobSeeker')}
+                                                        </span>
+                                                        <span className="location-info" style={{ background: 'rgba(99, 102, 241, 0.1)', color: 'var(--primary)', border: '1px solid rgba(99, 102, 241, 0.2)' }}>
+                                                            {t('candidate')}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="following-card-actions">
+                                                <button 
+                                                    className="action-btn view-profile" 
+                                                    style={{ width: '100%' }}
+                                                    onClick={() => navigate(`/candidate/${follower.id}`)}
+                                                >
+                                                    {t('viewProfile')}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
                                 </div>
                             )}
                         </div>

@@ -193,7 +193,7 @@ public class UsersController : ControllerBase
         if (!result.Success)
             return BadRequest(new { message = result.Message });
 
-        return CreatedAtAction(nameof(GetUser), new { id = result.User.Id }, result.User);
+        return CreatedAtAction(nameof(GetUser), new { id = result.User!.Id }, result.User);
     }
 
     [Authorize]

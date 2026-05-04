@@ -126,14 +126,9 @@ const EmployerDashboard = () => {
         <div className="dashboard-container" dir={dir}>
             <div className="dashboard-header">
                 <div>
-
                     <h1 className="dashboard-title">{t('welcomeBack')}, {user?.name}!</h1>
                     <p className="subtitle">{t('employerDashboardSubtitle') || 'Manage your listings and candidates'}</p>
                 </div>
-                <Link to="/jobs/post" className="btn-primary" style={{ textDecoration: 'none' }}>
-                    <PlusCircle size={20} />
-                    {t('postNewJob')}
-                </Link>
             </div>
 
             <div className="stats-grid">
