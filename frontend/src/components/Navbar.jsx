@@ -17,7 +17,8 @@ import {
     FileText,
     Settings,
     Loader2,
-    MessageSquare
+    MessageSquare,
+    Mail
 } from 'lucide-react';
 import { api } from '../api/api';
 import logo from '../assets/logo.png';
@@ -83,7 +84,8 @@ const Navbar = ({ toggleSidebar }) => {
             ...(results.pages || []),
             ...(results.jobs || []),
             ...(results.candidates || []),
-            ...(results.companies || [])
+            ...(results.companies || []),
+            ...(results.contactMessages || [])
         ];
     }, [results]);
 
@@ -180,7 +182,7 @@ const Navbar = ({ toggleSidebar }) => {
                     <input
                         type="text"
                         className="search-input"
-                        placeholder={t('search')}
+                        placeholder={t('searchPlaceholder') || t('search')}
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         onFocus={() => searchQuery.trim() && setShowResults(true)}
@@ -192,12 +194,24 @@ const Navbar = ({ toggleSidebar }) => {
                 {showResults && results && (
                     <div className="search-dropdown glass shadow-xl">
                         {renderResultSection(t('pages'), results.pages, <FileText size={14} />, 0)}
-                        {renderResultSection(t('jobs'), results.jobs, <Briefcase size={14} />, results.pages?.length || 0)}
-                        {renderResultSection(t('candidates'), results.candidates, <User size={14} />, (results.pages?.length || 0) + (results.jobs?.length || 0))}
-                        {renderResultSection(t('companies'), results.companies, <Building size={14} />, (results.pages?.length || 0) + (results.jobs?.length || 0) + (results.candidates?.length || 0))}
+                        
+                        {renderResultSection(t('jobs'), results.jobs, <Briefcase size={14} />, 
+                            (results.pages?.length || 0))}
+                        
+                        {renderResultSection(user?.role?.toLowerCase() === 'admin' ? t('users') : t('candidates'), results.candidates, <User size={14} />, 
+                            (results.pages?.length || 0) + (results.jobs?.length || 0))}
+                        
+                        {renderResultSection(t('companies'), results.companies, <Building size={14} />, 
+                            (results.pages?.length || 0) + (results.jobs?.length || 0) + (results.candidates?.length || 0))}
+
+                        {renderResultSection(t('contactMessages'), results.contactMessages, <Mail size={14} />, 
+                            (results.pages?.length || 0) + (results.jobs?.length || 0) + (results.candidates?.length || 0) + (results.companies?.length || 0))}
                         
                         {!allResults.length && (
-                            <div className="no-results">{t('noResults')}</div>
+                            <div className="no-results">
+                                <Search size={24} style={{ opacity: 0.3, marginBottom: '0.5rem' }} />
+                                <p>{t('noResults')}</p>
+                            </div>
                         )}
                     </div>
                 )}

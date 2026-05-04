@@ -16,4 +16,5 @@ public class SearchResponseDto
     public List<SearchResultDto> Candidates { get; set; } = new();
     public List<SearchResultDto> Companies { get; set; } = new();
     public List<SearchResultDto> Pages { get; set; } = new();
+    public List<SearchResultDto> ContactMessages { get; set; } = new();
 }

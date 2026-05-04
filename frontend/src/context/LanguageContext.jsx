@@ -19,6 +19,10 @@ export const LanguageProvider = ({ children }) => {
     const translations = {
         en: {
             search: "Search...",
+            searchPlaceholder: "Search for pages, jobs, candidates...",
+            noResults: "No results found.",
+            users: "Users",
+            contactMessages: "Contact Messages",
             signIn: "Sign In",
             register: "Register",
             dashboard: "Dashboard",
@@ -852,6 +856,10 @@ export const LanguageProvider = ({ children }) => {
         },
         ar: {
             search: "ابحث...",
+            searchPlaceholder: "ابحث عن الصفحات، الوظائف، المرشحين...",
+            noResults: "لم يتم العثور على نتائج.",
+            users: "المستخدمين",
+            contactMessages: "رسائل التواصل",
             signIn: "تسجيل الدخول",
             register: "إنشاء حساب",
             dashboard: "لوحة التحكم",
