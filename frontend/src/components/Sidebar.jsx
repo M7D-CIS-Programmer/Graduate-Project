@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
+import LogoutModal from './ui/LogoutModal';
 import './Sidebar.css';
 
 const Sidebar = ({ isOpen }) => {
@@ -29,6 +30,7 @@ const Sidebar = ({ isOpen }) => {
     const { t } = useLanguage();
     const location = useLocation();
     const navigate = useNavigate();
+    const [showLogoutModal, setShowLogoutModal] = React.useState(false);
 
     const isEmployerHome = location.pathname === '/employer-home';
 
@@ -82,48 +84,65 @@ const Sidebar = ({ isOpen }) => {
     const navItems = getNavItems();
 
     return (
-        <aside className={`sidebar glass ${isOpen ? 'open' : ''}`}>
-            <div>
-                <div className="sidebar-header">
-                    <p className="sidebar-label">
-                        {user
-                            ? (['employer', 'company'].includes(userRole) ? t('company')
-                                : userRole === 'admin' ? 'Admin'
-                                    : t('jobSeeker'))
-                            : t('menu')}
-                    </p>
+        <>
+            <aside className={`sidebar glass ${isOpen ? 'open' : ''}`}>
+                <div>
+                    <div className="sidebar-header">
+                        <p className="sidebar-label">
+                            {user
+                                ? (['employer', 'company'].includes(userRole) ? t('company')
+                                    : userRole === 'admin' ? 'Admin'
+                                        : t('jobSeeker'))
+                                : t('menu')}
+                        </p>
+                    </div>
+
+                    <nav className="sidebar-menu">
+                        {navItems.map((item) => (
+                            <NavLink
+                                key={item.name}
+                                to={item.path}
+                                className={({ isActive }) =>
+                                    `sidebar-link ${isActive ? 'active' : ''}`
+                                }
+                            >
+                                <div className="sidebar-link-content">
+                                    {item.icon}
+                                    <span>{item.name}</span>
+                                </div>
+                            </NavLink>
+                        ))}
+                    </nav>
                 </div>
 
-                <nav className="sidebar-menu">
-                    {navItems.map((item) => (
-                        <NavLink
-                            key={item.name}
-                            to={item.path}
-                            className={({ isActive }) =>
-                                `sidebar-link ${isActive ? 'active' : ''}`
-                            }
+                <div className="sidebar-footer">
+                    {user && (
+                        <button
+                            onClick={() => setShowLogoutModal(true)}
+                            className="logout-btn"
                         >
-                            <div className="sidebar-link-content">
-                                {item.icon}
-                                <span>{item.name}</span>
-                            </div>
-                        </NavLink>
-                    ))}
-                </nav>
-            </div>
+                            <LogOut size={20} />
+                            <span style={{ fontWeight: '500' }}>{t('logout')}</span>
+                        </button>
+                    )}
+                </div>
+            </aside>
 
-            <div className="sidebar-footer">
-                {user && (
-                    <button
-                        onClick={() => { logout(); navigate('/'); }}
-                        className="logout-btn"
-                    >
-                        <LogOut size={20} />
-                        <span style={{ fontWeight: '500' }}>{t('logout')}</span>
-                    </button>
-                )}
-            </div>
-        </aside>
+            {/* Logout confirmation modal – rendered outside <aside> to avoid stacking-context clipping */}
+            <LogoutModal
+                isOpen={showLogoutModal}
+                onClose={() => setShowLogoutModal(false)}
+                onConfirm={() => {
+                    setShowLogoutModal(false);
+                    logout();
+                    navigate('/');
+                }}
+                title={t('logout')}
+                message="Are you sure you want to log out? You will need to sign in again to access your account."
+                cancelLabel={t('cancel') || 'Cancel'}
+                confirmLabel={t('logout')}
+            />
+        </>
     );
 };
 
