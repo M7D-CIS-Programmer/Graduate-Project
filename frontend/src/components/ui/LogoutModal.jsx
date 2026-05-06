@@ -1,17 +1,25 @@
 import React, { useEffect, useCallback } from 'react';
 import { LogOut } from 'lucide-react';
+import { useLanguage } from '../../context/LanguageContext';
 import './LogoutModal.css';
-
 
 const LogoutModal = ({
     isOpen,
     onClose,
     onConfirm,
-    title = 'Confirm Logout',
-    message = 'Are you sure you want to log out? You will need to sign in again to access your account.',
-    cancelLabel = 'Cancel',
-    confirmLabel = 'Logout',
+    title,
+    message,
+    cancelLabel,
+    confirmLabel,
 }) => {
+    const { t, dir } = useLanguage();
+
+    /* ── Resolved labels: caller can override, otherwise falls back to translated strings ── */
+    const resolvedTitle   = title         ?? t('logoutConfirmTitle');
+    const resolvedMessage = message       ?? t('logoutConfirmMessage');
+    const resolvedCancel  = cancelLabel   ?? t('cancel');
+    const resolvedConfirm = confirmLabel  ?? t('logout');
+
     /* ── Lock body scroll while modal is open ── */
     useEffect(() => {
         if (isOpen) {
@@ -51,9 +59,10 @@ const LogoutModal = ({
             aria-labelledby="logout-modal-title"
             aria-describedby="logout-modal-desc"
         >
-            {/* Panel – stop backdrop click from propagating */}
+            {/* Panel – dir syncs text direction with the active language */}
             <div
                 className="logout-modal-panel glass"
+                dir={dir}
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Icon */}
@@ -63,12 +72,12 @@ const LogoutModal = ({
 
                 {/* Heading */}
                 <h2 id="logout-modal-title" className="logout-modal-title">
-                    {title}
+                    {resolvedTitle}
                 </h2>
 
                 {/* Body text */}
                 <p id="logout-modal-desc" className="logout-modal-message">
-                    {message}
+                    {resolvedMessage}
                 </p>
 
                 {/* Actions */}
@@ -79,7 +88,7 @@ const LogoutModal = ({
                         onClick={onClose}
                         autoFocus
                     >
-                        {cancelLabel}
+                        {resolvedCancel}
                     </button>
 
                     <button
@@ -88,7 +97,7 @@ const LogoutModal = ({
                         onClick={onConfirm}
                     >
                         <LogOut size={16} strokeWidth={2.5} aria-hidden="true" />
-                        {confirmLabel}
+                        {resolvedConfirm}
                     </button>
                 </div>
             </div>

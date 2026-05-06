@@ -137,10 +137,6 @@ const Sidebar = ({ isOpen }) => {
                     logout();
                     navigate('/');
                 }}
-                title={t('logout')}
-                message="Are you sure you want to log out? You will need to sign in again to access your account."
-                cancelLabel={t('cancel') || 'Cancel'}
-                confirmLabel={t('logout')}
             />
         </>
     );
