@@ -16,13 +16,13 @@ import { useToast } from '../context/ToastContext';
 import { useLocation, useNavigate } from 'react-router-dom';
 import '../pages/Jobs/Jobs.css';
 import { useApplications, useUpdateApplicationStatus } from '../hooks/useApplications';
+import CandidateActionModal from '../components/ui/CandidateActionModal';
 
 const Candidates = () => {
     const { t, dir } = useLanguage();
     const { addToast } = useToast();
     const navigate = useNavigate();
     const location = useLocation();
-
 
     const queryParams = new URLSearchParams(location.search);
     const initialSearch = queryParams.get('q') || '';
@@ -35,32 +35,51 @@ const Candidates = () => {
         experience: []
     });
 
+    /* ── Modal state ── */
+    const [modal, setModal] = useState({
+        isOpen: false,
+        actionType: null,   // 'accept' | 'reject' | 'review'
+        candidate: null,
+    });
 
     useEffect(() => {
         setSearchQuery(queryParams.get('q') || '');
     }, [location.search]);
 
-    const handleAction = (e, actionType, application) => {
+    /* Opens the confirmation modal instead of acting immediately */
+    const openModal = (e, actionType, application) => {
         e.stopPropagation();
-
         if (actionType === 'download') {
             navigate(`/resume/${application.userId}`);
-        } else if (actionType === 'message') {
-            addToast(t('messageSent') || 'Message Sent to Candidate', 'success');
-        } else if (actionType === 'accept' || actionType === 'reject') {
-            const updatedStatus = actionType === 'accept' ? 'Hired' : 'Rejected';
-            updateApplicationStatus({ id: application.id, status: updatedStatus }, {
-                onSuccess: () => {
-                    addToast(
-                        t(actionType === 'accept' ? 'candidateAccepted' : 'candidateRejected'),
-                        'success'
-                    );
-                },
-                onError: () => {
-                    addToast('Failed to update status', 'error');
-                }
-            });
+            return;
         }
+        if (actionType === 'message') {
+            addToast(t('messageSent') || 'Message Sent to Candidate', 'success');
+            return;
+        }
+        // ── DEBUG STEP 1: confirm setModal is called ──────────────────────
+        const next = { isOpen: true, actionType, candidate: application };
+        console.log('[Candidates] MODAL STATE SET →', next);
+        setModal(next);
+    };
+
+    const closeModal = () => setModal({ isOpen: false, actionType: null, candidate: null });
+
+    /* Called when user confirms action inside the modal */
+    const handleConfirm = (actionType, application) => {
+        closeModal();
+
+        const statusMap = { accept: 'Hired', reject: 'Rejected', review: 'Reviewing' };
+        const toastMap  = {
+            accept: 'candidateAccepted',
+            reject: 'candidateRejected',
+            review: 'candidateReviewing',
+        };
+
+        updateApplicationStatus({ id: application.id, status: statusMap[actionType] }, {
+            onSuccess: () => addToast(t(toastMap[actionType]), 'success'),
+            onError:   () => addToast(t('actionFailed'), 'error'),
+        });
     };
 
     const filterSections = [
@@ -72,7 +91,6 @@ const Candidates = () => {
         setSelectedFilters(prev => {
             const currentSelected = prev[sectionId];
             const isSelected = currentSelected.includes(option);
-
             return {
                 ...prev,
                 [sectionId]: isSelected
@@ -111,128 +129,143 @@ const Candidates = () => {
     };
 
     return (
-        <div className="jobs-page-container">
-            <div className="dashboard-header">
-                <h1 className="dashboard-title">{t('candidates')}</h1>
-            </div>
+        <>
+            <div className="jobs-page-container">
+                <div className="dashboard-header">
+                    <h1 className="dashboard-title">{t('candidates')}</h1>
+                </div>
 
-            <div className="jobs-layout">
-                <aside className="filters-sidebar">
-                    <div className="filter-header" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '2rem' }}>
-                        <Filter size={20} className="text-primary" />
-                        <h2 style={{ fontSize: '1.25rem' }}>{t('filters')}</h2>
-                    </div>
+                <div className="jobs-layout">
+                    <aside className="filters-sidebar">
+                        <div className="filter-header" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '2rem' }}>
+                            <Filter size={20} className="text-primary" />
+                            <h2 style={{ fontSize: '1.25rem' }}>{t('filters')}</h2>
+                        </div>
 
-                    {filterSections.map(cat => (
-                        <div key={cat.id} className="filter-section">
-                            <h3 className="filter-title">{cat.title}</h3>
-                            <div className="filter-options">
-                                {cat.options.map((opt, i) => (
-                                    <label key={i} className="filter-checkbox">
-                                        <input
-                                            type="checkbox"
-                                            checked={selectedFilters[cat.id].includes(opt)}
-                                            onChange={() => handleFilterChange(cat.id, opt)}
-                                        />
-                                        <span>{opt}</span>
-                                    </label>
-                                ))}
+                        {filterSections.map(cat => (
+                            <div key={cat.id} className="filter-section">
+                                <h3 className="filter-title">{cat.title}</h3>
+                                <div className="filter-options">
+                                    {cat.options.map((opt, i) => (
+                                        <label key={i} className="filter-checkbox">
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedFilters[cat.id].includes(opt)}
+                                                onChange={() => handleFilterChange(cat.id, opt)}
+                                            />
+                                            <span>{opt}</span>
+                                        </label>
+                                    ))}
+                                </div>
                             </div>
-                        </div>
-                    ))}
-                </aside>
+                        ))}
+                    </aside>
 
-                <div className="jobs-main">
-                    <form className="search-bar-container" onSubmit={handleSearch} style={{
-                        display: 'flex',
-                        gap: '1rem',
-                        background: 'var(--bg-card)',
-                        padding: '1rem',
-                        borderRadius: '16px',
-                        border: '1px solid var(--border-color)',
-                        marginBottom: '2rem'
-                    }}>
-                        <div className="search-field" style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
-                            <Search size={20} color="var(--primary)" />
-                            <input
-                                type="text"
-                                placeholder={t('searchCandidates') || 'Search candidates...'}
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                style={{ background: 'none', border: 'none', color: 'white', outline: 'none', width: '100%', paddingLeft: '10px' }}
-                            />
-                        </div>
-                        <button type="submit" className="btn-primary" style={{ height: '44px' }}>{t('search')}</button>
-                    </form>
+                    <div className="jobs-main">
+                        <form className="search-bar-container" onSubmit={handleSearch} style={{
+                            display: 'flex',
+                            gap: '1rem',
+                            background: 'var(--bg-card)',
+                            padding: '1rem',
+                            borderRadius: '16px',
+                            border: '1px solid var(--border-color)',
+                            marginBottom: '2rem'
+                        }}>
+                            <div className="search-field" style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
+                                <Search size={20} color="var(--primary)" />
+                                <input
+                                    type="text"
+                                    placeholder={t('searchCandidates') || 'Search candidates...'}
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    style={{ background: 'none', border: 'none', color: 'inherit', outline: 'none', width: '100%', paddingLeft: '10px' }}
+                                />
+                            </div>
+                            <button type="submit" className="btn-primary" style={{ height: '44px' }}>{t('search')}</button>
+                        </form>
 
-                    <div className="jobs-grid">
-                        {filteredCandidates.length > 0 ? filteredCandidates.map(app => (
-                            <div key={app.id} className="card" onClick={() => navigate(`/profile/${app.userId}`)} style={{ cursor: 'pointer' }}>
-                                <div className="job-card-header">
-                                    <div className="company-logo-placeholder" style={{ background: 'rgba(99, 102, 241, 0.1)', color: 'var(--primary)' }}>
-                                        <Users size={24} />
-                                    </div>
-                                    <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                        {app.candidateStatus && app.candidateStatus !== 'New' && (
-                                            <span className={`job-type-badge ${app.candidateStatus === 'Hired' ? 'success' : app.candidateStatus === 'Rejected' ? 'danger' : ''}`} style={{
-                                                backgroundColor: app.candidateStatus === 'Hired' ? 'rgba(16, 185, 129, 0.1)' : app.candidateStatus === 'Rejected' ? 'rgba(239, 68, 68, 0.1)' : '',
-                                                color: app.candidateStatus === 'Hired' ? '#10b981' : app.candidateStatus === 'Rejected' ? '#ef4444' : ''
-                                            }}>
-                                                {t(app.candidateStatus?.toLowerCase()) || app.candidateStatus}
+                        <div className="jobs-grid">
+                            {filteredCandidates.length > 0 ? filteredCandidates.map(app => (
+                                <div key={app.id} className="card" onClick={() => navigate(`/profile/${app.userId}`)} style={{ cursor: 'pointer' }}>
+                                    <div className="job-card-header">
+                                        <div className="company-logo-placeholder" style={{ background: 'rgba(99, 102, 241, 0.1)', color: 'var(--primary)' }}>
+                                            <Users size={24} />
+                                        </div>
+                                        <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                            {app.candidateStatus && app.candidateStatus !== 'New' && (
+                                                <span className={`job-type-badge ${app.candidateStatus === 'Hired' ? 'success' : app.candidateStatus === 'Rejected' ? 'danger' : ''}`} style={{
+                                                    backgroundColor: app.candidateStatus === 'Hired' ? 'rgba(16, 185, 129, 0.1)' : app.candidateStatus === 'Rejected' ? 'rgba(239, 68, 68, 0.1)' : '',
+                                                    color: app.candidateStatus === 'Hired' ? '#10b981' : app.candidateStatus === 'Rejected' ? '#ef4444' : ''
+                                                }}>
+                                                    {t(app.candidateStatus?.toLowerCase()) || app.candidateStatus}
+                                                </span>
+                                            )}
+                                            <span className="job-type-badge">
+                                                {app.job?.type || ''}
                                             </span>
-                                        )}
-                                        <span className="job-type-badge">
-                                            {app.job?.type || ''}
-                                        </span>
+                                        </div>
+                                    </div>
+                                    <h3 className="job-title">{app.job?.title || 'Job Deleted'}</h3>
+                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.5rem', fontSize: '0.875rem' }}>
+                                        <div className="job-meta-item"><Users size={16} /> {app.user?.name || 'Candidate'}</div>
+                                        <div className="job-meta-item"><MapPin size={16} /> {app.job?.workMode || 'Remote'}</div>
+                                    </div>
+                                    <div className="job-card-footer" style={{
+                                        borderTop: '1px solid var(--border-color)',
+                                        paddingTop: '1rem',
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                        alignItems: 'center',
+                                        flexWrap: 'wrap',
+                                        gap: '1rem'
+                                    }}>
+                                        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                                            <button type="button" className="btn-candidate-action" onClick={(e) => openModal(e, 'download', app)}>
+                                                <Download size={16} />
+                                                <span>{t('downloadCV') || 'CV'}</span>
+                                            </button>
+                                            <button type="button" className="btn-candidate-action" onClick={(e) => openModal(e, 'message', app)}>
+                                                <Mail size={16} />
+                                                <span>{t('sendMessage') || 'Message'}</span>
+                                            </button>
+                                            <button type="button" className="btn-candidate-action success" onClick={(e) => openModal(e, 'accept', app)}>
+                                                <CheckCircle size={16} />
+                                                <span>{t('accept')}</span>
+                                            </button>
+                                            <button type="button" className="btn-candidate-action danger" onClick={(e) => openModal(e, 'reject', app)}>
+                                                <XCircle size={16} />
+                                                <span>{t('reject')}</span>
+                                            </button>
+                                            <button type="button" className="btn-candidate-action" onClick={(e) => openModal(e, 'review', app)}>
+                                                <Eye size={16} />
+                                                <span>{t('review')}</span>
+                                            </button>
+                                        </div>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--primary)', fontWeight: '600' }}>
+                                            {t('viewProfile')}
+                                            <ChevronRight size={18} style={{ transform: dir === 'rtl' ? 'rotate(180deg)' : 'none' }} />
+                                        </div>
                                     </div>
                                 </div>
-                                <h3 className="job-title">{app.job?.title || 'Job Deleted'}</h3>
-                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.5rem', fontSize: '0.875rem' }}>
-                                    <div className="job-meta-item"><Users size={16} /> {app.user?.name || 'Candidate'}</div>
-                                    <div className="job-meta-item"><MapPin size={16} /> {app.job?.workMode || 'Remote'}</div>
+                            )) : (
+                                <div style={{ textAlign: 'center', padding: '3rem', width: '100%' }}>
+                                    <p style={{ color: 'var(--text-muted)' }}>{t('noCandidatesFound') || 'No candidates found matching your criteria.'}</p>
                                 </div>
-                                <div className="job-card-footer" style={{
-                                    borderTop: '1px solid var(--border-color)',
-                                    paddingTop: '1rem',
-                                    display: 'flex',
-                                    justifyContent: 'space-between',
-                                    alignItems: 'center',
-                                    flexWrap: 'wrap',
-                                    gap: '1rem'
-                                }}>
-                                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                                        <button className="btn-candidate-action" onClick={(e) => handleAction(e, 'download', app)}>
-                                            <Download size={16} />
-                                            <span>{t('downloadCV') || 'CV'}</span>
-                                        </button>
-                                        <button className="btn-candidate-action" onClick={(e) => handleAction(e, 'message', app)}>
-                                            <Mail size={16} />
-                                            <span>{t('sendMessage') || 'Message'}</span>
-                                        </button>
-                                        <button className="btn-candidate-action success" onClick={(e) => handleAction(e, 'accept', app)}>
-                                            <CheckCircle size={16} />
-                                            <span>{t('accept') || 'Accept'}</span>
-                                        </button>
-                                        <button className="btn-candidate-action danger" onClick={(e) => handleAction(e, 'reject', app)}>
-                                            <XCircle size={16} />
-                                            <span>{t('reject') || 'Reject'}</span>
-                                        </button>
-                                    </div>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--primary)', fontWeight: '600' }}>
-                                        {t('viewProfile')}
-                                        <ChevronRight size={18} style={{ transform: dir === 'rtl' ? 'rotate(180deg)' : 'none' }} />
-                                    </div>
-                                </div>
-                            </div>
-                        )) : (
-                            <div style={{ textAlign: 'center', padding: '3rem', width: '100%' }}>
-                                <p style={{ color: 'var(--text-muted)' }}>{t('noCandidatesFound') || 'No candidates found matching your criteria.'}</p>
-                            </div>
-                        )}
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+
+            {/* ── Confirmation modal ── */}
+            <CandidateActionModal
+                isOpen={modal.isOpen}
+                actionType={modal.actionType}
+                candidate={modal.candidate}
+                onClose={closeModal}
+                onConfirm={handleConfirm}
+            />
+        </>
     );
 };
 

@@ -48,10 +48,10 @@ const Sidebar = ({ isOpen }) => {
             items.push({ name: t('profile'), icon: <UserIcon size={20} />, path: '/profile' });
             items.push({ name: t('contactUs'), icon: <Mail size={20} />, path: '/contact' });
             items.push({ name: t('settings'), icon: <Settings size={20} />, path: '/settings' });
-        } 
+        }
         else if (role === 'employer' || role === 'company') {
             items.push({ name: t('dashboard'), icon: <LayoutDashboard size={20} />, path: '/dashboard/employer' });
-            items.push({ name: t('findCandidates'), icon: <Users size={20} />, path: '/candidates' });
+            // items.push({ name: t('findCandidates'), icon: <Users size={20} />, path: '/candidates' });
             items.push({ name: t('departmentsAndJobs'), icon: <Briefcase size={20} />, path: '/dashboard/employer/jobs' });
             items.push({ name: t('postAJob'), icon: <PlusCircle size={20} />, path: '/jobs/post' });
             items.push({ name: t('candidates'), icon: <Users size={20} />, path: '/dashboard/employer/applicants' });
@@ -60,7 +60,7 @@ const Sidebar = ({ isOpen }) => {
             items.push({ name: t('profile'), icon: <UserIcon size={20} />, path: '/profile' });
             items.push({ name: t('contactUs'), icon: <Mail size={20} />, path: '/contact' });
             items.push({ name: t('settings'), icon: <Settings size={20} />, path: '/settings' });
-        } 
+        }
         else if (role === 'admin') {
             items.push({ name: t('adminDashboard'), icon: <LayoutDashboard size={20} />, path: '/dashboard/admin' });
             items.push({ name: t('platformSettings'), icon: <Settings size={20} />, path: '/dashboard/admin/settings' });
@@ -69,7 +69,7 @@ const Sidebar = ({ isOpen }) => {
             items.push({ name: t('manageJobs'), icon: <Briefcase size={20} />, path: '/dashboard/admin/jobs' });
             items.push({ name: t('contactMessages') || 'Contact Messages', icon: <Mail size={20} />, path: '/dashboard/admin/contact-messages' });
             items.push({ name: t('settings'), icon: <Settings size={20} />, path: '/settings' });
-        } 
+        }
         else {
             items.push({ name: t('findJobs'), icon: <Briefcase size={20} />, path: '/jobs' });
             items.push({ name: t('companies'), icon: <Building2 size={20} />, path: '/companies' });

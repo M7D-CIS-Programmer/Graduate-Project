@@ -13,6 +13,7 @@ import {
     TrendingUp, AlertCircle, ChevronDown, Loader2,
     BarChart3, Filter, RefreshCw, MessageSquare
 } from 'lucide-react';
+import CandidateActionModal from '../../components/ui/CandidateActionModal';
 import './Dashboard.css';
 import { formatFriendlyDate } from '../../utils/dateUtils';
 
@@ -137,6 +138,11 @@ const Applicants = () => {
     const { data: dbDepartments = [] }           = useDepartments();
     const { mutate: updateStatus }               = useUpdateApplicationStatus();
 
+    // ── Confirmation modal state ───────────────────────────────────────────────
+    const [modal, setModal] = useState({ isOpen: false, actionType: null, candidate: null });
+    const openModal  = (actionType, app) => setModal({ isOpen: true, actionType, candidate: app });
+    const closeModal = ()                => setModal({ isOpen: false, actionType: null, candidate: null });
+
     // Department names from DB (used in both dropdowns)
     const departmentNames = useMemo(() => dbDepartments.map(c => c.name).filter(Boolean), [dbDepartments]);
 
@@ -207,20 +213,28 @@ const Applicants = () => {
 
     const handleAction = (action, app) => {
         if (action === 'accept' || action === 'reject' || action === 'review') {
-            const newStatus = action === 'accept' ? 'Shortlisted' : action === 'review' ? 'Reviewing' : 'Rejected';
-            updateStatus({ id: app.id, status: newStatus }, {
-                onSuccess: () => addToast(`Candidate status updated to ${newStatus}`, 'success'),
-                onError:   () => addToast(`Failed to ${action} applicant.`, 'error'),
-            });
-        } else if (action === 'viewResume') {
+            // Route through confirmation modal instead of acting immediately
+            openModal(action, app);
+            return;
+        }
+        if (action === 'viewResume') {
             const cvUrl = getImageUrl(app.cv);
             if (cvUrl) {
                 window.open(cvUrl, '_blank', 'noopener,noreferrer');
             } else {
-                // No uploaded PDF — fall back to the structured resume page
                 navigate(`/resume/${app.userId}`);
             }
         } else if (action === 'viewProfile') navigate(`/candidate/${app.userId}`);
+    };
+
+    // Called by the modal's Confirm button
+    const handleConfirm = (actionType, app) => {
+        closeModal();
+        const newStatus = actionType === 'accept' ? 'Shortlisted' : actionType === 'review' ? 'Reviewing' : 'Rejected';
+        updateStatus({ id: app.id, status: newStatus }, {
+            onSuccess: () => addToast(t(actionType === 'accept' ? 'candidateAccepted' : actionType === 'reject' ? 'candidateRejected' : 'candidateReviewing'), 'success'),
+            onError:   () => addToast(t('actionFailed'), 'error'),
+        });
     };
 
     const handleGenerateReport = async () => {
@@ -302,7 +316,8 @@ const Applicants = () => {
     // ── Render ─────────────────────────────────────────────────────────────────
 
     return (
-        <div className="dashboard-container" dir={dir}>
+        <>
+            <div className="dashboard-container" dir={dir}>
 
             {/* ── Page Header ─────────────────────────────────────────────── */}
             <div className="dashboard-header">
@@ -679,22 +694,22 @@ const Applicants = () => {
                                     </td>
                                     <td style={{ padding: '1.1rem 1rem' }}>
                                         <div style={{ display: 'flex', gap: '0.4rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-                                            <button className="btn-candidate-action" onClick={() => handleAction('viewResume', app)} title={t('viewResume')}>
+                                            <button type="button" className="btn-candidate-action" onClick={() => handleAction('viewResume', app)} title={t('viewResume')}>
                                                 <Download size={15} /><span>{t('viewResume') || 'Resume'}</span>
                                             </button>
-                                            <button className="btn-candidate-action" onClick={() => handleAction('viewProfile', app)} title={t('viewProfile')}>
+                                            <button type="button" className="btn-candidate-action" onClick={() => handleAction('viewProfile', app)} title={t('viewProfile')}>
                                                 <Eye size={15} /><span>{t('viewProfile') || 'Profile'}</span>
                                             </button>
-                                            <button className="btn-candidate-action" onClick={() => navigate(`/messages?applicationId=${app.id}`)} title={t('message') || 'Message candidate'}>
+                                            <button type="button" className="btn-candidate-action" onClick={() => navigate(`/messages?applicationId=${app.id}`)} title={t('message') || 'Message candidate'}>
                                                 <MessageSquare size={15} /><span>{t('message') || 'Message'}</span>
                                             </button>
-                                            <button className="btn-candidate-action success" onClick={() => handleAction('accept', app)} title={t('accept')}>
+                                            <button type="button" className="btn-candidate-action success" onClick={() => handleAction('accept', app)} title={t('accept')}>
                                                 <CheckCircle size={15} /><span>{t('accept') || 'Accept'}</span>
                                             </button>
-                                            <button className="btn-candidate-action warning" onClick={() => handleAction('review', app)} title={t('review')}>
+                                            <button type="button" className="btn-candidate-action warning" onClick={() => handleAction('review', app)} title={t('review')}>
                                                 <Clock size={15} /><span>{t('review') || 'Review'}</span>
                                             </button>
-                                            <button className="btn-candidate-action danger" onClick={() => handleAction('reject', app)} title={t('reject')}>
+                                            <button type="button" className="btn-candidate-action danger" onClick={() => handleAction('reject', app)} title={t('reject')}>
                                                 <XCircle size={15} /><span>{t('reject') || 'Reject'}</span>
                                             </button>
                                         </div>
@@ -706,6 +721,16 @@ const Applicants = () => {
                 )}
             </div>
         </div>
+
+        {/* ── Confirmation modal (portal → document.body) ── */}
+        <CandidateActionModal
+            isOpen={modal.isOpen}
+            actionType={modal.actionType}
+            candidate={modal.candidate}
+            onClose={closeModal}
+            onConfirm={handleConfirm}
+        />
+        </>
     );
 };
 

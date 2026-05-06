@@ -1,0 +1,348 @@
+/* ═══════════════════════════════════════════════════
+   CandidateActionModal – scoped styles
+   Theme-aware via [data-theme] attribute on backdrop
+   ═══════════════════════════════════════════════════ */
+
+/* ── Color tokens ── */
+:root {
+    --cam-green: #10b981;
+    --cam-green-bg: rgba(16, 185, 129, 0.12);
+    --cam-green-border: rgba(16, 185, 129, 0.3);
+    --cam-green-glow: rgba(16, 185, 129, 0.4);
+
+    --cam-red: #ef4444;
+    --cam-red-bg: rgba(239, 68, 68, 0.12);
+    --cam-red-border: rgba(239, 68, 68, 0.3);
+    --cam-red-glow: rgba(239, 68, 68, 0.4);
+
+    --cam-blue: #3b82f6;
+    --cam-blue-bg: rgba(59, 130, 246, 0.12);
+    --cam-blue-border: rgba(59, 130, 246, 0.3);
+    --cam-blue-glow: rgba(59, 130, 246, 0.4);
+}
+
+/* ── Backdrop ── */
+.cam-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    animation: cam-fade-in 0.2s ease forwards;
+}
+
+@keyframes cam-fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+/* ── Panel ── */
+.cam-panel {
+    position: relative;
+    width: 100%;
+    max-width: 440px;
+    border-radius: 22px;
+    padding: 2.25rem 2rem 1.75rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.65rem;
+    text-align: center;
+
+    /* Dark theme (default) */
+    background: rgba(15, 23, 42, 0.92);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    box-shadow: 0 30px 70px rgba(0, 0, 0, 0.5),
+                0 0 0 1px rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    color: #f8fafc;
+
+    animation: cam-panel-in 0.28s cubic-bezier(0.34, 1.45, 0.64, 1) forwards;
+}
+
+@keyframes cam-panel-in {
+    from {
+        opacity: 0;
+        transform: scale(0.86) translateY(14px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* Light theme panel */
+[data-theme='light'] .cam-panel {
+    background: rgba(255, 255, 255, 0.97);
+    border-color: rgba(0, 0, 0, 0.09);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.14),
+                0 0 0 1px rgba(0, 0, 0, 0.04);
+    color: #0f172a;
+}
+
+/* ── Close button ── */
+.cam-close-btn {
+    position: absolute;
+    top: 1rem;
+    inset-inline-end: 1rem;   /* RTL-aware: right in LTR, left in RTL */
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #94a3b8;
+    cursor: pointer;
+    transition: all 0.18s ease;
+}
+
+.cam-close-btn:hover {
+    background: rgba(255, 255, 255, 0.14);
+    color: #f1f5f9;
+}
+
+[data-theme='light'] .cam-close-btn {
+    background: rgba(0, 0, 0, 0.05);
+    border-color: rgba(0, 0, 0, 0.08);
+    color: #64748b;
+}
+
+[data-theme='light'] .cam-close-btn:hover {
+    background: rgba(0, 0, 0, 0.1);
+    color: #0f172a;
+}
+
+/* ── Icon badge ── */
+.cam-icon-wrap {
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.2rem;
+    animation: cam-icon-pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s both;
+}
+
+@keyframes cam-icon-pop {
+    from { transform: scale(0.6); opacity: 0; }
+    to   { transform: scale(1);   opacity: 1; }
+}
+
+/* Accept – green */
+.cam-icon-wrap.cam--accept {
+    background: var(--cam-green-bg);
+    border: 1.5px solid var(--cam-green-border);
+    color: var(--cam-green);
+}
+/* Reject – red */
+.cam-icon-wrap.cam--reject {
+    background: var(--cam-red-bg);
+    border: 1.5px solid var(--cam-red-border);
+    color: var(--cam-red);
+}
+/* Review – blue */
+.cam-icon-wrap.cam--review {
+    background: var(--cam-blue-bg);
+    border: 1.5px solid var(--cam-blue-border);
+    color: var(--cam-blue);
+}
+
+/* ── Accent top strip ── */
+.cam-panel.cam--accept::before,
+.cam-panel.cam--reject::before,
+.cam-panel.cam--review::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 10%;
+    right: 10%;
+    height: 2px;
+    border-radius: 0 0 4px 4px;
+}
+
+.cam-panel.cam--accept::before { background: var(--cam-green); }
+.cam-panel.cam--reject::before { background: var(--cam-red); }
+.cam-panel.cam--review::before { background: var(--cam-blue); }
+
+/* ── Title ── */
+.cam-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin: 0;
+    line-height: 1.35;
+}
+
+/* ── Message ── */
+.cam-message {
+    font-size: 0.88rem;
+    line-height: 1.65;
+    color: #94a3b8;
+    margin: 0 0 0.4rem;
+    max-width: 360px;
+}
+
+[data-theme='light'] .cam-message {
+    color: #475569;
+}
+
+/* ── Candidate pill ── */
+.cam-candidate-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.35rem 0.85rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 0.8rem;
+    margin-bottom: 0.25rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+[data-theme='light'] .cam-candidate-pill {
+    background: rgba(0, 0, 0, 0.05);
+    border-color: rgba(0, 0, 0, 0.08);
+}
+
+.cam-pill-name {
+    font-weight: 600;
+    color: #e2e8f0;
+}
+
+[data-theme='light'] .cam-pill-name {
+    color: #1e293b;
+}
+
+.cam-pill-sep {
+    color: #475569;
+}
+
+.cam-pill-job {
+    color: #94a3b8;
+}
+
+[data-theme='light'] .cam-pill-job {
+    color: #64748b;
+}
+
+/* ── Actions row ── */
+.cam-actions {
+    display: flex;
+    gap: 0.75rem;
+    width: 100%;
+    margin-top: 0.75rem;
+}
+
+/* ── Base button ── */
+.cam-btn {
+    flex: 1;
+    padding: 0.7rem 1.25rem;
+    border-radius: 12px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    border: none;
+    outline: none;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+}
+
+.cam-btn:focus-visible {
+    outline: 2px solid var(--primary, #6366f1);
+    outline-offset: 2px;
+}
+
+/* Cancel */
+.cam-btn--cancel {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #94a3b8;
+}
+
+.cam-btn--cancel:hover {
+    background: rgba(255, 255, 255, 0.11);
+    border-color: rgba(255, 255, 255, 0.18);
+    color: #f1f5f9;
+    transform: translateY(-1px);
+}
+
+[data-theme='light'] .cam-btn--cancel {
+    background: rgba(0, 0, 0, 0.05);
+    border-color: rgba(0, 0, 0, 0.1);
+    color: #475569;
+}
+
+[data-theme='light'] .cam-btn--cancel:hover {
+    background: rgba(0, 0, 0, 0.09);
+    color: #0f172a;
+}
+
+/* Confirm – accept (green) */
+.cam-btn--confirm.cam--accept {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: #fff;
+    box-shadow: 0 4px 14px var(--cam-green-glow);
+}
+
+.cam-btn--confirm.cam--accept:hover {
+    background: linear-gradient(135deg, #34d399, #10b981);
+    box-shadow: 0 6px 20px var(--cam-green-glow);
+    transform: translateY(-1px);
+}
+
+/* Confirm – reject (red) */
+.cam-btn--confirm.cam--reject {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: #fff;
+    box-shadow: 0 4px 14px var(--cam-red-glow);
+}
+
+.cam-btn--confirm.cam--reject:hover {
+    background: linear-gradient(135deg, #f87171, #ef4444);
+    box-shadow: 0 6px 20px var(--cam-red-glow);
+    transform: translateY(-1px);
+}
+
+/* Confirm – review (blue) */
+.cam-btn--confirm.cam--review {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: #fff;
+    box-shadow: 0 4px 14px var(--cam-blue-glow);
+}
+
+.cam-btn--confirm.cam--review:hover {
+    background: linear-gradient(135deg, #60a5fa, #3b82f6);
+    box-shadow: 0 6px 20px var(--cam-blue-glow);
+    transform: translateY(-1px);
+}
+
+.cam-btn--confirm:active {
+    transform: translateY(0);
+    filter: brightness(0.92);
+}
+
+/* ── Responsive ── */
+@media (max-width: 480px) {
+    .cam-panel {
+        padding: 1.75rem 1.25rem 1.5rem;
+    }
+
+    .cam-actions {
+        flex-direction: column-reverse;
+    }
+}

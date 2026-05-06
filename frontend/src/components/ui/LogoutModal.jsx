@@ -1,4 +1,5 @@
 import React, { useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { LogOut } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import './LogoutModal.css';
@@ -49,7 +50,7 @@ const LogoutModal = ({
     /* ── Don't render anything when closed ── */
     if (!isOpen) return null;
 
-    return (
+    return createPortal(
         /* Backdrop */
         <div
             className="logout-modal-backdrop"
@@ -101,7 +102,8 @@ const LogoutModal = ({
                     </button>
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 };
 
