@@ -16,6 +16,7 @@ import { useToast } from '../context/ToastContext';
 import { useLocation, useNavigate } from 'react-router-dom';
 import '../pages/Jobs/Jobs.css';
 import { useApplications, useUpdateApplicationStatus } from '../hooks/useApplications';
+import { getImageUrl } from '../api/api';
 import CandidateActionModal from '../components/ui/CandidateActionModal';
 
 const Candidates = () => {
@@ -49,10 +50,6 @@ const Candidates = () => {
     /* Opens the confirmation modal instead of acting immediately */
     const openModal = (e, actionType, application) => {
         e.stopPropagation();
-        if (actionType === 'download') {
-            navigate(`/resume/${application.userId}`);
-            return;
-        }
         if (actionType === 'message') {
             addToast(t('messageSent') || 'Message Sent to Candidate', 'success');
             return;
@@ -61,6 +58,40 @@ const Candidates = () => {
         const next = { isOpen: true, actionType, candidate: application };
         console.log('[Candidates] MODAL STATE SET →', next);
         setModal(next);
+    };
+
+    const [isDownloading, setIsDownloading] = useState(false);
+
+    const handleDownloadCV = async (e, application) => {
+        e.stopPropagation();
+        if (isDownloading) return;
+        
+        setIsDownloading(true);
+
+        // Check if CV file exists directly
+        const cvUrl = application.cv ? getImageUrl(application.cv) : null;
+        
+        if (cvUrl) {
+            try {
+                const res = await fetch(cvUrl, { method: 'HEAD' });
+                if (res.ok) {
+                    window.open(cvUrl, '_blank', 'noopener,noreferrer');
+                } else {
+                    addToast(t('cvNotAvailable') || 'CV file is missing from the server', 'error');
+                }
+            } catch {
+                // Fallback if CORS prevents HEAD request
+                window.open(cvUrl, '_blank', 'noopener,noreferrer');
+            }
+        } else if ((application.hasResume || application.resumeUrl) && application.userId) {
+            // Fallback to internal resume if it exists
+            navigate(`/resume/${application.userId}`);
+        } else {
+            // No CV found — prevent navigation to 404
+            addToast(t('cvNotAvailable') || 'CV not available for this candidate', 'error');
+        }
+        
+        setIsDownloading(false);
     };
 
     const closeModal = () => setModal({ isOpen: false, actionType: null, candidate: null });
@@ -220,7 +251,7 @@ const Candidates = () => {
                                         gap: '1rem'
                                     }}>
                                         <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                                            <button type="button" className="btn-candidate-action" onClick={(e) => openModal(e, 'download', app)}>
+                                            <button type="button" className="btn-candidate-action" onClick={(e) => handleDownloadCV(e, app)} disabled={isDownloading}>
                                                 <Download size={16} />
                                                 <span>{t('downloadCV') || 'CV'}</span>
                                             </button>

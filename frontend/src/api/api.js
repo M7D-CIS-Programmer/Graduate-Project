@@ -4,7 +4,7 @@ if (!BASE_URL) throw new Error('API base URL is not set. Define VITE_API_URL in 
 // Converts a relative server path (e.g. "uploads/profiles/x.jpg") to a full URL.
 // Strips the trailing "/api" segment from BASE_URL since static files are served at root.
 export const getImageUrl = (path) => {
-    if (!path) return null;
+    if (!path || path === 'null' || path === 'undefined') return null;
     if (path.startsWith('http')) return path;
     const origin = BASE_URL.replace(/\/api\/?$/, '');
     return `${origin}/${path}`;

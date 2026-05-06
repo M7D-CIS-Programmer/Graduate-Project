@@ -211,7 +211,7 @@ const Applicants = () => {
 
     // ── Handlers ───────────────────────────────────────────────────────────────
 
-    const handleAction = (action, app) => {
+    const handleAction = async (action, app) => {
         if (action === 'accept' || action === 'reject' || action === 'review') {
             // Route through confirmation modal instead of acting immediately
             openModal(action, app);
@@ -220,9 +220,20 @@ const Applicants = () => {
         if (action === 'viewResume') {
             const cvUrl = getImageUrl(app.cv);
             if (cvUrl) {
-                window.open(cvUrl, '_blank', 'noopener,noreferrer');
-            } else {
+                try {
+                    const res = await fetch(cvUrl, { method: 'HEAD' });
+                    if (res.ok) {
+                        window.open(cvUrl, '_blank', 'noopener,noreferrer');
+                    } else {
+                        addToast(t('cvNotAvailable') || 'CV file is missing from the server', 'error');
+                    }
+                } catch {
+                    window.open(cvUrl, '_blank', 'noopener,noreferrer');
+                }
+            } else if ((app.hasResume || app.resumeUrl) && app.userId) {
                 navigate(`/resume/${app.userId}`);
+            } else {
+                addToast(t('cvNotAvailable') || 'CV not available for this candidate', 'error');
             }
         } else if (action === 'viewProfile') navigate(`/candidate/${app.userId}`);
     };
