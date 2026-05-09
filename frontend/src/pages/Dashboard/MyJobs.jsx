@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate, Link } from 'react-router-dom';
 import { useLanguage } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
 import { useMyJobs, useDeleteJob } from '../../hooks/useJobs';
@@ -16,7 +16,8 @@ import {
     Search,
     ExternalLink,
     AlertTriangle,
-    Loader2
+    Loader2,
+    PlusCircle
 } from 'lucide-react';
 import './Dashboard.css';
 import { formatFriendlyDate } from '../../utils/dateUtils';
@@ -88,15 +89,22 @@ const MyJobs = () => {
                     </div>
                 </div>
 
-                <div className="dashboard-stats-brief">
-                    <div className="stat-brief-item">
-                        <span className="stat-brief-value">{jobs.length}</span>
-                        <span className="stat-brief-label">{t('totalJobs')}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
+                    <div className="dashboard-stats-brief">
+                        <div className="stat-brief-item">
+                            <span className="stat-brief-value">{jobs.length}</span>
+                            <span className="stat-brief-label">{t('totalJobs')}</span>
+                        </div>
+                        <div className="stat-brief-item">
+                            <span className="stat-brief-value">{activeJobsCount}</span>
+                            <span className="stat-brief-label">{t('activeJobs')}</span>
+                        </div>
                     </div>
-                    <div className="stat-brief-item">
-                        <span className="stat-brief-value">{activeJobsCount}</span>
-                        <span className="stat-brief-label">{t('activeJobs')}</span>
-                    </div>
+
+                    <Link to="/jobs/post" className="btn-primary" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.75rem 1.5rem' }}>
+                        <PlusCircle size={20} />
+                        {t('postNewJob')}
+                    </Link>
                 </div>
             </div>
 
