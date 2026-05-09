@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using aabu_project.Data;
 
@@ -11,9 +12,11 @@ using aabu_project.Data;
 namespace aabu_project.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    partial class MyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260509132115_AddMissingSocialLinks")]
+    partial class AddMissingSocialLinks
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -443,7 +446,7 @@ namespace aabu_project.Migrations
                             Description = "Build amazing UIs for our enterprise platform used by thousands of clients worldwide.",
                             IsSalaryNegotiable = false,
                             Location = "Remote",
-                            PostedDate = new DateTimeOffset(new DateTime(2026, 5, 9, 16, 22, 43, 867, DateTimeKind.Unspecified).AddTicks(3), new TimeSpan(0, 3, 0, 0, 0)),
+                            PostedDate = new DateTimeOffset(new DateTime(2026, 5, 9, 16, 21, 15, 77, DateTimeKind.Unspecified).AddTicks(8962), new TimeSpan(0, 3, 0, 0, 0)),
                             Requirements = "5+ years React, TypeScript, Redux, REST APIs",
                             Responsibilities = "Develop and maintain React applications, collaborate with backend teams, conduct code reviews, mentor junior developers.",
                             SalaryMax = 160000m,
@@ -463,7 +466,7 @@ namespace aabu_project.Migrations
                             Description = "Design clean, intuitive interfaces for web and mobile applications.",
                             IsSalaryNegotiable = false,
                             Location = "Abu Dhabi",
-                            PostedDate = new DateTimeOffset(new DateTime(2026, 5, 9, 16, 22, 43, 867, DateTimeKind.Unspecified).AddTicks(16), new TimeSpan(0, 3, 0, 0, 0)),
+                            PostedDate = new DateTimeOffset(new DateTime(2026, 5, 9, 16, 21, 15, 77, DateTimeKind.Unspecified).AddTicks(8977), new TimeSpan(0, 3, 0, 0, 0)),
                             Requirements = "3+ years experience, Figma, Adobe XD, user research skills",
                             Responsibilities = "Create wireframes, prototypes, and high-fidelity designs. Conduct user research and usability testing.",
                             SalaryMax = 140000m,
@@ -483,7 +486,7 @@ namespace aabu_project.Migrations
                             Description = "Develop and maintain scalable ASP.NET Core APIs for our cloud platform.",
                             IsSalaryNegotiable = false,
                             Location = "Dubai",
-                            PostedDate = new DateTimeOffset(new DateTime(2026, 5, 9, 16, 22, 43, 867, DateTimeKind.Unspecified).AddTicks(70), new TimeSpan(0, 3, 0, 0, 0)),
+                            PostedDate = new DateTimeOffset(new DateTime(2026, 5, 9, 16, 21, 15, 77, DateTimeKind.Unspecified).AddTicks(9102), new TimeSpan(0, 3, 0, 0, 0)),
                             Requirements = "4+ years .NET, C#, Entity Framework, SQL Server",
                             Responsibilities = "Design RESTful APIs, optimize database queries, implement security best practices.",
                             SalaryMax = 150000m,
@@ -503,7 +506,7 @@ namespace aabu_project.Migrations
                             Description = "Lead our digital marketing efforts across all channels.",
                             IsSalaryNegotiable = false,
                             Location = "Sharjah",
-                            PostedDate = new DateTimeOffset(new DateTime(2026, 5, 9, 16, 22, 43, 867, DateTimeKind.Unspecified).AddTicks(75), new TimeSpan(0, 3, 0, 0, 0)),
+                            PostedDate = new DateTimeOffset(new DateTime(2026, 5, 9, 16, 21, 15, 77, DateTimeKind.Unspecified).AddTicks(9110), new TimeSpan(0, 3, 0, 0, 0)),
                             Requirements = "5+ years digital marketing, Google Ads, Meta Ads, analytics tools",
                             Responsibilities = "Manage SEO/SEM campaigns, oversee social media strategy, analyze performance metrics.",
                             SalaryMax = 120000m,
@@ -523,7 +526,7 @@ namespace aabu_project.Migrations
                             Description = "Analyze financial data and provide insights to support business decisions.",
                             IsSalaryNegotiable = false,
                             Location = "Dubai",
-                            PostedDate = new DateTimeOffset(new DateTime(2026, 5, 9, 16, 22, 43, 867, DateTimeKind.Unspecified).AddTicks(81), new TimeSpan(0, 3, 0, 0, 0)),
+                            PostedDate = new DateTimeOffset(new DateTime(2026, 5, 9, 16, 21, 15, 77, DateTimeKind.Unspecified).AddTicks(9114), new TimeSpan(0, 3, 0, 0, 0)),
                             Requirements = "CFA or CPA preferred, Excel, Power BI, 3+ years experience",
                             Responsibilities = "Prepare financial reports, build forecasting models, monitor KPIs.",
                             SalaryMax = 130000m,
@@ -543,7 +546,7 @@ namespace aabu_project.Migrations
                             Description = "Build cross-platform mobile apps for iOS and Android.",
                             IsSalaryNegotiable = false,
                             Location = "Remote",
-                            PostedDate = new DateTimeOffset(new DateTime(2026, 5, 9, 16, 22, 43, 867, DateTimeKind.Unspecified).AddTicks(85), new TimeSpan(0, 3, 0, 0, 0)),
+                            PostedDate = new DateTimeOffset(new DateTime(2026, 5, 9, 16, 21, 15, 77, DateTimeKind.Unspecified).AddTicks(9118), new TimeSpan(0, 3, 0, 0, 0)),
                             Requirements = "3+ years React Native, TypeScript, push notifications, app store publishing",
                             Responsibilities = "Develop features, integrate APIs, optimize app performance.",
                             SalaryMax = 110000m,
@@ -634,7 +637,7 @@ namespace aabu_project.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTimeOffset(new DateTime(2026, 5, 9, 15, 52, 43, 867, DateTimeKind.Unspecified).AddTicks(245), new TimeSpan(0, 3, 0, 0, 0)),
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 5, 9, 15, 51, 15, 77, DateTimeKind.Unspecified).AddTicks(9290), new TimeSpan(0, 3, 0, 0, 0)),
                             IsRead = false,
                             Message = "Your application for Senior React Developer has been received.",
                             Receiver = "Job Seeker",
@@ -645,7 +648,7 @@ namespace aabu_project.Migrations
                         new
                         {
                             Id = 2,
-                            CreatedAt = new DateTimeOffset(new DateTime(2026, 5, 9, 14, 22, 43, 867, DateTimeKind.Unspecified).AddTicks(261), new TimeSpan(0, 3, 0, 0, 0)),
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 5, 9, 14, 21, 15, 77, DateTimeKind.Unspecified).AddTicks(9304), new TimeSpan(0, 3, 0, 0, 0)),
                             IsRead = true,
                             Message = "An employer viewed your profile.",
                             Receiver = "Job Seeker",
@@ -656,7 +659,7 @@ namespace aabu_project.Migrations
                         new
                         {
                             Id = 3,
-                            CreatedAt = new DateTimeOffset(new DateTime(2026, 5, 8, 16, 22, 43, 867, DateTimeKind.Unspecified).AddTicks(267), new TimeSpan(0, 3, 0, 0, 0)),
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 5, 8, 16, 21, 15, 77, DateTimeKind.Unspecified).AddTicks(9310), new TimeSpan(0, 3, 0, 0, 0)),
                             IsRead = false,
                             Message = "A new UI/UX Designer position matches your profile.",
                             Receiver = "Job Seeker",
@@ -667,7 +670,7 @@ namespace aabu_project.Migrations
                         new
                         {
                             Id = 4,
-                            CreatedAt = new DateTimeOffset(new DateTime(2026, 5, 6, 16, 22, 43, 867, DateTimeKind.Unspecified).AddTicks(271), new TimeSpan(0, 3, 0, 0, 0)),
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 5, 6, 16, 21, 15, 77, DateTimeKind.Unspecified).AddTicks(9314), new TimeSpan(0, 3, 0, 0, 0)),
                             IsRead = false,
                             Message = "Ahmad Al-Hassan applied for Senior React Developer.",
                             Receiver = "Employer",
@@ -980,7 +983,7 @@ namespace aabu_project.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTimeOffset(new DateTime(2026, 5, 9, 16, 22, 43, 866, DateTimeKind.Unspecified).AddTicks(9874), new TimeSpan(0, 3, 0, 0, 0)),
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 5, 9, 16, 21, 15, 77, DateTimeKind.Unspecified).AddTicks(8833), new TimeSpan(0, 3, 0, 0, 0)),
                             Description = "Senior software engineer with 8 years of experience.",
                             Email = "ahmad@example.com",
                             Github = "github.com/ahmad",
@@ -995,7 +998,7 @@ namespace aabu_project.Migrations
                         new
                         {
                             Id = 2,
-                            CreatedAt = new DateTimeOffset(new DateTime(2026, 5, 9, 16, 22, 43, 866, DateTimeKind.Unspecified).AddTicks(9919), new TimeSpan(0, 3, 0, 0, 0)),
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 5, 9, 16, 21, 15, 77, DateTimeKind.Unspecified).AddTicks(8875), new TimeSpan(0, 3, 0, 0, 0)),
                             Description = "Creative UI/UX designer passionate about user-centered design.",
                             Email = "sara@example.com",
                             Industry = "Design",
@@ -1008,7 +1011,7 @@ namespace aabu_project.Migrations
                         new
                         {
                             Id = 3,
-                            CreatedAt = new DateTimeOffset(new DateTime(2026, 5, 9, 16, 22, 43, 866, DateTimeKind.Unspecified).AddTicks(9923), new TimeSpan(0, 3, 0, 0, 0)),
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 5, 9, 16, 21, 15, 77, DateTimeKind.Unspecified).AddTicks(8880), new TimeSpan(0, 3, 0, 0, 0)),
                             Description = "Leading technology company specializing in enterprise solutions.",
                             Email = "hr@techcorp.com",
                             Industry = "Technology",
@@ -1021,7 +1024,7 @@ namespace aabu_project.Migrations
                         new
                         {
                             Id = 4,
-                            CreatedAt = new DateTimeOffset(new DateTime(2026, 5, 9, 16, 22, 43, 866, DateTimeKind.Unspecified).AddTicks(9927), new TimeSpan(0, 3, 0, 0, 0)),
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 5, 9, 16, 21, 15, 77, DateTimeKind.Unspecified).AddTicks(8884), new TimeSpan(0, 3, 0, 0, 0)),
                             Description = "Digital marketing specialist with expertise in SEO and social media.",
                             Email = "omar@example.com",
                             Industry = "Marketing",
@@ -1034,7 +1037,7 @@ namespace aabu_project.Migrations
                         new
                         {
                             Id = 100,
-                            CreatedAt = new DateTimeOffset(new DateTime(2026, 5, 9, 16, 22, 43, 866, DateTimeKind.Unspecified).AddTicks(9931), new TimeSpan(0, 3, 0, 0, 0)),
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 5, 9, 16, 21, 15, 77, DateTimeKind.Unspecified).AddTicks(8888), new TimeSpan(0, 3, 0, 0, 0)),
                             Description = "System Administrator",
                             Email = "admin@example.com",
                             Industry = "Administration",

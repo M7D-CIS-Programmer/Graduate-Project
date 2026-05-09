@@ -18,7 +18,8 @@ import {
     Zap,
     FolderOpen,
     ShieldAlert,
-    Mail
+    Mail,
+    Bot
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -44,7 +45,7 @@ const Sidebar = ({ isOpen }) => {
             items.push({ name: t('companies'), icon: <Building2 size={20} />, path: '/companies' });
             items.push({ name: t('jobMatching'), icon: <Zap size={20} />, path: '/job-matching' });
             items.push({ name: t('resumeBuilder'), icon: <FileEdit size={20} />, path: '/resume-builder' });
-            items.push({ name: t('interview'), icon: <MessageSquare size={20} />, path: '/interview' });
+            items.push({ name: t('interview'), icon: <Bot size={20} />, path: '/interview' });
             items.push({ name: t('profile'), icon: <UserIcon size={20} />, path: '/profile' });
             items.push({ name: t('contactUs'), icon: <Mail size={20} />, path: '/contact' });
             items.push({ name: t('settings'), icon: <Settings size={20} />, path: '/settings' });
