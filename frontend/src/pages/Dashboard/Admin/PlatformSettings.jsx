@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useLanguage } from '../../context/LanguageContext';
+import { useLanguage } from '../../../context/LanguageContext';
 import {
     Settings as SettingsIcon,
     Shield,
@@ -7,8 +7,8 @@ import {
     Save,
     Trash2
 } from 'lucide-react';
-import { useToast } from '../../context/ToastContext';
-import './Dashboard.css';
+import { useToast } from '../../../context/ToastContext';
+import '../Dashboard.css';
 
 const PlatformSettings = () => {
     const { t, dir } = useLanguage();

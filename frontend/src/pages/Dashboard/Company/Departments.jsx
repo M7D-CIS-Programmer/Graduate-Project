@@ -3,15 +3,15 @@ import {
     Building2, Plus, Pencil, Trash2, Check, X,
     Briefcase, Calendar, Loader2, AlertCircle, FolderOpen, Eye, Search
 } from 'lucide-react';
-import { useMyDepartments, useCreateDepartment, useUpdateDepartment, useDeleteDepartment } from '../../hooks/useDepartments';
+import { useMyDepartments, useCreateDepartment, useUpdateDepartment, useDeleteDepartment } from '../../../hooks/useDepartments';
 import { useNavigate, NavLink, Link } from 'react-router-dom';
-import { useToast } from '../../context/ToastContext';
-import { useLanguage } from '../../context/LanguageContext';
-import './Dashboard.css';
+import { useToast } from '../../../context/ToastContext';
+import { useLanguage } from '../../../context/LanguageContext';
+import '../Dashboard.css';
 
-import Modal from '../../components/ui/Modal';
+import Modal from '../../../components/ui/Modal';
 
-import { formatFriendlyDate } from '../../utils/dateUtils';
+import { formatFriendlyDate } from '../../../utils/dateUtils';
 
 // ── Main Page ─────────────────────────────────────────────────────────────────
 

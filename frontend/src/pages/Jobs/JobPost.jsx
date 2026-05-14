@@ -14,13 +14,13 @@ import {
     Plus,
     LayoutDashboard
 } from 'lucide-react';
-import { useLanguage } from '../context/LanguageContext';
+import { useLanguage } from '../../context/LanguageContext';
 import './JobPost.css';
-import { api } from '../api/api';
-import { useAuth } from '../context/AuthContext';
-import { useCreateJob, useUpdateJob, useJob } from '../hooks/useJobs';
-import { useDepartments } from '../hooks/useDepartments';
-import { validateShortText, validateDescription, validateSalary } from '../utils/validators';
+import { api } from '../../api/api';
+import { useAuth } from '../../context/AuthContext';
+import { useCreateJob, useUpdateJob, useJob } from '../../hooks/useJobs';
+import { useDepartments } from '../../hooks/useDepartments';
+import { validateShortText, validateDescription, validateSalary } from '../../utils/validators';
 
 export default function JobPost() {
     const { t, dir, language } = useLanguage();

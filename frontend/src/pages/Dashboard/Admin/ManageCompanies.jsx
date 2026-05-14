@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Spinner from '../../components/ui/Spinner';
-import Modal from '../../components/ui/Modal';
-import { useLanguage } from '../../context/LanguageContext';
-import { useToast } from '../../context/ToastContext';
+import Spinner from '../../../components/ui/Spinner';
+import Modal from '../../../components/ui/Modal';
+import { useLanguage } from '../../../context/LanguageContext';
+import { useToast } from '../../../context/ToastContext';
 import {
     Search,
     Filter,
@@ -14,8 +14,8 @@ import {
     Trash2,
     MapPin
 } from 'lucide-react';
-import './Dashboard.css';
-import { useUsers, useUpdateUserStatus, useDeleteUser } from '../../hooks/useUsers';
+import '../Dashboard.css';
+import { useUsers, useUpdateUserStatus, useDeleteUser } from '../../../hooks/useUsers';
 
 const ManageCompanies = () => {
     const { t, dir } = useLanguage();

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useLanguage } from '../context/LanguageContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { Shield, Lock, Eye, FileText, UserCheck, Globe, Info } from 'lucide-react';
 import './PrivacyPolicy.css';
 

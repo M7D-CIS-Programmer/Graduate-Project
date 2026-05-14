@@ -65,12 +65,12 @@ const Candidates = () => {
     const handleDownloadCV = async (e, application) => {
         e.stopPropagation();
         if (isDownloading) return;
-        
+
         setIsDownloading(true);
 
         // Check if CV file exists directly
         const cvUrl = application.cv ? getImageUrl(application.cv) : null;
-        
+
         if (cvUrl) {
             try {
                 const res = await fetch(cvUrl, { method: 'HEAD' });
@@ -90,7 +90,7 @@ const Candidates = () => {
             // No CV found — prevent navigation to 404
             addToast(t('cvNotAvailable') || 'CV not available for this candidate', 'error');
         }
-        
+
         setIsDownloading(false);
     };
 
@@ -101,7 +101,7 @@ const Candidates = () => {
         closeModal();
 
         const statusMap = { accept: 'Hired', reject: 'Rejected', review: 'Reviewing' };
-        const toastMap  = {
+        const toastMap = {
             accept: 'candidateAccepted',
             reject: 'candidateRejected',
             review: 'candidateReviewing',
@@ -109,7 +109,7 @@ const Candidates = () => {
 
         updateApplicationStatus({ id: application.id, status: statusMap[actionType] }, {
             onSuccess: () => addToast(t(toastMap[actionType]), 'success'),
-            onError:   () => addToast(t('actionFailed'), 'error'),
+            onError: () => addToast(t('actionFailed'), 'error'),
         });
     };
 

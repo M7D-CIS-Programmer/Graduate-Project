@@ -18,7 +18,7 @@ import { useNotifications } from '../context/NotificationContext';
 import { api } from '../api/api';
 import Button from '../components/ui/Button';
 import { formatTimeAgo } from '../utils/dateUtils';
-import './User.css';
+import './Profile/User.css';
 
 const Notifications = () => {
     const { t, dir } = useLanguage();

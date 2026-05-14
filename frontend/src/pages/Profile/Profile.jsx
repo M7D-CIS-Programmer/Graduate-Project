@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
-import { api, getImageUrl } from '../api/api';
+import { api, getImageUrl } from '../../api/api';
 import {
     User,
     Mail,
@@ -17,13 +17,13 @@ import {
     HeartOff,
     Users
 } from 'lucide-react';
-import { useLanguage } from '../context/LanguageContext';
-import { useAuth } from '../context/AuthContext';
-import { useToast } from '../context/ToastContext';
-import { useFollowedCompanies, useUnfollowCompany, useCompanyFollowers } from '../hooks/useFollows';
+import { useLanguage } from '../../context/LanguageContext';
+import { useAuth } from '../../context/AuthContext';
+import { useToast } from '../../context/ToastContext';
+import { useFollowedCompanies, useUnfollowCompany, useCompanyFollowers } from '../../hooks/useFollows';
 import { useQuery } from '@tanstack/react-query';
-import Button from '../components/ui/Button';
-import Spinner from '../components/ui/Spinner';
+import Button from '../../components/ui/Button';
+import Spinner from '../../components/ui/Spinner';
 import './User.css';
 
 const Profile = () => {

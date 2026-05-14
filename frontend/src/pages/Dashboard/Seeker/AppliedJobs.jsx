@@ -1,13 +1,13 @@
 import React from 'react';
-import Spinner from '../../components/ui/Spinner';
-import { useLanguage } from '../../context/LanguageContext';
-import { useAuth } from '../../context/AuthContext';
+import Spinner from '../../../components/ui/Spinner';
+import { useLanguage } from '../../../context/LanguageContext';
+import { useAuth } from '../../../context/AuthContext';
 import { Briefcase, Clock, CheckCircle, XCircle, Building2, MapPin, Calendar, Eye, MessageSquare } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useApplications } from '../../hooks/useApplications';
-import './Dashboard.css';
-import '../User.css';
-import { formatFriendlyDate } from '../../utils/dateUtils';
+import { useApplications } from '../../../hooks/useApplications';
+import '../Dashboard.css';
+import '../../Profile/User.css';
+import { formatFriendlyDate } from '../../../utils/dateUtils';
 
 const AppliedJobs = () => {
     const { t, dir, language } = useLanguage();

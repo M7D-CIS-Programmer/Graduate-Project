@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { NavLink, useNavigate, Link } from 'react-router-dom';
-import { useLanguage } from '../../context/LanguageContext';
-import { useAuth } from '../../context/AuthContext';
-import { useMyJobs, useDeleteJob } from '../../hooks/useJobs';
-import Spinner from '../../components/ui/Spinner';
-import Modal from '../../components/ui/Modal';
-import Button from '../../components/ui/Button';
+import { useLanguage } from '../../../context/LanguageContext';
+import { useAuth } from '../../../context/AuthContext';
+import { useMyJobs, useDeleteJob } from '../../../hooks/useJobs';
+import Spinner from '../../../components/ui/Spinner';
+import Modal from '../../../components/ui/Modal';
+import Button from '../../../components/ui/Button';
 import {
     Briefcase,
     Calendar,
@@ -19,8 +19,8 @@ import {
     Loader2,
     PlusCircle
 } from 'lucide-react';
-import './Dashboard.css';
-import { formatFriendlyDate } from '../../utils/dateUtils';
+import '../Dashboard.css';
+import { formatFriendlyDate } from '../../../utils/dateUtils';
 
 const MyJobs = () => {
     const langContext = useLanguage();

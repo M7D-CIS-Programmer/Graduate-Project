@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { api, getImageUrl } from '../api/api';
+import { api, getImageUrl } from '../../api/api';
 import {
     User,
     Mail,
@@ -14,15 +14,15 @@ import {
     Phone,
     ArrowLeft
 } from 'lucide-react';
-import { useLanguage } from '../context/LanguageContext';
-import { useAuth } from '../context/AuthContext';
-import { useToast } from '../context/ToastContext';
-import Input from '../components/ui/Input';
-import Button from '../components/ui/Button';
+import { useLanguage } from '../../context/LanguageContext';
+import { useAuth } from '../../context/AuthContext';
+import { useToast } from '../../context/ToastContext';
+import Input from '../../components/ui/Input';
+import Button from '../../components/ui/Button';
 import {
     validateName, validateEmail, validatePhone,
     validateUrl, validateLinkedIn, validateGitHub
-} from '../utils/validators';
+} from '../../utils/validators';
 import './User.css';
 
 const EditProfile = () => {

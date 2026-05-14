@@ -5,18 +5,18 @@ import {
     Phone, Mail, Globe, Github, Linkedin,
     Languages as LangIcon, Download, Eye, X, Save
 } from 'lucide-react';
-import { useLanguage } from '../context/LanguageContext';
-import { useTheme } from '../context/ThemeContext';
-import Input from '../components/ui/Input';
-import Button from '../components/ui/Button';
-import { useAuth } from '../context/AuthContext';
-import { useToast } from '../context/ToastContext';
-import { api } from '../api/api';
+import { useLanguage } from '../../context/LanguageContext';
+import { useTheme } from '../../context/ThemeContext';
+import Input from '../../components/ui/Input';
+import Button from '../../components/ui/Button';
+import { useAuth } from '../../context/AuthContext';
+import { useToast } from '../../context/ToastContext';
+import { api } from '../../api/api';
 import {
     validateName, validateEmail, validatePhone,
     validateUrl, validateLinkedIn, validateGitHub
-} from '../utils/validators';
-import './User.css';
+} from '../../utils/validators';
+import '../Profile/User.css';
 import './ResumeBuilder.css';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────

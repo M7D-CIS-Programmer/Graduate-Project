@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Spinner from '../../components/ui/Spinner';
-import Modal from '../../components/ui/Modal';
-import { useLanguage } from '../../context/LanguageContext';
-import { useToast } from '../../context/ToastContext';
+import Spinner from '../../../components/ui/Spinner';
+import Modal from '../../../components/ui/Modal';
+import { useLanguage } from '../../../context/LanguageContext';
+import { useToast } from '../../../context/ToastContext';
 import {
     Search,
     Filter,
@@ -14,9 +14,9 @@ import {
     Eye,
     Trash2
 } from 'lucide-react';
-import './Dashboard.css';
-import { useJobs, useUpdateJobStatus, useDeleteJob } from '../../hooks/useJobs';
-import { formatFriendlyDate } from '../../utils/dateUtils';
+import '../Dashboard.css';
+import { useJobs, useUpdateJobStatus, useDeleteJob } from '../../../hooks/useJobs';
+import { formatFriendlyDate } from '../../../utils/dateUtils';
 
 const ManageJobs = () => {
     const { t, dir, language } = useLanguage();

@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useLanguage } from '../context/LanguageContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { Search, MapPin, Briefcase, Building, Users, TrendingUp, ChevronRight } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import heroImg1 from '../assets/heroImg1.jpg';
-import heroImg2 from '../assets/heroImg2.jpg';
-import heroImg3 from '../assets/heroImg3.jpg';
-import { api } from '../api/api';
+import heroImg1 from '../../assets/heroImg1.jpg';
+import heroImg2 from '../../assets/heroImg2.jpg';
+import heroImg3 from '../../assets/heroImg3.jpg';
+import { api } from '../../api/api';
 import './Home.css';
 
 const Home = () => {

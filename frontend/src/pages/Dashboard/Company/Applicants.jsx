@@ -1,21 +1,21 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useApplicationsByCompany, useUpdateApplicationStatus } from '../../hooks/useApplications';
-import { useAuth } from '../../context/AuthContext';
-import { useToast } from '../../context/ToastContext';
-import { useLanguage } from '../../context/LanguageContext';
-import { useMyJobs } from '../../hooks/useJobs';
-import { useDepartments } from '../../hooks/useDepartments';
-import { api, getImageUrl } from '../../api/api';
+import { useApplicationsByCompany, useUpdateApplicationStatus } from '../../../hooks/useApplications';
+import { useAuth } from '../../../context/AuthContext';
+import { useToast } from '../../../context/ToastContext';
+import { useLanguage } from '../../../context/LanguageContext';
+import { useMyJobs } from '../../../hooks/useJobs';
+import { useDepartments } from '../../../hooks/useDepartments';
+import { api, getImageUrl } from '../../../api/api';
 import {
     Users, Search, Eye, CheckCircle, XCircle, Clock,
     Mail, Download, Brain, Sparkles, Trophy, Target,
     TrendingUp, AlertCircle, ChevronDown, Loader2,
     BarChart3, Filter, RefreshCw, MessageSquare
 } from 'lucide-react';
-import CandidateActionModal from '../../components/ui/CandidateActionModal';
-import './Dashboard.css';
-import { formatFriendlyDate } from '../../utils/dateUtils';
+import CandidateActionModal from '../../../components/ui/CandidateActionModal';
+import '../Dashboard.css';
+import { formatFriendlyDate } from '../../../utils/dateUtils';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 

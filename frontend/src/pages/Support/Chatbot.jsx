@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Send, User, Bot, X, Trash2 } from 'lucide-react';
-import { useLanguage } from '../context/LanguageContext';
-import { useTheme } from '../context/ThemeContext';
-import { useAuth } from '../context/AuthContext';
-import { formatFriendlyDate } from '../utils/dateUtils';
-import { api } from '../api/api';
-import Button from '../components/ui/Button';
-import Modal from '../components/ui/Modal';
+import { useLanguage } from '../../context/LanguageContext';
+import { useTheme } from '../../context/ThemeContext';
+import { useAuth } from '../../context/AuthContext';
+import { formatFriendlyDate } from '../../utils/dateUtils';
+import { api } from '../../api/api';
+import Button from '../../components/ui/Button';
+import Modal from '../../components/ui/Modal';
 import './Chatbot.css';
 
 // ── Normalise the role string to what the backend expects ─────────────────────

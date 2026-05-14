@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { useLanguage } from '../context/LanguageContext';
-import { useAuth } from '../context/AuthContext';
-import { api } from '../api/api';
+import { useLanguage } from '../../context/LanguageContext';
+import { useAuth } from '../../context/AuthContext';
+import { api } from '../../api/api';
 import {
     Mail, Phone, MapPin, Send, MessageSquare,
     Clock, CheckCircle, AlertCircle, Loader2
 } from 'lucide-react';
 import {
     validateName, validateEmail, validatePhone, sanitize
-} from '../utils/validators';
+} from '../../utils/validators';
 import './ContactUs.css';
 
 // ── Field-level validation ────────────────────────────────────────────────────

@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { api } from '../../api/api';
-import { useLanguage } from '../../context/LanguageContext';
-import { useToast } from '../../context/ToastContext';
-import Modal from '../../components/ui/Modal';
-import Spinner from '../../components/ui/Spinner';
+import { api } from '../../../api/api';
+import { useLanguage } from '../../../context/LanguageContext';
+import { useToast } from '../../../context/ToastContext';
+import Modal from '../../../components/ui/Modal';
+import Spinner from '../../../components/ui/Spinner';
 import {
     Search, Filter, Mail, Eye, Trash2,
     ChevronLeft, ChevronRight, MessageSquare,
     Clock, CheckCircle, XCircle, RefreshCw
 } from 'lucide-react';
-import { formatFriendlyDate } from '../../utils/dateUtils';
-import './Dashboard.css';
+import { formatFriendlyDate } from '../../../utils/dateUtils';
+import '../Dashboard.css';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 

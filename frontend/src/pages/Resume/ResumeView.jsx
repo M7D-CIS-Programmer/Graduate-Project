@@ -17,7 +17,7 @@ import { useToast } from '../../context/ToastContext';
 import { useAuth } from '../../context/AuthContext';
 import Button from '../../components/ui/Button';
 import Spinner from '../../components/ui/Spinner';
-import './Dashboard.css';
+import '../Dashboard/Dashboard.css';
 
 const ResumeView = () => {
     const { userId } = useParams();

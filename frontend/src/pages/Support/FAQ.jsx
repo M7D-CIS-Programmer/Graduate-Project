@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useLanguage } from '../context/LanguageContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { ChevronDown, HelpCircle } from 'lucide-react';
 import './FAQ.css';
 

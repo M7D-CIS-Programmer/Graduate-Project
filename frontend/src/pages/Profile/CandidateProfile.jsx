@@ -1,12 +1,12 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useLanguage } from '../context/LanguageContext';
-import { useTheme } from '../context/ThemeContext';
+import { useLanguage } from '../../context/LanguageContext';
+import { useTheme } from '../../context/ThemeContext';
 import { useQuery } from '@tanstack/react-query';
-import { api } from '../api/api';
-import { useAuth } from '../context/AuthContext';
-import Spinner from '../components/ui/Spinner';
-import Button from '../components/ui/Button';
+import { api } from '../../api/api';
+import { useAuth } from '../../context/AuthContext';
+import Spinner from '../../components/ui/Spinner';
+import Button from '../../components/ui/Button';
 import {
     Mail,
     MapPin,

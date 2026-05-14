@@ -1,5 +1,5 @@
 import React from 'react';
-import { useLanguage } from '../context/LanguageContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { Scale, CheckCircle, User, ShieldAlert, Briefcase, FileSignature, Power, AlertTriangle, RefreshCw, Gavel } from 'lucide-react';
 import './TermsOfService.css';
 

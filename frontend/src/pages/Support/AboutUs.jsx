@@ -1,5 +1,5 @@
 import React from 'react';
-import { useLanguage } from '../context/LanguageContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { Users, Target, Shield, Award } from 'lucide-react';
 import './AboutUs.css';
 

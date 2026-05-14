@@ -15,9 +15,9 @@ import {
     Award,
     Briefcase
 } from 'lucide-react';
-import { useLanguage } from '../../context/LanguageContext';
-import { useTheme } from '../../context/ThemeContext';
-import Button from '../../components/ui/Button';
+import { useLanguage } from '../../../context/LanguageContext';
+import { useTheme } from '../../../context/ThemeContext';
+import Button from '../../../components/ui/Button';
 import './AICandidateInsights.css';
 
 const AICandidateInsights = () => {
