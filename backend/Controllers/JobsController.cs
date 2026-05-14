@@ -151,9 +151,12 @@ public class JobsController : ControllerBase
         if (job == null)
             return NotFound();
 
-        // Increment Views
-        job.ViewsCount++;
-        await _context.SaveChangesAsync();
+        // Only increment Views if the user is a Job Seeker
+        if (User.Identity?.IsAuthenticated == true && User.IsInRole("Job Seeker"))
+        {
+            job.ViewsCount++;
+            await _context.SaveChangesAsync();
+        }
 
         return Ok(ToResponseDto(job));
     }

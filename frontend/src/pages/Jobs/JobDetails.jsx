@@ -17,6 +17,7 @@ const JobDetails = () => {
     const { user, updateUser } = useAuth();
     const { addToast } = useToast();
     const navigate = useNavigate();
+    const isEmployer = user?.role?.toLowerCase() === 'employer' || user?.role?.toLowerCase() === 'company';
 
     const { data: job, isLoading, error } = useJob(id);
     const { mutate: applyForJob, isPending: isApplying } = useApplyForJob();
@@ -184,7 +185,7 @@ const JobDetails = () => {
 
     return (
         <div className="job-details-page">
-            <div className="job-details-grid">
+            <div className="job-details-grid" style={{ gridTemplateColumns: isEmployer ? '1fr' : undefined }}>
                 <main className="main-content">
                     <div className="card glass job-main-card">
                         <div className="job-header-top">
@@ -240,29 +241,31 @@ const JobDetails = () => {
                 </main>
 
 
-                <aside className="job-details-sidebar">
-                    <div className="card glass sidebar-card">
-                        <h3>{t('applyNow')}</h3>
-                        <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem', fontSize: '0.9rem' }}>
-                            {t('applySubtitle') || "Interested in this position? Apply directly through our platform."}
-                        </p>
-                        <Button 
-                            className={`btn-full ${isApplied ? 'btn-disabled' : ''}`} 
-                            onClick={handleApplyClick}
-                            disabled={isApplied}
-                        >
-                            {isApplied ? (t('alreadyApplied') || 'Already Applied') : t('submitApplication')}
-                        </Button>
-                        <div className="sidebar-footer-links">
-                            <span>{t('securityPolicy')}  ,</span>
-                            <span>{t('reportJob')}</span>
+                {!isEmployer && (
+                    <aside className="job-details-sidebar">
+                        <div className="card glass sidebar-card">
+                            <h3>{t('applyNow')}</h3>
+                            <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem', fontSize: '0.9rem' }}>
+                                {t('applySubtitle') || "Interested in this position? Apply directly through our platform."}
+                            </p>
+                            <Button 
+                                className={`btn-full ${isApplied ? 'btn-disabled' : ''}`} 
+                                onClick={handleApplyClick}
+                                disabled={isApplied}
+                            >
+                                {isApplied ? (t('alreadyApplied') || 'Already Applied') : t('submitApplication')}
+                            </Button>
+                            <div className="sidebar-footer-links">
+                                <span>{t('securityPolicy')}  ,</span>
+                                <span>{t('reportJob')}</span>
+                            </div>
                         </div>
-                    </div>
-                </aside>
+                    </aside>
+                )}
             </div>
 
             {/* Application Modal */}
-            {isModalOpen && (
+            {!isEmployer && isModalOpen && (
                 <div className="application-modal-overlay">
                     <div className="application-modal">
                         <div className="modal-header">
