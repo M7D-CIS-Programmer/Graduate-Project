@@ -17,7 +17,7 @@ const MainLayout = ({ children }) => {
     const location = useLocation();
 
     const isChatbotPage = location.pathname === '/chatbot';
-    const isHomePage = location.pathname === '/' || location.pathname === '/employer-home';
+    const isHomePage = location.pathname === '/' || location.pathname === '/company-home';
 
     const toggleSidebar = () => {
         setIsSidebarOpen(!isSidebarOpen);

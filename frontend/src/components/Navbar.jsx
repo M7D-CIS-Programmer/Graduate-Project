@@ -112,8 +112,8 @@ const Navbar = ({ toggleSidebar }) => {
         e.preventDefault();
         setShowResults(false);
         const role = user?.role?.toLowerCase();
-        const isEmployer = role === 'employer' || role === 'company' || location.pathname === '/employer-home';
-        const basePath = isEmployer ? '/candidates' : '/jobs';
+        const isCompany = role === 'company' || location.pathname === '/company-home';
+        const basePath = isCompany ? '/candidates' : '/jobs';
 
         if (searchQuery.trim()) {
             navigate(`${basePath}?q=${encodeURIComponent(searchQuery.trim())}`);
@@ -219,13 +219,13 @@ const Navbar = ({ toggleSidebar }) => {
 
             <div className="navbar-right" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                 {!user && (
-                    location.pathname === '/employer-home' ? (
+                    location.pathname === '/company-home' ? (
                         <Link to="/" style={{ color: 'var(--text-color)', textDecoration: 'none', fontWeight: 500, whiteSpace: 'nowrap' }}>
                             {t('forJobSeekers')}
                         </Link>
                     ) : (
-                        <Link to="/employer-home" style={{ color: 'var(--text-color)', textDecoration: 'none', fontWeight: 500, whiteSpace: 'nowrap' }}>
-                            {t('forEmployers')}
+                        <Link to="/company-home" style={{ color: 'var(--text-color)', textDecoration: 'none', fontWeight: 500, whiteSpace: 'nowrap' }}>
+                            {t('forCompanies')}
                         </Link>
                     )
                 )}

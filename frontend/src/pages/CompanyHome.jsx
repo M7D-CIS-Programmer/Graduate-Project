@@ -11,7 +11,7 @@ import { useJobs } from '../hooks/useJobs';
 import { api } from '../api/api';
 import EmployeeCard from '../components/EmployeeCard';
 
-const EmployerHome = () => {
+const CompanyHome = () => {
     const { t, dir } = useLanguage();
     const navigate = useNavigate();
     const [currentImage, setCurrentImage] = useState(0);
@@ -84,10 +84,10 @@ const EmployerHome = () => {
                 </div>
                 <div className="hero-content">
                     <h1 className="hero-title">
-                        {t('employerHeroTitle')}
+                        {t('companyHeroTitle')}
                     </h1>
                     <p className="hero-subtitle">
-                        {t('employerHeroSubtitle')}
+                        {t('companyHeroSubtitle')}
                     </p>
 
                     <form className="hero-search-bar glass" onSubmit={handleSearch}>
@@ -192,4 +192,4 @@ const EmployerHome = () => {
     );
 };
 
-export default EmployerHome;
+export default CompanyHome;

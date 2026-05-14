@@ -167,7 +167,7 @@ const AppliedJobs = () => {
                                             }}
                                         >
                                             <MessageSquare size={16} />
-                                            Message Company
+                                            {t('messageCompany')}
                                         </button>
                                     </div>
                                 </div>

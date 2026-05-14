@@ -94,7 +94,7 @@ const Profile = () => {
     if (!userData) return <div className="user-page-container">{t('userNotFound')}</div>;
 
     const profilePhoto = getImageUrl(userData.profilePicture || userData.photo);
-    const isEmployer = userData.role === 'Employer' || userData.role === 'Company';
+    const isCompany = userData.role === 'Company';
     const isAdmin = userData.role?.toLowerCase() === 'admin';
 
     return (
@@ -103,7 +103,7 @@ const Profile = () => {
                 <div>
                     <h1 className="dashboard-title">{isOwnProfile ? t('myProfile') || 'My Profile' : t('userProfile')}</h1>
                     <p style={{ color: 'var(--text-muted)' }}>
-                        {isEmployer ? t('employerProfile') || 'Employer Account' 
+                        {isCompany ? t('companyProfile') || 'Company Account' 
                           : isAdmin ? t('adminProfile') || 'Administrator Account'
                           : t('jobSeekerProfile') || 'Job Seeker Account'}
                     </p>
@@ -203,7 +203,7 @@ const Profile = () => {
                             <div className="dashboard-section">
                                 <h3 className="section-title">
                                     <User size={20} />
-                                    {isEmployer ? t('aboutCompany') || 'About Company' 
+                                    {isCompany ? t('aboutCompany') || 'About Company' 
                                       : isAdmin ? t('aboutAdmin') || 'Administrator Bio'
                                       : t('aboutMe')}
                                 </h3>
@@ -224,7 +224,7 @@ const Profile = () => {
                                             <span className="info-label">{t('role') || 'Role'}:</span>
                                             <span className="info-value">{userData.role}</span>
                                         </div>
-                                        {isEmployer && userData.industry && (
+                                        {isCompany && userData.industry && (
                                             <div className="info-row">
                                                 <span className="info-label">{t('industry') || 'Industry'}:</span>
                                                 <span className="info-value">{t(userData.industry.toLowerCase().replace(' ', '')) || userData.industry}</span>

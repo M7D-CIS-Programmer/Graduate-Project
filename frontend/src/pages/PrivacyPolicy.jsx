@@ -34,7 +34,7 @@ const PrivacyPolicy = () => {
             title: t('sharingTitle'),
             desc: t('sharingDesc'),
             items: [
-                t('shareEmployerItem'),
+                t('shareCompanyItem'),
                 t('shareProviderItem'),
                 t('shareLawItem')
             ]

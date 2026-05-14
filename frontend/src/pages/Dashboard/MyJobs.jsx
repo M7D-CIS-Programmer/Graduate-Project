@@ -80,7 +80,7 @@ const MyJobs = () => {
                     </h1>
                     
                     <div className="dashboard-nav glass" style={{ marginTop: '1rem' }}>
-                        <NavLink to="/dashboard/employer/jobs" className={({ isActive }) => `dash-nav-link ${isActive ? 'active' : ''}`}>
+                        <NavLink to="/dashboard/company/jobs" className={({ isActive }) => `dash-nav-link ${isActive ? 'active' : ''}`}>
                             {t('myJobs')}
                         </NavLink>
                         <NavLink to="/departments" className={({ isActive }) => `dash-nav-link ${isActive ? 'active' : ''}`}>

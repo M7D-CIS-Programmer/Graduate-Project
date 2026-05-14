@@ -50,7 +50,7 @@ namespace aabu_project.Data
             modelBuilder.Entity<Role>().HasData(
                 new Role { Id = 1, UserId = 1, RoleName = "Job Seeker" },
                 new Role { Id = 2, UserId = 2, RoleName = "Job Seeker" },
-                new Role { Id = 3, UserId = 3, RoleName = "Employer" },
+                new Role { Id = 3, UserId = 3, RoleName = "Company" },
                 new Role { Id = 4, UserId = 4, RoleName = "Job Seeker" },
                 new Role { Id = 100, UserId = 100, RoleName = "Admin" }
             );
@@ -104,9 +104,9 @@ namespace aabu_project.Data
             // Seed Notifications
             modelBuilder.Entity<Notification>().HasData(
                 new Notification { Id = 1, UserId = 1, Title = "Application Received", Message = "Your application for Senior React Developer has been received.", Type = "info", IsRead = false, Receiver = "Job Seeker", CreatedAt = DateTime.Now.AddMinutes(-30) },
-                new Notification { Id = 2, UserId = 1, Title = "Profile Viewed", Message = "An employer viewed your profile.", Type = "info", IsRead = true, Receiver = "Job Seeker", CreatedAt = DateTime.Now.AddHours(-2) },
+                new Notification { Id = 2, UserId = 1, Title = "Profile Viewed", Message = "A company viewed your profile.", Type = "info", IsRead = true, Receiver = "Job Seeker", CreatedAt = DateTime.Now.AddHours(-2) },
                 new Notification { Id = 3, UserId = 2, Title = "New Job Match", Message = "A new UI/UX Designer position matches your profile.", Type = "success", IsRead = false, Receiver = "Job Seeker", CreatedAt = DateTime.Now.AddDays(-1) },
-                new Notification { Id = 4, UserId = 3, Title = "New Application", Message = "Ahmad Al-Hassan applied for Senior React Developer.", Type = "info", IsRead = false, Receiver = "Employer", CreatedAt = DateTime.Now.AddDays(-3) }
+                new Notification { Id = 4, UserId = 3, Title = "New Application", Message = "Ahmad Al-Hassan applied for Senior React Developer.", Type = "info", IsRead = false, Receiver = "Company", CreatedAt = DateTime.Now.AddDays(-3) }
             );
 
             // Seed ApplicationJobs

@@ -20,7 +20,7 @@ const Companies = () => {
     const { data: users = [], isLoading, error } = useUsers();
     const { data: followedCompanies = [] } = useFollowedCompanies();
 
-    const companies = users.filter(u => u.role === 'Employer').map(u => ({
+    const companies = users.filter(u => u.role === 'Company').map(u => ({
         id: u.id,
         name: u.name,
         logo: `https://api.dicebear.com/7.x/initials/svg?seed=${u.name}&backgroundColor=6366f1`,

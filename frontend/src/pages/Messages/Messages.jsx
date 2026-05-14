@@ -31,9 +31,9 @@ const Avatar = ({ src, name, size = 40 }) => {
 };
 
 const ConversationItem = ({ conv, currentUserId, isActive, onClick }) => {
-    const isEmployer   = conv.employerId === currentUserId;
-    const otherName    = isEmployer ? conv.candidateName  : conv.employerName;
-    const otherPicture = isEmployer ? conv.candidatePicture : conv.employerPicture;
+    const isCompany    = conv.companyId === currentUserId;
+    const otherName    = isCompany ? conv.candidateName  : conv.companyName;
+    const otherPicture = isCompany ? conv.candidatePicture : conv.companyPicture;
 
     return (
         <button
@@ -91,9 +91,9 @@ const Thread = ({ conv, currentUserId }) => {
     const sendMessage = useSendMessage();
     const markRead    = useMarkMessagesRead();
 
-    const isEmployer   = conv.employerId === currentUserId;
-    const otherName    = isEmployer ? conv.candidateName  : conv.employerName;
-    const otherPicture = isEmployer ? conv.candidatePicture : conv.employerPicture;
+    const isCompany    = conv.companyId === currentUserId;
+    const otherName    = isCompany ? conv.candidateName  : conv.companyName;
+    const otherPicture = isCompany ? conv.candidatePicture : conv.companyPicture;
 
     useEffect(() => {
         if (messages.length > 0) {
@@ -244,8 +244,8 @@ const Messages = () => {
                         <UserIcon size={36} style={{ opacity: 0.3 }} />
                         <p>{t('msgNoConversations')}</p>
                         <span>
-                            {user.role?.toLowerCase() === 'employer' || user.role?.toLowerCase() === 'company'
-                                ? t('msgEmployerNoConv')
+                            {user.role?.toLowerCase() === 'company'
+                                ? t('msgCompanyNoConv')
                                 : t('msgSeekerNoConv')}
                         </span>
                     </div>

@@ -47,7 +47,7 @@ namespace aabu_project.Services
             if (string.Equals(normalizedRole, "Company", StringComparison.OrdinalIgnoreCase) ||
                 string.Equals(normalizedRole, "Employer", StringComparison.OrdinalIgnoreCase))
             {
-                normalizedRole = "Employer";
+                normalizedRole = "Company";
             }
             else if (string.Equals(normalizedRole, "Job Seeker", StringComparison.OrdinalIgnoreCase) ||
                      string.Equals(normalizedRole, "JobSeeker", StringComparison.OrdinalIgnoreCase))

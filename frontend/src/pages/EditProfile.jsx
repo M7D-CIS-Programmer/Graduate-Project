@@ -205,7 +205,7 @@ const EditProfile = () => {
                     </div>
                     <h2 style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>{formData.name}</h2>
                     <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>
-                        {formData.role === 'Employer' || formData.role === 'Company' ? t('employer') : t('jobSeeker')}
+                        {formData.role === 'Company' ? t('company') : t('jobSeeker')}
                     </p>
                 </aside>
 
@@ -229,7 +229,7 @@ const EditProfile = () => {
                             type="email"
                         />
                         
-                        {(formData.role === 'Employer' || formData.role === 'Company') && (
+                        {formData.role === 'Company' && (
                             <div className="input-group">
                                 <label className="input-label" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
                                     <Briefcase size={16} /> {t('industry') || 'Industry'}

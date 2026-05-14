@@ -20,7 +20,7 @@ public class MessagesController : ControllerBase
     /// <summary>
     /// GET /api/Messages/application/{applicationId}?userId={userId}
     /// Returns all messages for an application thread.
-    /// Only the candidate and the employer for that application may read it.
+    /// Only the candidate and the company for that application may read it.
     /// </summary>
     [HttpGet("application/{applicationId}")]
     public async Task<IActionResult> GetByApplication(int applicationId, [FromQuery] int userId)
@@ -33,9 +33,9 @@ public class MessagesController : ControllerBase
             return NotFound(new { message = "Application not found." });
 
         var isCandidate = application.UserId == userId;
-        var isEmployer  = application.Job.UserId == userId;
+        var isCompany  = application.Job.UserId == userId;
 
-        if (!isCandidate && !isEmployer)
+        if (!isCandidate && !isCompany)
             return Forbid();
 
         var messages = await _context.Messages
@@ -67,7 +67,7 @@ public class MessagesController : ControllerBase
     [HttpGet("conversations/{userId}")]
     public async Task<IActionResult> GetConversations(int userId)
     {
-        // Find all applications where this user is either the candidate or the employer
+        // Find all applications where this user is either the candidate or the company
         var applications = await _context.ApplicationJobs
             .Include(a => a.Job)
                 .ThenInclude(j => j.User)
@@ -106,9 +106,9 @@ public class MessagesController : ControllerBase
                     CandidateId      = a.UserId,
                     CandidateName    = a.User.Name,
                     CandidatePicture = a.User.ProfilePicture,
-                    EmployerId       = a.Job.UserId,
-                    EmployerName     = a.Job.User.Name,
-                    EmployerPicture  = a.Job.User.ProfilePicture,
+                    CompanyId        = a.Job.UserId,
+                    CompanyName      = a.Job.User.Name,
+                    CompanyPicture   = a.Job.User.ProfilePicture,
                     LastMessage      = stats?.LastMessage,
                     LastMessageAt    = stats?.LastMessageAt,
                     UnreadCount      = stats?.UnreadCount ?? 0
@@ -137,9 +137,9 @@ public class MessagesController : ControllerBase
             return NotFound(new { message = "Application not found." });
 
         var isCandidate = application.UserId == userId;
-        var isEmployer  = application.Job.UserId == userId;
+        var isCompany  = application.Job.UserId == userId;
 
-        if (!isCandidate && !isEmployer)
+        if (!isCandidate && !isCompany)
             return Forbid();
 
         var lastMsg = await _context.Messages
@@ -159,9 +159,9 @@ public class MessagesController : ControllerBase
             CandidateId      = application.UserId,
             CandidateName    = application.User.Name,
             CandidatePicture = application.User.ProfilePicture,
-            EmployerId       = application.Job.UserId,
-            EmployerName     = application.Job.User.Name,
-            EmployerPicture  = application.Job.User.ProfilePicture,
+            CompanyId        = application.Job.UserId,
+            CompanyName      = application.Job.User.Name,
+            CompanyPicture   = application.Job.User.ProfilePicture,
             LastMessage      = lastMsg?.Content,
             LastMessageAt    = lastMsg?.SentAt,
             UnreadCount      = unreadCount
@@ -170,7 +170,7 @@ public class MessagesController : ControllerBase
 
     /// <summary>
     /// POST /api/Messages
-    /// Sends a message. Sender must be the candidate or employer for the application.
+    /// Sends a message. Sender must be the candidate or company for the application.
     /// Also creates a notification for the recipient.
     /// </summary>
     [HttpPost]
@@ -188,9 +188,9 @@ public class MessagesController : ControllerBase
             return NotFound(new { message = "Application not found." });
 
         var isCandidate = application.UserId == dto.SenderId;
-        var isEmployer  = application.Job.UserId == dto.SenderId;
+        var isCompany  = application.Job.UserId == dto.SenderId;
 
-        if (!isCandidate && !isEmployer)
+        if (!isCandidate && !isCompany)
             return Forbid();
 
         var message = new Message
@@ -205,7 +205,7 @@ public class MessagesController : ControllerBase
         _context.Messages.Add(message);
 
         // Notify the recipient
-        var recipientId = isEmployer ? application.UserId : application.Job.UserId;
+        var recipientId = isCompany ? application.UserId : application.Job.UserId;
         var sender      = await _context.Users.FindAsync(dto.SenderId);
 
         var notification = new Notification
@@ -215,7 +215,7 @@ public class MessagesController : ControllerBase
             Message  = $"{sender?.Name ?? "Someone"} sent you a message about: {application.Job.Title}",
             Type     = "Message",
             IsRead   = false,
-            Receiver = isEmployer ? "Job Seeker" : "Employer",
+            Receiver = isCompany ? "Job Seeker" : "Company",
             RelatedId = dto.ApplicationJobId
         };
         _context.Notifications.Add(notification);

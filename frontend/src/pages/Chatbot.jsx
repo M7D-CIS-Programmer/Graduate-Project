@@ -13,7 +13,7 @@ import './Chatbot.css';
 const normalizeRole = (raw) => {
     if (!raw) return '';
     const r = raw.toLowerCase().trim();
-    if (r === 'employer' || r === 'company') return 'company';
+    if (r === 'company') return 'company';
     if (r.includes('seeker') || r === 'job seeker') return 'jobseeker';
     return '';
 };

@@ -32,7 +32,7 @@ const ManageUsers = () => {
     // ── Navigate to the correct profile based on role ─────────────────────────
     const viewProfile = (user) => {
         const role = (user.role || '').toLowerCase();
-        if (role === 'employer' || role === 'company') {
+        if (role === 'company') {
             navigate(`/companies/${user.id}`);
         } else {
             navigate(`/candidate/${user.id}`);
@@ -121,7 +121,7 @@ const ManageUsers = () => {
                         >
                             <option value="">{t('allRoles')}</option>
                             <option value="Job Seeker">{t('jobSeeker')}</option>
-                            <option value="Employer">{t('employer')}</option>
+                            <option value="Company">{t('company')}</option>
                         </select>
                     </div>
                 </div>
@@ -151,7 +151,7 @@ const ManageUsers = () => {
                                     </td>
                                     <td style={{ padding: '1rem', color: 'var(--text-muted)' }}>{user.email}</td>
                                     <td style={{ padding: '1rem' }}>
-                                        <span>{user.role === 'Job Seeker' ? t('jobSeeker') : user.role === 'Employer' ? t('employer') : user.role}</span>
+                                        <span>{user.role === 'Job Seeker' ? t('jobSeeker') : user.role === 'Company' ? t('company') : user.role}</span>
                                     </td>
                                     <td style={{ padding: '1rem', color: 'var(--text-muted)' }}>
                                         {new Date(user.createdAt).toLocaleDateString()}

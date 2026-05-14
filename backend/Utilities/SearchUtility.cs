@@ -29,6 +29,9 @@ public static class SearchUtility
         { "back", "خلفي" },
         { "full", "كامل" },
         { "stack", "ستاك" },
+        { "company", "شركة" },
+        { "employer", "شركة" },
+        { "seeker", "باحث" },
         
         // Industries
         { "technology", "تكنولوجيا" },

@@ -58,16 +58,16 @@ public class SearchController(MyDbContext context) : ControllerBase
                 .Take(5)
                 .ToListAsync();
         }
-        else if (normalizedRole == "employer" || normalizedRole == "company")
+        else if (normalizedRole == "company")
         {
-            // Employers see their own jobs
+            // Companies see their own jobs
             var jobsQuery = _context.Jobs.Where(j => j.UserId == userId);
             response.Jobs = await ApplyMultilingualFilter(jobsQuery, searchTerms)
                 .Select(j => new SearchResultDto { Id = j.Id, Title = j.Title, Description = j.Status ?? "Active", Type = "Job", Link = $"/jobs/{j.Id}" })
                 .Take(5)
                 .ToListAsync();
 
-            // Employers see all job seekers
+            // Companies see all job seekers
             var candidateQuery = _context.Users
                 .Include(u => u.Roles)
                 .Where(u => u.Roles.Any(r => r.RoleName == "Job Seeker"));
@@ -88,7 +88,7 @@ public class SearchController(MyDbContext context) : ControllerBase
             // Companies (all)
             var companyQuery = _context.Users
                 .Include(u => u.Roles)
-                .Where(u => u.Roles.Any(r => r.RoleName == "Employer" || r.RoleName == "Company"));
+                .Where(u => u.Roles.Any(r => r.RoleName == "Company"));
             response.Companies = await ApplyMultilingualFilter(companyQuery, searchTerms)
                 .Select(u => new SearchResultDto { Id = u.Id, Title = u.Name, Description = u.Industry ?? "Company", Type = "Company", Link = $"/profile/{u.Id}" })
                 .Take(5)
@@ -177,14 +177,14 @@ public class SearchController(MyDbContext context) : ControllerBase
             AddPage("Contact Messages", "رسائل التواصل", "Review user inquiries", "مراجعة استفسارات المستخدمين", "/dashboard/admin/contact-messages");
         }
 
-        // --- Employer Pages ---
-        if (role == "employer" || role == "company")
+        // --- Company Pages ---
+        if (role == "company")
         {
-            AddPage("Employer Dashboard", "لوحة تحكم صاحب العمل", "Recruitment overview", "نظرة عامة على التوظيف", "/dashboard/employer");
-            AddPage("My Jobs", "وظائفي", "Manage your postings", "إدارة إعلاناتك", "/dashboard/employer/jobs");
+            AddPage("Company Dashboard", "لوحة تحكم الشركة", "Recruitment overview", "نظرة عامة على التوظيف", "/dashboard/company");
+            AddPage("My Jobs", "وظائفي", "Manage your postings", "إدارة إعلاناتك", "/dashboard/company/jobs");
             AddPage("Post a Job", "نشر وظيفة", "Create new opening", "إضافة وظيفة جديدة", "/jobs/post");
-            AddPage("Applicants", "المتقدمين", "Review candidates", "مراجعة المتقدمين", "/dashboard/employer/applicants");
-            AddPage("Candidate Insights", "تحليل المرشحين", "AI candidate ranking", "تحليل وتصنيف المرشحين", "/dashboard/employer/insights");
+            AddPage("Applicants", "المتقدمين", "Review candidates", "مراجعة المتقدمين", "/dashboard/company/applicants");
+            AddPage("Candidate Insights", "تحليل المرشحين", "AI candidate ranking", "تحليل وتصنيف المرشحين", "/dashboard/company/insights");
             AddPage("Fraud Detection", "كشف التزوير", "CV integrity check", "التحقق من صحة السير الذاتية", "/cv-fraud-check");
             AddPage("Departments", "الأقسام", "Manage company units", "إدارة أقسام الشركة", "/departments");
         }

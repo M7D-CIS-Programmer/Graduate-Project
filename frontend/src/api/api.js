@@ -120,7 +120,7 @@ export const api = {
     },
 
     // Applications
-    getApplications:          (employerId) => get(`${BASE_URL}/ApplicationJobs${employerId ? `?employerId=${employerId}` : ''}`),
+    getApplications:          (companyId) => get(`${BASE_URL}/ApplicationJobs${companyId ? `?companyId=${companyId}` : ''}`),
     getApplicationsByCompany: (companyId)  => get(`${BASE_URL}/ApplicationJobs/company/${companyId}`),
     applyForJob:              (formData)   => postForm(`${BASE_URL}/ApplicationJobs`, formData),
     updateApplicationStatus:  (id, status) => put(`${BASE_URL}/ApplicationJobs/${id}/status`, { status }),

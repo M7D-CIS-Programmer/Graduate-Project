@@ -32,8 +32,8 @@ public class FollowsController : ControllerBase
         if (company == null) return NotFound(new { message = "Company not found" });
 
         var companyRole = company.Roles?.FirstOrDefault()?.RoleName;
-        if (companyRole != "Employer" && companyRole != "Company")
-            return BadRequest(new { message = "You can only follow companies/employers." });
+        if (companyRole != "Company")
+            return BadRequest(new { message = "You can only follow companies." });
 
         var existingFollow = await _context.FollowCompanies
             .FirstOrDefaultAsync(f => f.UserId == userId && f.CompanyId == companyId);
@@ -111,7 +111,7 @@ public class FollowsController : ControllerBase
                 f.Company.LinkedIn,
                 f.Company.Github,
                 f.Company.Status,
-                "Employer",
+                "Company",
                 f.Company.CreatedAt,
                 0,
                 f.Company.Industry,

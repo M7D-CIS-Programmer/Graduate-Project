@@ -30,8 +30,8 @@ const CandidateProfile = () => {
     const navigate = useNavigate();
     const { user: currentUser } = useAuth();
 
-    const isEmployer = currentUser &&
-        (currentUser.role?.toLowerCase() === 'employer' || currentUser.role?.toLowerCase() === 'company');
+    const isCompany = currentUser &&
+        (currentUser.role?.toLowerCase() === 'company');
 
     const { data: candidate, isLoading, error } = useQuery({
         queryKey: ['candidate', id],
@@ -39,16 +39,16 @@ const CandidateProfile = () => {
         enabled: !!id && id !== 'undefined'
     });
 
-    // Employer: find an existing application from this candidate to any of the employer's jobs
-    const { data: employerApplications = [] } = useQuery({
-        queryKey: ['employer-applications-for-candidate', currentUser?.id, id],
+    // Company: find an existing application from this candidate to any of the company's jobs
+    const { data: companyApplications = [] } = useQuery({
+        queryKey: ['company-applications-for-candidate', currentUser?.id, id],
         queryFn: () => api.getApplicationsByCompany(currentUser.id),
-        enabled: isEmployer && !!currentUser?.id,
+        enabled: isCompany && !!currentUser?.id,
         staleTime: 60_000,
     });
 
-    const applicationWithCandidate = isEmployer
-        ? employerApplications.find(a => a.userId === Number(id))
+    const applicationWithCandidate = isCompany
+        ? companyApplications.find(a => a.userId === Number(id))
         : null;
 
     if (isLoading) return <Spinner />;
@@ -74,7 +74,7 @@ const CandidateProfile = () => {
                     <h1 className="dashboard-title">{t('candidateProfile') || 'Candidate Profile'}</h1>
                 </div>
 
-                {/* Message button — only shown when the logged-in employer has an application from this candidate */}
+                {/* Message button — only shown when the logged-in company has an application from this candidate */}
                 {applicationWithCandidate && (
                     <Button
                         onClick={() => navigate(`/messages?applicationId=${applicationWithCandidate.id}`)}
@@ -198,7 +198,7 @@ const CandidateProfile = () => {
                         </section>
                     </div>
 
-                    {/* Applications History (Optional visibility for Employer) */}
+                    {/* Applications History (Optional visibility for Company) */}
                     <section className="dashboard-section glass">
                         <h3 className="section-title">
                             <FileText size={20} />

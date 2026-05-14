@@ -46,7 +46,7 @@ const CompanyProfileView = () => {
             if (
                 currentUser &&
                 currentUser.id?.toString() === id &&
-                (currentUser.role === 'Employer' || currentUser.role === 'Company')
+                (currentUser.role === 'Company')
             ) {
                 navigate('/profile', { replace: true });
                 return null;
@@ -55,7 +55,7 @@ const CompanyProfileView = () => {
             const data = await api.getUser(id);
 
             // Validate this is actually an employer profile
-            if (data.role !== 'Employer' && data.role !== 'Company') {
+            if (data.role !== 'Company') {
                 throw new Error('not_a_company');
             }
 

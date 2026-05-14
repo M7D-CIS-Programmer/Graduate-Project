@@ -26,9 +26,9 @@ public class ConversationSummaryDto
     public int CandidateId { get; set; }
     public string CandidateName { get; set; } = null!;
     public string? CandidatePicture { get; set; }
-    public int EmployerId { get; set; }
-    public string EmployerName { get; set; } = null!;
-    public string? EmployerPicture { get; set; }
+    public int CompanyId { get; set; }
+    public string CompanyName { get; set; } = null!;
+    public string? CompanyPicture { get; set; }
     public string? LastMessage { get; set; }
     public DateTimeOffset? LastMessageAt { get; set; }
     public int UnreadCount { get; set; }

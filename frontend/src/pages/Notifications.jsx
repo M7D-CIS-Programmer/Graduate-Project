@@ -50,7 +50,7 @@ const Notifications = () => {
                 const match = message.match(/(.+) viewed your resume/);
                 if (match) {
                     title = t('resumeViewed');
-                    message = t('employerViewedResumeMsg', { company: match[1] });
+                    message = t('companyViewedResumeMsg', { company: match[1] });
                 }
             } else if (message.includes("Your application for ") && message.includes(" has been received")) {
                 const match = message.match(/Your application for (.+) has been received/);
@@ -58,9 +58,7 @@ const Notifications = () => {
                     title = t('applicationReceived');
                     message = t('applicationReceivedMsg', { jobTitle: match[1] });
                 }
-            } else if (message.includes("An employer viewed your profile")) {
-                title = t('applicationViewed');
-                message = t('employerViewedProfileMsg');
+                message = t('companyViewedProfileMsg');
             } else if (type === 'follow') {
                 title = t('newFollower') || "New Follower";
             }

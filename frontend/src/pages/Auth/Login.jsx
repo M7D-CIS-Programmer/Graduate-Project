@@ -61,7 +61,7 @@ const Login = () => {
 
             const dashboardPaths = {
                 'admin': '/dashboard/admin',
-                'employer': '/dashboard/employer',
+                'company': '/dashboard/company',
                 'job seeker': '/dashboard/seeker'
             };
 

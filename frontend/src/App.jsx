@@ -8,12 +8,12 @@ import { NotificationProvider } from './context/NotificationContext';
 import { ThemeProvider } from './context/ThemeContext';
 import MainLayout from './layout/MainLayout';
 import Home from './pages/Home';
-import EmployerHome from './pages/EmployerHome';
+import CompanyHome from './pages/CompanyHome';
 import Login from './pages/Auth/Login';
 import Register from './pages/Auth/Register';
 import JobSeekerDashboard from './pages/Dashboard/JobSeekerDashboard';
 import AppliedJobs from './pages/Dashboard/AppliedJobs';
-import EmployerDashboard from './pages/Dashboard/EmployerDashboard';
+import CompanyDashboard from './pages/Dashboard/CompanyDashboard';
 import Applicants from './pages/Dashboard/Applicants';
 import MyJobs from './pages/Dashboard/MyJobs';
 import AdminDashboard from './pages/Dashboard/AdminDashboard';
@@ -55,8 +55,8 @@ const ConditionalHome = () => {
   const { user } = useAuth();
   const role = user?.role?.toLowerCase();
 
-  if (user && (role === 'employer' || role === 'company')) {
-    return <EmployerHome />;
+  if (user && role === 'company') {
+    return <CompanyHome />;
   }
 
   return <Home />;
@@ -101,11 +101,11 @@ const AuthInitializer = ({ children }) => {
 
 // Restricts a route to employer / company accounts only.
 // Unauthenticated users go to /login; everyone else goes to /.
-const EmployerRoute = ({ children }) => {
+const CompanyRoute = ({ children }) => {
   const { user } = useAuth();
   if (!user) return <Navigate to="/login" replace />;
   const role = user.role?.toLowerCase();
-  if (role !== 'employer' && role !== 'company') return <Navigate to="/" replace />;
+  if (role !== 'company') return <Navigate to="/" replace />;
   return children;
 };
 
@@ -132,7 +132,7 @@ function App() {
                     <Routes>
                       {/* Home */}
                       <Route path="/" element={<ConditionalHome />} />
-                  <Route path="/employer-home" element={<EmployerHome />} />
+                  <Route path="/company-home" element={<CompanyHome />} />
 
                   {/* Auth */}
                   <Route path="/login" element={<Login />} />
@@ -141,10 +141,10 @@ function App() {
                   {/* Dashboards */}
                   <Route path="/dashboard/seeker" element={<JobSeekerDashboard />} />
                   <Route path="/dashboard/seeker/applications" element={<AppliedJobs />} />
-                  <Route path="/dashboard/employer" element={<EmployerDashboard />} />
-                  <Route path="/dashboard/employer/applicants" element={<Applicants />} />
-                  <Route path="/dashboard/employer/jobs" element={<MyJobs />} />
-                  <Route path="/dashboard/employer/insights" element={<AICandidateInsights />} />
+                  <Route path="/dashboard/company" element={<CompanyDashboard />} />
+                  <Route path="/dashboard/company/applicants" element={<Applicants />} />
+                  <Route path="/dashboard/company/jobs" element={<MyJobs />} />
+                  <Route path="/dashboard/company/insights" element={<AICandidateInsights />} />
                   <Route path="/dashboard/admin" element={<AdminDashboard />} />
                   <Route path="/dashboard/admin/users" element={<ManageUsers />} />
                   <Route path="/dashboard/admin/jobs" element={<ManageJobs />} />
@@ -185,9 +185,9 @@ function App() {
                   <Route path="/cv-analyzer"      element={<Navigate to="/job-matching" replace />} />
                   <Route path="/cv-semantic"      element={<Navigate to="/job-matching" replace />} />
                   {/* Specialist tools — accessible by direct URL, not shown in sidebar */}
-                  <Route path="/cv-fraud-check"   element={<EmployerRoute><FraudCheck /></EmployerRoute>} />
-                  <Route path="/cv-hiring-report" element={<EmployerRoute><HiringReport /></EmployerRoute>} />
-                  <Route path="/departments"      element={<EmployerRoute><Departments /></EmployerRoute>} />
+                  <Route path="/cv-fraud-check"   element={<CompanyRoute><FraudCheck /></CompanyRoute>} />
+                  <Route path="/cv-hiring-report" element={<CompanyRoute><HiringReport /></CompanyRoute>} />
+                  <Route path="/departments"      element={<CompanyRoute><Departments /></CompanyRoute>} />
                   <Route path="/interview"        element={<Interview />} />
 
                   {/* Fallback */}

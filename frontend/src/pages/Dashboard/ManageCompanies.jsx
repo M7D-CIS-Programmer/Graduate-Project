@@ -35,7 +35,7 @@ const ManageCompanies = () => {
     // Only employers/companies
     const companies = allUsers.filter(u => {
         const role = (u.role || '').toLowerCase();
-        return role === 'employer' || role === 'company';
+        return role === 'company';
     });
 
     // ── Suspend / Activate ────────────────────────────────────────────────────

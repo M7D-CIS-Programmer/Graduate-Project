@@ -17,7 +17,7 @@ const JobDetails = () => {
     const { user, updateUser } = useAuth();
     const { addToast } = useToast();
     const navigate = useNavigate();
-    const isEmployer = user?.role?.toLowerCase() === 'employer' || user?.role?.toLowerCase() === 'company';
+    const isCompany = user?.role?.toLowerCase() === 'company';
 
     const { data: job, isLoading, error } = useJob(id);
     const { mutate: applyForJob, isPending: isApplying } = useApplyForJob();
@@ -185,7 +185,7 @@ const JobDetails = () => {
 
     return (
         <div className="job-details-page">
-            <div className="job-details-grid" style={{ gridTemplateColumns: isEmployer ? '1fr' : undefined }}>
+            <div className="job-details-grid" style={{ gridTemplateColumns: isCompany ? '1fr' : undefined }}>
                 <main className="main-content">
                     <div className="card glass job-main-card">
                         <div className="job-header-top">
@@ -241,7 +241,7 @@ const JobDetails = () => {
                 </main>
 
 
-                {!isEmployer && (
+                {!isCompany && (
                     <aside className="job-details-sidebar">
                         <div className="card glass sidebar-card">
                             <h3>{t('applyNow')}</h3>
@@ -265,7 +265,7 @@ const JobDetails = () => {
             </div>
 
             {/* Application Modal */}
-            {!isEmployer && isModalOpen && (
+            {!isCompany && isModalOpen && (
                 <div className="application-modal-overlay">
                     <div className="application-modal">
                         <div className="modal-header">

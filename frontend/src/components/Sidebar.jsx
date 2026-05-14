@@ -33,7 +33,7 @@ const Sidebar = ({ isOpen }) => {
     const navigate = useNavigate();
     const [showLogoutModal, setShowLogoutModal] = React.useState(false);
 
-    const isEmployerHome = location.pathname === '/employer-home';
+    const isCompanyHome = location.pathname === '/company-home';
 
     const getNavItems = () => {
         const role = user?.role?.toLowerCase() || '';
@@ -50,12 +50,12 @@ const Sidebar = ({ isOpen }) => {
             items.push({ name: t('contactUs'), icon: <Mail size={20} />, path: '/contact' });
             items.push({ name: t('settings'), icon: <Settings size={20} />, path: '/settings' });
         }
-        else if (role === 'employer' || role === 'company') {
-            items.push({ name: t('dashboard'), icon: <LayoutDashboard size={20} />, path: '/dashboard/employer' });
+        else if (role === 'company') {
+            items.push({ name: t('dashboard'), icon: <LayoutDashboard size={20} />, path: '/dashboard/company' });
             // items.push({ name: t('findCandidates'), icon: <Users size={20} />, path: '/candidates' });
-            items.push({ name: t('departmentsAndJobs'), icon: <Briefcase size={20} />, path: '/dashboard/employer/jobs' });
+            items.push({ name: t('departmentsAndJobs'), icon: <Briefcase size={20} />, path: '/dashboard/company/jobs' });
             items.push({ name: t('postAJob'), icon: <PlusCircle size={20} />, path: '/jobs/post' });
-            items.push({ name: t('candidates'), icon: <Users size={20} />, path: '/dashboard/employer/applicants' });
+            items.push({ name: t('candidates'), icon: <Users size={20} />, path: '/dashboard/company/applicants' });
             items.push({ name: t('jobMatching'), icon: <Zap size={20} />, path: '/job-matching' });
             items.push({ name: t('fraudDetection'), icon: <ShieldAlert size={20} />, path: '/cv-fraud-check' });
             items.push({ name: t('profile'), icon: <UserIcon size={20} />, path: '/profile' });
@@ -91,7 +91,7 @@ const Sidebar = ({ isOpen }) => {
                     <div className="sidebar-header">
                         <p className="sidebar-label">
                             {user
-                                ? (['employer', 'company'].includes(userRole) ? t('company')
+                                ? (userRole === 'company' ? t('company')
                                     : userRole === 'admin' ? 'Admin'
                                         : t('jobSeeker'))
                                 : t('menu')}

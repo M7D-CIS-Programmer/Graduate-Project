@@ -40,7 +40,7 @@ ChartJS.register(
     Legend
 );
 
-const EmployerDashboard = () => {
+const CompanyDashboard = () => {
     const { theme } = useTheme();
     const { t, dir } = useLanguage();
     const { user } = useAuth();
@@ -61,20 +61,20 @@ const EmployerDashboard = () => {
         staleTime: 0,
     });
 
-    const employerJobs = useMemo(() => {
+    const companyJobs = useMemo(() => {
         return allJobs.filter(j => j.userId === user?.id);
     }, [allJobs, user]);
 
-    const employerJobIds = useMemo(() => employerJobs.map(j => j.id), [employerJobs]);
+    const companyJobIds = useMemo(() => companyJobs.map(j => j.id), [companyJobs]);
 
-    const employerApplications = useMemo(() => {
-        return allApplications.filter(app => employerJobIds.includes(app.jobId));
-    }, [allApplications, employerJobIds]);
+    const companyApplications = useMemo(() => {
+        return allApplications.filter(app => companyJobIds.includes(app.jobId));
+    }, [allApplications, companyJobIds]);
 
     const stats = [
-        { label: t('totalPostings'), value: employerJobs.length, icon: <FileText />, color: '#6366f1' },
-        { label: t('totalApplicants'), value: employerApplications.length, icon: <Users />, color: '#10b981' },
-        { label: t('activeJobs'), value: employerJobs.filter(j => j.status === 'Active').length, icon: <TrendingUp />, color: '#f59e0b' },
+        { label: t('totalPostings'), value: companyJobs.length, icon: <FileText />, color: '#6366f1' },
+        { label: t('totalApplicants'), value: companyApplications.length, icon: <Users />, color: '#10b981' },
+        { label: t('activeJobs'), value: companyJobs.filter(j => j.status === 'Active').length, icon: <TrendingUp />, color: '#f59e0b' },
         { label: t('followers'), value: liveProfile?.followerCount ?? 0, icon: <Users />, color: '#ec4899' },
     ];
 
@@ -98,7 +98,7 @@ const EmployerDashboard = () => {
     };
 
     const recentApplicants = useMemo(() => {
-        return employerApplications
+        return companyApplications
             .sort((a, b) => new Date(b.date) - new Date(a.date))
             .slice(0, 5)
             .map(app => ({
@@ -109,16 +109,16 @@ const EmployerDashboard = () => {
                 time: new Date(app.date).toLocaleDateString(),
                 status: app.candidateStatus
             }));
-    }, [employerApplications]);
+    }, [companyApplications]);
 
     const chartData = useMemo(() => {
-        const topJobs = employerJobs.slice(0, 3);
+        const topJobs = companyJobs.slice(0, 3);
         return {
             labels: topJobs.map(j => j.title),
-            apps: topJobs.map(j => employerApplications.filter(a => a.jobId === j.id).length),
+            apps: topJobs.map(j => companyApplications.filter(a => a.jobId === j.id).length),
             views: topJobs.map(j => j.viewsCount || 0)
         };
-    }, [employerJobs, employerApplications]);
+    }, [companyJobs, companyApplications]);
 
     if (jobsLoading || appsLoading) return <Spinner />;
 
@@ -127,7 +127,7 @@ const EmployerDashboard = () => {
             <div className="dashboard-header">
                 <div>
                     <h1 className="dashboard-title">{t('welcomeBack')}, {user?.name}!</h1>
-                    <p className="subtitle">{t('employerDashboardSubtitle') || 'Manage your listings and candidates'}</p>
+                    <p className="subtitle">{t('companyDashboardSubtitle') || 'Manage your listings and candidates'}</p>
                 </div>
             </div>
 
@@ -238,4 +238,4 @@ const EmployerDashboard = () => {
     );
 };
 
-export default EmployerDashboard;
+export default CompanyDashboard;

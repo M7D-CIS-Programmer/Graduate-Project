@@ -210,7 +210,7 @@ public class UsersController : ControllerBase
         var user = await _context.Users.Include(u => u.Roles).Include(u => u.Followers).FirstOrDefaultAsync(u => u.Id == id);
         if (user == null) return NotFound();
 
-        // Security: Job Seekers cannot update Employer/Company profiles
+        // Security: Job Seekers cannot update Company profiles
         var callerRoleName = user.Roles?.FirstOrDefault()?.RoleName ?? "Job Seeker";
         if (string.Equals(callerRoleName, "Job Seeker", StringComparison.OrdinalIgnoreCase))
         {
@@ -298,7 +298,7 @@ public class UsersController : ControllerBase
 
         if (user == null) return NotFound();
 
-        // 1. Cleanup Employer-related data if they have jobs
+        // 1. Cleanup Company-related data if they have jobs
         foreach (var job in user.Jobs)
         {
             if (job.SavedJobs.Any())

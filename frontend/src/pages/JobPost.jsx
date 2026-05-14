@@ -194,7 +194,7 @@ export default function JobPost() {
                     <div className="success-actions">
                         <button
                             className="btn-primary"
-                            onClick={() => navigate('/dashboard/employer')}
+                            onClick={() => navigate('/dashboard/company')}
                         >
                             <LayoutDashboard size={20} />
                             {t('goToDashboard')}

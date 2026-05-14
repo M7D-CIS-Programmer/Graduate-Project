@@ -51,14 +51,14 @@ const AdminDashboard = () => {
 
     const stats = [
         { label: t('totalUsers'), value: rawUsers.length.toString(), icon: <Users />, color: '#6366f1', trend: '+12%' },
-        { label: t('totalCompanies'), value: rawUsers.filter(u => u.role === 'Employer').length.toString(), icon: <Building2 />, color: '#10b981', trend: '+5%' },
+        { label: t('totalCompanies'), value: rawUsers.filter(u => u.role === 'Company').length.toString(), icon: <Building2 />, color: '#10b981', trend: '+5%' },
         { label: t('activeJobs'), value: rawJobs.length.toString(), icon: <Briefcase />, color: '#f59e0b', trend: '+18%' },
     ];
 
     const recentUsers = rawUsers.slice(0, 4).map(u => ({
         id: u.id,
         name: u.name,
-        role: u.role === 'Employer' ? t('employer') : t('jobSeeker'),
+        role: u.role === 'Company' ? t('company') : t('jobSeeker'),
         date: t('justNow') || 'Recently',
         status: u.status === 'Active' ? t('active') : u.status || t('active')
     }));
@@ -224,7 +224,7 @@ const AdminDashboard = () => {
                                     <Link
                                         to={(() => {
                                             const role = (rawUsers.find(ru => ru.id === user.id)?.role || '').toLowerCase();
-                                            return (role === 'employer' || role === 'company')
+                                            return (role === 'company')
                                                 ? `/companies/${user.id}`
                                                 : `/candidate/${user.id}`;
                                         })()}

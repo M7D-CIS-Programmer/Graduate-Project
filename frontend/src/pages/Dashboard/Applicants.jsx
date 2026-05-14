@@ -58,7 +58,7 @@ const buildCvText = (resume) => {
     const experiences = resume.experiences || resume.experience || [];
     experiences.forEach(exp => {
         const title   = exp.jobTitle   || exp.title    || '';
-        const company = exp.company    || exp.employer || '';
+        const company = exp.company    || exp.company || '';
         const desc    = exp.description || exp.responsibilities || '';
         if (title) parts.push(`${title}${company ? ` at ${company}` : ''}: ${desc}`);
     });
@@ -177,22 +177,22 @@ const Applicants = () => {
         app.job?.department?.name || jobDepartmentMap.get(app.jobId) || 'General',
         [jobDepartmentMap]);
 
-    const employerApplications = useMemo(() =>
+    const companyApplications = useMemo(() =>
         applications.filter(app => myJobIds.size === 0 || myJobIds.has(app.jobId)),
         [applications, myJobIds]);
 
     // Departments shown in the table filter — seeded from DB, narrowed to ones with applicants
     const availableDepartments = useMemo(() => {
-        const usedDepts = new Set(employerApplications.map(a => getDepartment(a)).filter(Boolean));
+        const usedDepts = new Set(companyApplications.map(a => getDepartment(a)).filter(Boolean));
         const ordered = departmentNames.length > 0
             ? departmentNames.filter(n => usedDepts.has(n))
             : Array.from(usedDepts).sort();
         return ['All', ...ordered];
-    }, [employerApplications, getDepartment, departmentNames]);
+    }, [companyApplications, getDepartment, departmentNames]);
 
     // Table rows (search + department + status)
     const tableApplicants = useMemo(() => {
-        return employerApplications.filter(app => {
+        return companyApplications.filter(app => {
             const name = (app.user?.name || '').toLowerCase();
             const role = (app.job?.title || '').toLowerCase();
             const q    = searchTerm.toLowerCase();
@@ -207,7 +207,7 @@ const Applicants = () => {
 
             return true;
         }).sort((a, b) => new Date(b.date) - new Date(a.date));
-    }, [employerApplications, searchTerm, departmentFilter, statusFilter, getDepartment]);
+    }, [companyApplications, searchTerm, departmentFilter, statusFilter, getDepartment]);
 
     // ── Handlers ───────────────────────────────────────────────────────────────
 
@@ -259,7 +259,7 @@ const Applicants = () => {
 
         try {
             setGeneratingStep('Filtering candidates by department…');
-            const catApps = employerApplications.filter(app => getDepartment(app) === reportDepartment);
+            const catApps = companyApplications.filter(app => getDepartment(app) === reportDepartment);
 
             if (catApps.length === 0) {
                 setReportError(`No applicants found in the "${reportDepartment}" department.`);

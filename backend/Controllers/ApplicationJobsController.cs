@@ -18,12 +18,12 @@ public class ApplicationJobsController : ControllerBase
     }
 
     /// <summary>
-    /// GET /api/ApplicationJobs?employerId={id}
-    /// Returns applications for the given employer's jobs only.
-    /// Omit employerId (admin use) to return all applications.
+    /// GET /api/ApplicationJobs?companyId={id}
+    /// Returns applications for the given company's jobs only.
+    /// Omit companyId (admin use) to return all applications.
     /// </summary>
     [HttpGet]
-    public async Task<IActionResult> Get([FromQuery] int? employerId)
+    public async Task<IActionResult> Get([FromQuery] int? companyId)
     {
         var query = _context.ApplicationJobs
             .Include(a => a.Job)
@@ -31,14 +31,14 @@ public class ApplicationJobsController : ControllerBase
             .Include(a => a.User)
             .AsQueryable();
 
-        if (employerId.HasValue)
-            query = query.Where(a => a.Job.UserId == employerId.Value);
+        if (companyId.HasValue)
+            query = query.Where(a => a.Job.UserId == companyId.Value);
 
         return Ok(await query.OrderByDescending(a => a.Date).ToListAsync());
     }
 
     /// <summary>
-    /// Returns only applications for jobs posted by the specified company (employer).
+    /// Returns only applications for jobs posted by the specified company (company).
     /// Filters by Job.UserId == companyId to prevent cross-company data leakage.
     /// </summary>
     [HttpGet("company/{companyId}")]
@@ -128,7 +128,7 @@ public class ApplicationJobsController : ControllerBase
 
         _context.ApplicationJobs.Add(app);
         
-        // Notify Employer
+        // Notify Company
         var job = await _context.Jobs.FindAsync(dto.JobId);
         if (job != null)
         {
@@ -140,7 +140,7 @@ public class ApplicationJobsController : ControllerBase
                 Message = $"{seeker?.Name ?? "A candidate"} applied for your job: {job.Title}",
                 Type = "Application",
                 IsRead = false,
-                Receiver = "Employer",
+                Receiver = "Company",
                 RelatedId = dto.UserId
             };
             _context.Notifications.Add(notification);

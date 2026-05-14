@@ -343,7 +343,7 @@ namespace aabu_project.Services
             var roleLabel = role switch
             {
                 "jobseeker" => "Job Seeker",
-                "company"   => "Employer / Company",
+                "company"   => "Company",
                 "admin"     => "Admin",
                 _           => "Guest (not logged in)"
             };
@@ -361,7 +361,7 @@ namespace aabu_project.Services
                 view application status (Applied → Reviewing → Shortlisted → Accepted/Rejected),
                 messaging with employers, notifications.
 
-                For Companies/Employers: post jobs, manage applicants, view candidate profiles,
+                For Companies: post jobs, manage applicants, view candidate profiles,
                 AI candidate insights, AI hiring report (ranked candidates), fraud detection on CVs,
                 messaging with applicants, department management, follower system.
 

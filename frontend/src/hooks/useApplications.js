@@ -2,10 +2,10 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '../api/api';
 import { queryKeys } from './queryKeys';
 
-export const useApplications = (employerId) =>
+export const useApplications = (companyId) =>
     useQuery({
-        queryKey: employerId ? [...queryKeys.applications, employerId] : queryKeys.applications,
-        queryFn:  () => api.getApplications(employerId),
+        queryKey: companyId ? [...queryKeys.applications, companyId] : queryKeys.applications,
+        queryFn:  () => api.getApplications(companyId),
         staleTime: 30_000,
     });
 

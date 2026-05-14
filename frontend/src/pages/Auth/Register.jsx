@@ -97,7 +97,7 @@ const Register = () => {
         setErrors({});
 
         try {
-            const roleName = formData.role === 'seeker' ? 'Job Seeker' : 'Employer';
+            const roleName = formData.role === 'seeker' ? 'Job Seeker' : 'Company';
 
             const userResponse = await api.register({
                 name:     formData.fullName.trim(),
@@ -109,7 +109,7 @@ const Register = () => {
 
             const dashboardPaths = {
                 'admin':      '/dashboard/admin',
-                'employer':   '/dashboard/employer',
+                'company':    '/dashboard/company',
                 'job seeker': '/dashboard/seeker'
             };
 

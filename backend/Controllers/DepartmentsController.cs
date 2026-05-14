@@ -32,7 +32,7 @@ public class DepartmentsController(MyDbContext context) : ControllerBase
             .ToListAsync());
 
     // ── GET /api/Departments/mine ──────────────────────────────────────────────
-    // Authenticated employer only — returns only THIS company's departments.
+    // Authenticated company only — returns only THIS company's departments.
     [HttpGet("mine")]
     [Authorize]
     public async Task<IActionResult> GetMine()
