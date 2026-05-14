@@ -149,7 +149,7 @@ const Applicants = () => {
     // Table filters
     const [searchTerm,     setSearchTerm]    = useState('');
     const [statusFilter,   setStatusFilter]  = useState('All');
-    const [departmentFilter, setDepartmentFilter] = useState('All');
+    const [departmentFilter, setDepartmentFilter] = useState('Select Department');
 
     // Report form
     const [reportJobTitle, setReportJobTitle] = useState('');
@@ -187,7 +187,7 @@ const Applicants = () => {
         const ordered = departmentNames.length > 0
             ? departmentNames.filter(n => usedDepts.has(n))
             : Array.from(usedDepts).sort();
-        return ['All', ...ordered];
+        return ['Select Department', ...ordered];
     }, [companyApplications, getDepartment, departmentNames]);
 
     // Table rows (search + department + status)
@@ -198,7 +198,7 @@ const Applicants = () => {
             const q    = searchTerm.toLowerCase();
             if (q && !name.includes(q) && !role.includes(q)) return false;
 
-            if (departmentFilter !== 'All' && getDepartment(app) !== departmentFilter) return false;
+            if (departmentFilter !== 'Select Department' && getDepartment(app) !== departmentFilter) return false;
 
             let status = app.candidateStatus || 'New';
             if (status === 'Applied')  status = 'New';
@@ -658,7 +658,7 @@ const Applicants = () => {
                     <div style={{ textAlign: 'center', padding: '3rem 1rem', color: 'var(--text-muted)' }}>
                         <Users size={48} style={{ opacity: 0.25, marginBottom: '0.75rem' }} />
                         <p style={{ fontSize: '0.95rem' }}>
-                            {departmentFilter !== 'All'
+                            {departmentFilter !== 'Select Department'
                                 ? `${t('noApplicantsInDept') || 'No applicants available in the'} "${departmentFilter}" ${t('department')}.`
                                 : t('noApplicantsMatch') || 'No applicants match your current filters.'}
                         </p>
