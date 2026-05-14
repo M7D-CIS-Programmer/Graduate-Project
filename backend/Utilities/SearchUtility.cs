@@ -30,7 +30,6 @@ public static class SearchUtility
         { "full", "كامل" },
         { "stack", "ستاك" },
         { "company", "شركة" },
-        { "employer", "شركة" },
         { "seeker", "باحث" },
         
         // Industries
