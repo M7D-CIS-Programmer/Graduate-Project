@@ -191,12 +191,12 @@ export default function JobPost() {
                     </div>
                     <h2>{lang === 'ar' ? "يجب إنشاء قسم أولاً" : "You must create a department first"}</h2>
                     <p style={{ marginTop: '1rem', opacity: 0.8 }}>
-                        {lang === 'ar' ? "يرجى الذهاب إلى لوحة التحكم وإنشاء قسم قبل نشر وظيفة." : "Please go to your dashboard and create a department before posting a job."}
+                        {lang === 'ar' ? "يرجى الذهاب إلى صفحة الأقسام الخاصة بك وإنشاء قسم قبل نشر وظيفة." : "Please go to your departments page and create a department before posting a job."}
                     </p>
                     <div style={{ marginTop: '2rem' }}>
                         <button className="btn-primary" onClick={() => navigate('/dashboard/company')}>
-                            <LayoutDashboard size={20} />
-                            {t('goToDashboard') || (lang === 'ar' ? "الذهاب للوحة التحكم" : "Go to Dashboard")}
+                            <Plus size={20} />
+                            {lang === 'ar' ? "إنشاء قسم" : "Create a Department"}
                         </button>
                     </div>
                 </div>

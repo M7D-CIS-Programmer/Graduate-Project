@@ -570,6 +570,7 @@ export const LanguageProvider = ({ children }) => {
             jobPostedSubtitle: "Your job listing is now live and visible to candidates.",
             goToDashboard: "Go to Dashboard",
             createAnother: "Create Another Listing",
+            myJobs: "My Jobs",
             // Admin Translations
             adminDashboard: "Admin Dashboard",
             totalUsers: "Total Users",
@@ -1326,6 +1327,7 @@ export const LanguageProvider = ({ children }) => {
             jobPostedSubtitle: "قائمتك الآن مباشرة ومرئية للمرشحين.",
             goToDashboard: "الذهاب إلى لوحة التحكم",
             createAnother: "إنشاء قائمة أخرى",
+            myJobs: "وظائفي",
             create: "إنشاء",
             // Admin Translations
             adminDashboard: "لوحة تحكم المسؤول",
