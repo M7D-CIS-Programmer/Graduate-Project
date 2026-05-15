@@ -12,14 +12,15 @@ import {
     Building2,
     FileText,
     Plus,
-    LayoutDashboard
+    LayoutDashboard,
+    AlertCircle
 } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import './JobPost.css';
 import { api } from '../../api/api';
 import { useAuth } from '../../context/AuthContext';
 import { useCreateJob, useUpdateJob, useJob } from '../../hooks/useJobs';
-import { useDepartments } from '../../hooks/useDepartments';
+import { useMyDepartments } from '../../hooks/useDepartments';
 import { validateShortText, validateDescription, validateSalary } from '../../utils/validators';
 
 export default function JobPost() {
@@ -32,7 +33,7 @@ export default function JobPost() {
     const createJobMutation = useCreateJob();
     const updateJobMutation = useUpdateJob();
     const { data: editJobData } = useJob(editId);
-    const { data: departments = [] } = useDepartments();
+    const { data: departments = [], isLoading: isDeptLoading } = useMyDepartments();
 
     const [step, setStep] = useState(1);
     const [isSubmitted, setIsSubmitted] = useState(false);
@@ -180,6 +181,28 @@ export default function JobPost() {
             alert(t('actionFailed') || 'Failed to post job. Please try again.');
         }
     };
+
+    if (!isDeptLoading && departments.length === 0) {
+        return (
+            <div className={`job-post-container ${dir}`}>
+                <div className="job-post-card glass" style={{ textAlign: 'center', padding: '3rem' }}>
+                    <div className="empty-icon" style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem', color: '#ef4444' }}>
+                        <AlertCircle size={64} />
+                    </div>
+                    <h2>{lang === 'ar' ? "يجب إنشاء قسم أولاً" : "You must create a department first"}</h2>
+                    <p style={{ marginTop: '1rem', opacity: 0.8 }}>
+                        {lang === 'ar' ? "يرجى الذهاب إلى لوحة التحكم وإنشاء قسم قبل نشر وظيفة." : "Please go to your dashboard and create a department before posting a job."}
+                    </p>
+                    <div style={{ marginTop: '2rem' }}>
+                        <button className="btn-primary" onClick={() => navigate('/dashboard/company')}>
+                            <LayoutDashboard size={20} />
+                            {t('goToDashboard') || (lang === 'ar' ? "الذهاب للوحة التحكم" : "Go to Dashboard")}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     if (isSubmitted) {
         return (

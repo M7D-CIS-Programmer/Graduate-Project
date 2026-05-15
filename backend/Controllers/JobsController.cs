@@ -3,6 +3,8 @@ using aabu_project.Models;
 using aabu_project.Dtos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -162,16 +164,25 @@ public class JobsController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize]
     public async Task<IActionResult> CreateJob(JobCreateDto dto)
     {
+        var callerId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
         // Cross-field: salary min must not exceed max
         if (!dto.IsSalaryNegotiable && dto.SalaryMin.HasValue && dto.SalaryMax.HasValue
             && dto.SalaryMin > dto.SalaryMax)
             return BadRequest(new { error = "Minimum salary must be less than or equal to maximum salary." });
 
+        var department = await _context.Departments.FindAsync(dto.DepartmentId);
+        if (department == null)
+            return BadRequest(new { error = "Department not found." });
+        if (department.UserId != callerId)
+            return BadRequest(new { error = "Department does not belong to you." });
+
         var job = new Job
         {
-            UserId = dto.UserId,
+            UserId = callerId,
             Title = dto.Title,
             Description = dto.Description,
             Type = dto.Type,
@@ -201,8 +212,11 @@ public class JobsController : ControllerBase
     }
 
     [HttpPut("{id}")]
+    [Authorize]
     public async Task<IActionResult> UpdateJob(int id, JobUpdateDto updated)
     {
+        var callerId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
         // Cross-field: salary min must not exceed max
         if (!updated.IsSalaryNegotiable && updated.SalaryMin.HasValue && updated.SalaryMax.HasValue
             && updated.SalaryMin > updated.SalaryMax)
@@ -212,6 +226,15 @@ public class JobsController : ControllerBase
 
         if (job == null)
             return NotFound();
+
+        if (job.UserId != callerId)
+            return Forbid();
+
+        var department = await _context.Departments.FindAsync(updated.DepartmentId);
+        if (department == null)
+            return BadRequest(new { error = "Department not found." });
+        if (department.UserId != callerId)
+            return BadRequest(new { error = "Department does not belong to you." });
 
         job.Title = updated.Title;
         job.Description = updated.Description;
