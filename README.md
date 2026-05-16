@@ -44,6 +44,8 @@ The project is built with a modern full-stack architecture, focusing on performa
 - **Multi-Language Support**: Full support for English and Arabic (RTL).
 - **Application Workflow**: Comprehensive status management (New, Shortlisted, Accepted, Rejected).
 - **Responsive Dashboards**: Interactive charts and statistics for data-driven decisions.
+- **AI Interview Simulator**: Built-in mock interview tools to help job seekers practice and refine their skills.
+- **Advanced Job Filtering**: Company-specific department filtering for streamlined job postings and precise search results.
 
 ## 🏁 Getting Started
 1. **Initialize Dependencies**:
