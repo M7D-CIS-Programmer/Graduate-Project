@@ -572,6 +572,7 @@ export const LanguageProvider = ({ children }) => {
             createAnother: "Create Another Listing",
             myJobs: "My Jobs",
             // Admin Translations
+            userSuspended: "User suspended ",
             adminDashboard: "Admin Dashboard",
             totalUsers: "Total Users",
             totalCompanies: "Total Companies",
