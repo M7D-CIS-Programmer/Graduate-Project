@@ -377,6 +377,45 @@
     },
 
     {
+      "intent": "contact_support",
+      "group": "support",
+      "scope": "all",
+      "keywords": ["support","help","contact","دعم","مساعدة","تواصل","مشكلة"],
+      "patterns": [
+        "كيف أتواصل مع الدعم","عندي مشكلة","أحتاج مساعدة","دعم فني",
+        "how to contact support","i need help","i have a problem","technical support","contact admin"
+      ],
+      "response_ar": "للتواصل مع الدعم الفني:\n• يمكنك إرسال بريد إلكتروني إلى support@jobportal.com\n• أو عبر صفحة 'تواصل معنا' أسفل الموقع\nنحن هنا لمساعدتك في أي وقت!",
+      "response_en": "To contact technical support:\n• You can email us at support@jobportal.com\n• Or use the 'Contact Us' page at the bottom of the site\nWe are here to help anytime!"
+    },
+
+    {
+      "intent": "forgot_password",
+      "group": "account",
+      "scope": "all",
+      "keywords": ["password","forgot","reset","مرور","كلمة","نسيت","استعادة"],
+      "patterns": [
+        "نسيت كلمة المرور","كيف أسترجع حسابي","تغيير الباسورد","استعادة كلمة السر",
+        "forgot password","reset password","change password","cant remember my password"
+      ],
+      "response_ar": "لاستعادة كلمة المرور:\n1️⃣ اذهب إلى صفحة تسجيل الدخول\n2️⃣ اضغط على 'نسيت كلمة المرور'\n3️⃣ أدخل بريدك الإلكتروني\n4️⃣ ستصلك رسالة تحتوي على رابط لإعادة تعيين كلمة المرور",
+      "response_en": "To reset your password:\n1️⃣ Go to the Login page\n2️⃣ Click on 'Forgot Password'\n3️⃣ Enter your email address\n4️⃣ You will receive an email with a link to reset your password"
+    },
+
+    {
+      "intent": "delete_account",
+      "group": "account",
+      "scope": "all",
+      "keywords": ["delete","remove","account","حذف","حساب","إلغاء"],
+      "patterns": [
+        "كيف أحذف حسابي","إلغاء الحساب","بدي أسكر حسابي","حذف الملف",
+        "how to delete my account","remove my account","deactivate account","delete profile"
+      ],
+      "response_ar": "لحذف حسابك نهائياً:\n1️⃣ اذهب إلى 'الإعدادات' من القائمة الجانبية\n2️⃣ انزل إلى أسفل الصفحة واضغط على 'حذف الحساب'\n3️⃣ سيُطلب منك تأكيد العملية\n⚠️ يرجى العلم أن هذا الإجراء نهائي ولا يمكن التراجع عنه.",
+      "response_en": "To permanently delete your account:\n1️⃣ Go to 'Settings' from the sidebar\n2️⃣ Scroll to the bottom and click 'Delete Account'\n3️⃣ You will be asked to confirm the action\n⚠️ Please note that this action is permanent and cannot be undone."
+    },
+
+    {
       "intent": "unknown",
       "group": "fallback",
       "scope": "all",
