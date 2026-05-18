@@ -135,13 +135,13 @@
     justify-content: center;
 }
 
-.stat-value {
+.hero-section .stat-value {
     font-size: 1.5rem;
-    color: #f8fafc;
+    color: #f8fafc !important;
 }
 
-.stat-label {
-    color: #f8fafc;
+.hero-section .stat-label {
+    color: #f8fafc !important;
     font-size: 0.875rem;
 }
 

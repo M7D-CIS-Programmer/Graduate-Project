@@ -1,12 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { MessageCircle, X, Send, User, Bot, Paperclip, File as FileIcon, Maximize2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { api } from '../api/api';
 import './Chatbot.css';
 
 const Chatbot = ({ isSidebarOpen }) => {
-    const { t, dir } = useLanguage();
+    const { t, dir, language } = useLanguage();
+    const { user } = useAuth();
     const navigate = useNavigate();
     const [isOpen, setIsOpen] = useState(false);
     const [message, setMessage] = useState('');
@@ -54,7 +56,9 @@ const Chatbot = ({ isSidebarOpen }) => {
         }
 
         try {
-            const data = await api.sendSupportMessage(sentText);
+            const userId = user?.id || null;
+            const role = user?.role || null;
+            const data = await api.sendSupportMessage(sentText, userId, role, language);
             setChatHistory(prev => [...prev, {
                 id: Date.now() + 1,
                 type: 'bot',

@@ -79,7 +79,9 @@
       "response_jobseeker_ar": "للتقديم على وظيفة:\n1️⃣ اذهب إلى صفحة 'البحث عن وظائف'\n2️⃣ استخدم الفلاتر للعثور على الوظيفة المناسبة\n3️⃣ افتح تفاصيل الوظيفة\n4️⃣ اضغط زر 'قدّم الآن'\n5️⃣ ارفع CV وأرسل طلبك ✅",
       "response_jobseeker_en": "To apply for a job:\n1️⃣ Go to 'Find Jobs' page\n2️⃣ Use filters to find the right job\n3️⃣ Open the job details\n4️⃣ Click 'Apply Now'\n5️⃣ Upload your CV and submit ✅",
       "response_company_ar": "حسابك مسجل كشركة، لذلك لا يمكنك التقديم على وظائف. كشركة، بإمكانك نشر الوظائف وإدارة المتقدمين من لوحة التحكم. هل تريد معرفة كيفية نشر وظيفة؟",
-      "response_company_en": "Your account is registered as a company, so applying for jobs is not available. As a company, you can post jobs and manage applicants from your dashboard. Would you like to know how to post a job?"
+      "response_company_en": "Your account is registered as a company, so applying for jobs is not available. As a company, you can post jobs and manage applicants from your dashboard. Would you like to know how to post a job?",
+      "response_ar": "يرجى تسجيل الدخول كباحث عن عمل للتقديم على الوظائف. يمكنك استعراض الوظائف المتاحة في صفحة 'البحث عن وظائف'.",
+      "response_en": "Please login as a job seeker to apply for jobs. You can browse available jobs on the 'Find Jobs' page."
     },
 
     {
@@ -96,7 +98,9 @@
       "response_company_ar": "لنشر وظيفة جديدة:\n1️⃣ اذهب إلى 'نشر وظيفة' من القائمة الجانبية\n2️⃣ أدخل العنوان والوصف والمتطلبات\n3️⃣ حدد الراتب ونوع العمل وطريقة العمل\n4️⃣ اضغط 'نشر' وستظهر فورًا للباحثين ✅",
       "response_company_en": "To post a new job:\n1️⃣ Go to 'Post a Job' from the sidebar\n2️⃣ Enter the title, description and requirements\n3️⃣ Set salary, job type and work mode\n4️⃣ Click 'Publish' and it will appear to job seekers immediately ✅",
       "response_jobseeker_ar": "نشر الوظائف متاح فقط للشركات. بإمكانك أنت التقديم على الوظائف المنشورة من خلال 'البحث عن وظائف'.",
-      "response_jobseeker_en": "Posting jobs is available for companies only. You can apply for listed jobs through 'Find Jobs'."
+      "response_jobseeker_en": "Posting jobs is available for companies only. You can apply for listed jobs through 'Find Jobs'.",
+      "response_ar": "يرجى تسجيل الدخول بحساب شركة لنشر الوظائف. إذا لم يكن لديك حساب شركة، يمكنك إنشاؤه عبر صفحة التسجيل.",
+      "response_en": "Please login with a company account to post jobs. If you don't have one, you can create a company account on the registration page."
     },
 
     {
@@ -110,7 +114,9 @@
         "who applied","view job applications","applicant list"
       ],
       "response_company_ar": "لعرض المتقدمين:\n• اذهب إلى 'لوحة التحكم' ← 'المتقدمون'\n• ستجد جميع الطلبات مع إمكانية التصفية حسب الوظيفة\n• بإمكانك قبول أو رفض أو مراجعة كل متقدم\n• يمكنك أيضًا توليد تقرير AI لترتيب المرشحين",
-      "response_company_en": "To view applicants:\n• Go to 'Dashboard' → 'Applicants'\n• You'll find all applications with filtering by job\n• You can accept, reject, or review each applicant\n• You can also generate an AI report to rank candidates"
+      "response_company_en": "To view applicants:\n• Go to 'Dashboard' → 'Applicants'\n• You'll find all applications with filtering by job\n• You can accept, reject, or review each applicant\n• You can also generate an AI report to rank candidates",
+      "response_ar": "ميزة عرض المتقدمين متاحة للشركات فقط للوظائف التي قاموا بنشرها.",
+      "response_en": "Viewing applicants is only available for companies for the jobs they have posted."
     },
 
     {
@@ -124,7 +130,9 @@
         "was my application approved","how to know if I got the job","my application status"
       ],
       "response_jobseeker_ar": "لمتابعة حالة طلباتك:\n• اذهب إلى 'لوحة التحكم' ← 'طلباتي'\n• ستجد كل طلب مع حالته الحالية:\n  ✅ Applied → Reviewing → Shortlisted → Accepted\n  ❌ Rejected\n• ستصلك إشعارات عند تغيير الحالة",
-      "response_jobseeker_en": "To track your application status:\n• Go to 'Dashboard' → 'My Applications'\n• You'll see each application with its current status:\n  ✅ Applied → Reviewing → Shortlisted → Accepted\n  ❌ Rejected\n• You'll receive notifications when the status changes"
+      "response_jobseeker_en": "To track your application status:\n• Go to 'Dashboard' → 'My Applications'\n• You'll see each application with its current status:\n  ✅ Applied → Reviewing → Shortlisted → Accepted\n  ❌ Rejected\n• You'll receive notifications when the status changes",
+      "response_ar": "يرجى تسجيل الدخول كباحث عن عمل لمتابعة حالة طلبات التوظيف الخاصة بك.",
+      "response_en": "Please login as a job seeker to track the status of your job applications."
     },
 
     {
@@ -348,7 +356,9 @@
         "how to add department","manage departments","job categories","add a category"
       ],
       "response_company_ar": "لإدارة الأقسام:\n• اذهب إلى 'الأقسام' من القائمة الجانبية\n• يمكنك إضافة أقسام مخصصة لتصنيف وظائفك\n• تُستخدم الأقسام عند نشر وظائف جديدة",
-      "response_company_en": "To manage departments:\n• Go to 'Departments' from the sidebar\n• Add custom departments to categorize your jobs\n• Departments are used when posting new jobs"
+      "response_company_en": "To manage departments:\n• Go to 'Departments' from the sidebar\n• Add custom departments to categorize your jobs\n• Departments are used when posting new jobs",
+      "response_ar": "ميزة إضافة وإدارة الأقسام متاحة للشركات فقط لتنظيم الوظائف الخاصة بهم.",
+      "response_en": "Managing departments is a feature available only for companies to organize their jobs."
     },
 
     {
