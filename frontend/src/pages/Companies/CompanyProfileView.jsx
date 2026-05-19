@@ -85,7 +85,7 @@ const CompanyProfileView = () => {
     });
 
     const applicationToCompany = isJobSeeker
-        ? seekerApplications.find(a => a.job?.userId?.toString() === id || a.job?.user?.id?.toString() === id)
+        ? seekerApplications.find(a => a.userId === currentUser?.id && (a.job?.userId?.toString() === id || a.job?.user?.id?.toString() === id))
         : null;
 
     const isFollowed = followedCompanies?.some(c => c.id.toString() === id) || isLocalFollowed;
