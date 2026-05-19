@@ -25,6 +25,8 @@ const ManageCompanies = () => {
     const [statusFilter, setStatusFilter] = useState('');
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [companyToDelete, setCompanyToDelete] = useState(null);
+    const [isSuspendModalOpen, setIsSuspendModalOpen] = useState(false);
+    const [companyToSuspend, setCompanyToSuspend] = useState(null);
 
     const { data: rawData = [], isLoading, error } = useUsers();
     const allUsers = Array.isArray(rawData) ? rawData : (rawData?.$values || []);
@@ -40,6 +42,15 @@ const ManageCompanies = () => {
 
     // ── Suspend / Activate ────────────────────────────────────────────────────
     const handleToggleStatus = (company) => {
+        if (company.status === 'Active') {
+            setCompanyToSuspend(company);
+            setIsSuspendModalOpen(true);
+        } else {
+            performToggleStatus(company);
+        }
+    };
+
+    const performToggleStatus = (company) => {
         const newStatus = company.status === 'Active' ? 'Suspended' : 'Active';
         updateUserStatus({ id: company.id, status: newStatus }, {
             onSuccess: () =>
@@ -52,6 +63,13 @@ const ManageCompanies = () => {
             onError: (err) =>
                 addToast(err.message || t('actionFailed') || 'Action failed', 'error'),
         });
+    };
+
+    const confirmSuspend = () => {
+        if (!companyToSuspend) return;
+        performToggleStatus(companyToSuspend);
+        setIsSuspendModalOpen(false);
+        setCompanyToSuspend(null);
     };
 
     // ── Approve (Pending → Active) ────────────────────────────────────────────
@@ -292,6 +310,28 @@ const ManageCompanies = () => {
             >
                 <p style={{ margin: 0 }}>
                     {t('deleteCompanyConfirmation') || `Are you sure you want to permanently delete ${companyToDelete?.name}? This cannot be undone.`}
+                </p>
+            </Modal>
+
+            {/* Suspend confirmation modal */}
+            <Modal
+                isOpen={isSuspendModalOpen}
+                onClose={() => { setIsSuspendModalOpen(false); setCompanyToSuspend(null); }}
+                title={t('suspendCompanyConfirm') || 'Suspend Company'}
+                type="warning"
+                footer={
+                    <>
+                        <button className="btn-outline" onClick={() => { setIsSuspendModalOpen(false); setCompanyToSuspend(null); }}>
+                            {t('cancel') || 'Cancel'}
+                        </button>
+                        <button className="btn-warning" onClick={confirmSuspend} disabled={isStatusPending}>
+                            {isStatusPending ? (t('suspending') || 'Suspending…') : (t('suspend') || 'Suspend')}
+                        </button>
+                    </>
+                }
+            >
+                <p style={{ margin: 0 }}>
+                    {t('suspendCompanyConfirmation') || `Are you sure you want to suspend ${companyToSuspend?.name}? All their job postings will be hidden and they will be blocked from logging in.`}
                 </p>
             </Modal>
         </div>

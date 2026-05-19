@@ -59,9 +59,6 @@ const CandidateProfile = () => {
                 <div className="empty-state glass">
                     <User size={64} className="empty-icon" />
                     <h3>{t('candidateNotFound') || 'Candidate Not Found'}</h3>
-                    <Button onClick={() => navigate(-1)} style={{ marginTop: '1rem' }}>
-                        {t('back')}
-                    </Button>
                 </div>
             </div>
         );

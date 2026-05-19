@@ -145,6 +145,7 @@ public class UsersController : ControllerBase
             .Include(u => u.Roles)
             .Include(u => u.Jobs)
             .Include(u => u.Followers)
+            .Where(u => !u.Roles.Any(r => r.RoleName == "Admin"))
             .ToListAsync();
         return Ok(users.Select(ToDto));
     }

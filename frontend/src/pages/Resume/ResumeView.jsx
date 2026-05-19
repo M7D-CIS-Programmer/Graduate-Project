@@ -50,10 +50,6 @@ const ResumeView = () => {
         return (
             <div className="dashboard-container" style={{ textAlign: 'center', padding: '100px 0' }}>
                 <h2 style={{ color: 'var(--text-muted)' }}>No resume data available for this candidate.</h2>
-                <Button onClick={() => navigate(-1)} style={{ marginTop: '1.5rem' }}>
-                    <ChevronLeft size={20} />
-                    Go Back
-                </Button>
             </div>
         );
     }

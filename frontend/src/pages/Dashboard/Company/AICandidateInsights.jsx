@@ -188,9 +188,6 @@ const AICandidateInsights = () => {
                     <h1>{t('aiCandidateInsights')}</h1>
                     <p>{t('candidateInsightsDesc')}</p>
                 </div>
-                <Button variant="outline" onClick={() => navigate(-1)}>
-                    {t('back')}
-                </Button>
             </div>
 
             <div className="summary-grid">

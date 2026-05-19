@@ -24,6 +24,8 @@ const ManageUsers = () => {
     const [roleFilter, setRoleFilter] = useState('');
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [userToDelete, setUserToDelete] = useState(null);
+    const [isSuspendModalOpen, setIsSuspendModalOpen] = useState(false);
+    const [userToSuspend, setUserToSuspend] = useState(null);
 
     const { data: users = [], isLoading } = useUsers();
     const { mutate: updateUserStatus, isPending: isStatusPending } = useUpdateUserStatus();
@@ -41,6 +43,15 @@ const ManageUsers = () => {
 
     // ── Suspend / Activate ────────────────────────────────────────────────────
     const handleToggleStatus = (user) => {
+        if (user.status === 'Active') {
+            setUserToSuspend(user);
+            setIsSuspendModalOpen(true);
+        } else {
+            performToggleStatus(user);
+        }
+    };
+
+    const performToggleStatus = (user) => {
         const newStatus = user.status === 'Active' ? 'Suspended' : 'Active';
         updateUserStatus({ id: user.id, status: newStatus }, {
             onSuccess: () =>
@@ -53,6 +64,13 @@ const ManageUsers = () => {
             onError: (err) =>
                 addToast(err.message || t('actionFailed') || 'Action failed', 'error'),
         });
+    };
+
+    const confirmSuspend = () => {
+        if (!userToSuspend) return;
+        performToggleStatus(userToSuspend);
+        setIsSuspendModalOpen(false);
+        setUserToSuspend(null);
     };
 
     // ── Delete ────────────────────────────────────────────────────────────────
@@ -76,6 +94,8 @@ const ManageUsers = () => {
 
     // ── Filtering ─────────────────────────────────────────────────────────────
     const filteredUsers = users.filter(user => {
+        if ((user.role || '').toLowerCase() === 'admin') return false;
+
         const matchesSearch =
             (user.name  || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
             (user.email || '').toLowerCase().includes(searchTerm.toLowerCase());
@@ -232,6 +252,28 @@ const ManageUsers = () => {
             >
                 <p style={{ margin: 0 }}>
                     {t('deleteUserConfirmation') || `Are you sure you want to permanently delete ${userToDelete?.name}? This cannot be undone.`}
+                </p>
+            </Modal>
+
+            {/* Suspend confirmation modal */}
+            <Modal
+                isOpen={isSuspendModalOpen}
+                onClose={() => { setIsSuspendModalOpen(false); setUserToSuspend(null); }}
+                title={t('suspendUserConfirm') || 'Suspend User'}
+                type="warning"
+                footer={
+                    <>
+                        <button className="btn-outline" onClick={() => { setIsSuspendModalOpen(false); setUserToSuspend(null); }}>
+                            {t('cancel') || 'Cancel'}
+                        </button>
+                        <button className="btn-warning" onClick={confirmSuspend} disabled={isStatusPending}>
+                            {isStatusPending ? (t('suspending') || 'Suspending…') : (t('suspend') || 'Suspend')}
+                        </button>
+                    </>
+                }
+            >
+                <p style={{ margin: 0 }}>
+                    {t('suspendUserConfirmation') || `Are you sure you want to suspend ${userToSuspend?.name}? They will be blocked from logging into the platform.`}
                 </p>
             </Modal>
         </div>

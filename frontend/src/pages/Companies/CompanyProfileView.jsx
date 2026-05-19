@@ -139,12 +139,7 @@ const CompanyProfileView = () => {
     return (
         <div className="company-view-container" dir={dir}>
             {/* Banner */}
-            <div className="company-view-banner glass">
-                <button className="cv-back-btn" onClick={() => navigate(-1)}>
-                    <ChevronLeft size={20} className={dir === 'rtl' ? 'rotate-180' : ''} />
-                    {t('back') || 'Back'}
-                </button>
-
+            <div className="company-view-banner glass" style={{ justifyContent: 'flex-end' }}>
                 <div className="cv-banner-actions">
                     <button className="cv-icon-btn" onClick={handleShare} title="Share">
                         <Share2 size={18} />

@@ -168,9 +168,6 @@ const EditProfile = () => {
         <div className="user-page-container" dir={dir}>
             <div className="dashboard-header">
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    <button className="cv-back-btn" onClick={() => navigate('/profile')}>
-                        <ArrowLeft size={20} />
-                    </button>
                     <div>
                         <h1 className="dashboard-title">{t('editProfile') || 'Edit Profile'}</h1>
                         <p style={{ color: 'var(--text-muted)' }}>{t('updateInfoMsg') || 'Keep your profile information up to date'}</p>
