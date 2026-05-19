@@ -31,6 +31,7 @@ const CompanyProfileView = () => {
     const { addToast } = useToast();
     const [isLocalFollowed, setIsLocalFollowed] = useState(false); // To handle optimistic UI
     const [activeTab, setActiveTab] = useState('bio'); // 'bio' or 'followers'
+    const [isCreatingThread, setIsCreatingThread] = useState(false);
     const { data: followedCompanies } = useFollowedCompanies();
     const { mutate: followCompany } = useFollowCompany();
     const { mutate: unfollowCompany } = useUnfollowCompany();
@@ -109,6 +110,58 @@ const CompanyProfileView = () => {
         addToast(t('linkCopied') || 'Profile link copied to clipboard!', 'success');
     };
 
+    const handleMessageClick = async () => {
+        if (!currentUser) {
+            addToast(t('loginToMessage') || 'Please sign in to send messages.', 'info');
+            return;
+        }
+
+        if (applicationToCompany) {
+            navigate(`/messages?applicationId=${applicationToCompany.id}`);
+            return;
+        }
+
+        // Seeker hasn't applied yet. Start a new thread by creating a placeholder application.
+        const companyActiveJobs = jobs?.filter(j => j.status === 'Active' || !j.status) || [];
+        if (companyActiveJobs.length === 0) {
+            addToast(t('noActiveJobsToMessage') || 'This company has no active jobs, so you cannot send a message.', 'warning');
+            return;
+        }
+
+        setIsCreatingThread(true);
+        try {
+            const baseUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL;
+            const res = await fetch(`${baseUrl}/ApplicationJobs`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+                },
+                body: JSON.stringify({
+                    jobId: companyActiveJobs[0].id,
+                    userId: currentUser.id,
+                    note: 'General Inquiry'
+                })
+            });
+
+            if (!res.ok) {
+                throw new Error('Failed to create conversation');
+            }
+
+            const data = await res.json();
+            const appId = data.id || data.Id;
+            if (appId) {
+                navigate(`/messages?applicationId=${appId}`);
+            } else {
+                throw new Error('No application ID returned');
+            }
+        } catch (err) {
+            addToast(t('failedToStartChat') || 'Failed to start conversation. Please try again.', 'error');
+        } finally {
+            setIsCreatingThread(false);
+        }
+    };
+
     const scrollToJobs = () => {
         document.getElementById('company-jobs-section')?.scrollIntoView({ behavior: 'smooth' });
     };
@@ -144,15 +197,16 @@ const CompanyProfileView = () => {
                     <button className="cv-icon-btn" onClick={handleShare} title="Share">
                         <Share2 size={18} />
                     </button>
-                    {/* Message button — job seekers who have applied to this company */}
-                    {isJobSeeker && applicationToCompany && (
+                    {/* Message button — job seekers */}
+                    {isJobSeeker && (
                         <button
                             className="cv-follow-btn"
-                            onClick={() => navigate(`/messages?applicationId=${applicationToCompany.id}`)}
+                            onClick={handleMessageClick}
+                            disabled={isCreatingThread}
                             style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}
                         >
                             <MessageSquare size={16} />
-                            Message
+                            {isCreatingThread ? (t('connecting') || 'Connecting...') : (t('message') || 'Message')}
                         </button>
                     )}
                     {/* Follow button — job seekers only */}
