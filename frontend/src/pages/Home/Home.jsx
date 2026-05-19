@@ -27,19 +27,19 @@ const Home = () => {
         return () => clearInterval(timer);
     }, []);
 
-    const [departments, setDepartments] = useState([]);
     const [jobs, setJobs] = useState([]);
     const [isLoadingJobs, setIsLoadingJobs] = useState(true);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [deptData, jobData] = await Promise.all([
-                    api.getDepartments(),
-                    api.getJobs()
-                ]);
-                setDepartments(deptData.slice(0, 4));
-                setJobs(jobData.slice(0, 3)); // Show top 3 jobs as "Featured"
+                const jobData = await api.getJobs();
+                const sortedJobs = [...jobData].sort((a, b) => {
+                    const dateA = a.postedDate ? new Date(a.postedDate) : new Date(0);
+                    const dateB = b.postedDate ? new Date(b.postedDate) : new Date(0);
+                    return dateB - dateA;
+                });
+                setJobs(sortedJobs.slice(0, 3)); // Show last 3 recent jobs as "Featured"
             } catch (error) {
                 console.error('Error fetching home data:', error);
             } finally {
@@ -48,15 +48,6 @@ const Home = () => {
         };
         fetchData();
     }, []);
-
-    const getDepartmentIcon = (name) => {
-        const n = name.toLowerCase();
-        if (n.includes('tech') || n.includes('engineering')) return <Briefcase />;
-        if (n.includes('design')) return <Users />;
-        if (n.includes('market')) return <Building />;
-        if (n.includes('manage') || n.includes('finance')) return <TrendingUp />;
-        return <Briefcase />;
-    };
 
     const handleSearch = (e) => {
         e.preventDefault();
@@ -136,24 +127,7 @@ const Home = () => {
                 </div>
             </section>
 
-            {/* Departments */}
-            <section className="categories-section">
-                <div className="featured-header">
-                    <div>
-                        <h2 className="featured-title">{t('popularDepartments')}</h2>
-                        <p style={{ color: 'var(--text-muted)' }}>{t('departmentsSubtitle')}</p>
-                    </div>
-                </div>
-                <div className="categories-grid">
-                    {departments.map((dept, i) => (
-                        <div key={i} className="card categories-card">
-                            <div className="cat-icon-box">{getDepartmentIcon(dept.name)}</div>
-                            <h3>{t(dept.name.toLowerCase()) || dept.name}</h3>
-                            <p>{dept.jobCount} {t('activeJobs')}</p>
-                        </div>
-                    ))}
-                </div>
-            </section>
+
 
             {/* Featured Jobs */}
             <section className="featured-section">
