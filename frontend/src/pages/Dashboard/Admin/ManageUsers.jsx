@@ -26,6 +26,8 @@ const ManageUsers = () => {
     const [userToDelete, setUserToDelete] = useState(null);
     const [isSuspendModalOpen, setIsSuspendModalOpen] = useState(false);
     const [userToSuspend, setUserToSuspend] = useState(null);
+    const [isActivateModalOpen, setIsActivateModalOpen] = useState(false);
+    const [userToActivate, setUserToActivate] = useState(null);
 
     const { data: users = [], isLoading } = useUsers();
     const { mutate: updateUserStatus, isPending: isStatusPending } = useUpdateUserStatus();
@@ -47,7 +49,8 @@ const ManageUsers = () => {
             setUserToSuspend(user);
             setIsSuspendModalOpen(true);
         } else {
-            performToggleStatus(user);
+            setUserToActivate(user);
+            setIsActivateModalOpen(true);
         }
     };
 
@@ -71,6 +74,13 @@ const ManageUsers = () => {
         performToggleStatus(userToSuspend);
         setIsSuspendModalOpen(false);
         setUserToSuspend(null);
+    };
+
+    const confirmActivate = () => {
+        if (!userToActivate) return;
+        performToggleStatus(userToActivate);
+        setIsActivateModalOpen(false);
+        setUserToActivate(null);
     };
 
     // ── Delete ────────────────────────────────────────────────────────────────
@@ -274,6 +284,28 @@ const ManageUsers = () => {
             >
                 <p style={{ margin: 0 }}>
                     {t('suspendUserConfirmation') || `Are you sure you want to suspend ${userToSuspend?.name}? They will be blocked from logging into the platform.`}
+                </p>
+            </Modal>
+
+            {/* Activate confirmation modal */}
+            <Modal
+                isOpen={isActivateModalOpen}
+                onClose={() => { setIsActivateModalOpen(false); setUserToActivate(null); }}
+                title={t('activateUserConfirm') || 'Activate User'}
+                type="success"
+                footer={
+                    <>
+                        <button className="btn-outline" onClick={() => { setIsActivateModalOpen(false); setUserToActivate(null); }}>
+                            {t('cancel') || 'Cancel'}
+                        </button>
+                        <button className="btn-success" onClick={confirmActivate} disabled={isStatusPending}>
+                            {isStatusPending ? (t('activating') || 'Activating…') : (t('activate') || 'Activate')}
+                        </button>
+                    </>
+                }
+            >
+                <p style={{ margin: 0 }}>
+                    {t('activateUserConfirmation', { name: userToActivate?.name })}
                 </p>
             </Modal>
         </div>

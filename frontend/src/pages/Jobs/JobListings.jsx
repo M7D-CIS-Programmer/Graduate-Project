@@ -67,10 +67,14 @@ const JobListings = () => {
     const [selectedTypes, setSelectedTypes] = useState(() => getInitialArray('types', 'types'));
     const [selectedWorkModes, setSelectedWorkModes] = useState(() => getInitialArray('modes', 'modes'));
     const [selectedSalaries, setSelectedSalaries] = useState(() => getInitialArray('salaries', 'salaries'));
-    const [selectedDepartment, setSelectedDepartment] = useState(() => getInitial('department', 'departmentId'));
+    const [selectedDepartment, setSelectedDepartment] = useState(() => getInitial('department', 'department'));
 
     const debouncedQuery = useDebounce(searchQuery, 400);
     const { data: departments = [] } = useDepartments();
+
+    const uniqueDepartments = useMemo(() => {
+        return Array.from(new Set(departments.map(d => d.name).filter(Boolean))).sort();
+    }, [departments]);
 
     // Sync state to URL and localStorage
     useEffect(() => {
@@ -80,7 +84,7 @@ const JobListings = () => {
         if (selectedTypes.length > 0) params.set('types', selectedTypes.join(','));
         if (selectedWorkModes.length > 0) params.set('modes', selectedWorkModes.join(','));
         if (selectedSalaries.length > 0) params.set('salaries', selectedSalaries.join(','));
-        if (selectedDepartment) params.set('departmentId', selectedDepartment);
+        if (selectedDepartment) params.set('department', selectedDepartment);
         
         setSearchParams(params, { replace: true });
 
@@ -95,8 +99,7 @@ const JobListings = () => {
     const { data: jobs = [], isLoading: jobsLoading } = useJobs({
         type: selectedTypes.join(','),
         workMode: selectedWorkModes.join(','),
-        q: debouncedQuery,
-        departmentId: selectedDepartment
+        q: debouncedQuery
     });
 
     const { data: savedJobs = [], isLoading: savedLoading } = useSavedJobs();
@@ -178,6 +181,10 @@ const JobListings = () => {
     ];
 
     const filteredJobs = jobs.filter(job => {
+        if (selectedDepartment) {
+            if (job.department?.name !== selectedDepartment) return false;
+        }
+
         if (selectedSalaries.length > 0) {
             return selectedSalaries.some(label => {
                 const range = salaryRanges.find(r => r.label === label);
@@ -258,8 +265,8 @@ const JobListings = () => {
                                 style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', background: 'var(--bg-card)', border: '1px solid var(--border-color)', color: 'var(--text-main)', marginBottom: '1rem' }}
                             >
                                 <option value="">{t('allDepartments') || 'All Departments'}</option>
-                                {departments.map(cat => (
-                                    <option key={cat.id} value={cat.id}>{cat.name}</option>
+                                {uniqueDepartments.map(name => (
+                                    <option key={name} value={name}>{name}</option>
                                 ))}
                             </select>
                         </div>

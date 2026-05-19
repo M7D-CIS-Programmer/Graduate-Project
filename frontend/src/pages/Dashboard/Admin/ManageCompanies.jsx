@@ -27,6 +27,8 @@ const ManageCompanies = () => {
     const [companyToDelete, setCompanyToDelete] = useState(null);
     const [isSuspendModalOpen, setIsSuspendModalOpen] = useState(false);
     const [companyToSuspend, setCompanyToSuspend] = useState(null);
+    const [isActivateModalOpen, setIsActivateModalOpen] = useState(false);
+    const [companyToActivate, setCompanyToActivate] = useState(null);
 
     const { data: rawData = [], isLoading, error } = useUsers();
     const allUsers = Array.isArray(rawData) ? rawData : (rawData?.$values || []);
@@ -46,7 +48,8 @@ const ManageCompanies = () => {
             setCompanyToSuspend(company);
             setIsSuspendModalOpen(true);
         } else {
-            performToggleStatus(company);
+            setCompanyToActivate(company);
+            setIsActivateModalOpen(true);
         }
     };
 
@@ -70,6 +73,13 @@ const ManageCompanies = () => {
         performToggleStatus(companyToSuspend);
         setIsSuspendModalOpen(false);
         setCompanyToSuspend(null);
+    };
+
+    const confirmActivate = () => {
+        if (!companyToActivate) return;
+        performToggleStatus(companyToActivate);
+        setIsActivateModalOpen(false);
+        setCompanyToActivate(null);
     };
 
     // ── Approve (Pending → Active) ────────────────────────────────────────────
@@ -332,6 +342,28 @@ const ManageCompanies = () => {
             >
                 <p style={{ margin: 0 }}>
                     {t('suspendCompanyConfirmation') || `Are you sure you want to suspend ${companyToSuspend?.name}? All their job postings will be hidden and they will be blocked from logging in.`}
+                </p>
+            </Modal>
+
+            {/* Activate confirmation modal */}
+            <Modal
+                isOpen={isActivateModalOpen}
+                onClose={() => { setIsActivateModalOpen(false); setCompanyToActivate(null); }}
+                title={t('activateCompanyConfirm') || 'Activate Company'}
+                type="success"
+                footer={
+                    <>
+                        <button className="btn-outline" onClick={() => { setIsActivateModalOpen(false); setCompanyToActivate(null); }}>
+                            {t('cancel') || 'Cancel'}
+                        </button>
+                        <button className="btn-success" onClick={confirmActivate} disabled={isStatusPending}>
+                            {isStatusPending ? (t('activating') || 'Activating…') : (t('activate') || 'Activate')}
+                        </button>
+                    </>
+                }
+            >
+                <p style={{ margin: 0 }}>
+                    {t('activateCompanyConfirmation', { name: companyToActivate?.name })}
                 </p>
             </Modal>
         </div>

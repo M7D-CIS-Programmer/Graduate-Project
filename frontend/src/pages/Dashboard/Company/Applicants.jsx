@@ -5,7 +5,7 @@ import { useAuth } from '../../../context/AuthContext';
 import { useToast } from '../../../context/ToastContext';
 import { useLanguage } from '../../../context/LanguageContext';
 import { useMyJobs } from '../../../hooks/useJobs';
-import { useDepartments } from '../../../hooks/useDepartments';
+import { useMyDepartments } from '../../../hooks/useDepartments';
 import { api, getImageUrl } from '../../../api/api';
 import {
     Users, Search, Eye, CheckCircle, XCircle, Clock,
@@ -135,7 +135,7 @@ const Applicants = () => {
     // Data hooks
     const { data: applications = [], isLoading } = useApplicationsByCompany(user?.id);
     const { data: myJobs = [] }                  = useMyJobs(user?.id);
-    const { data: dbDepartments = [] }           = useDepartments();
+    const { data: dbDepartments = [] }           = useMyDepartments();
     const { mutate: updateStatus }               = useUpdateApplicationStatus();
 
     // ── Confirmation modal state ───────────────────────────────────────────────
@@ -144,7 +144,7 @@ const Applicants = () => {
     const closeModal = ()                => setModal({ isOpen: false, actionType: null, candidate: null });
 
     // Department names from DB (used in both dropdowns)
-    const departmentNames = useMemo(() => dbDepartments.map(c => c.name).filter(Boolean), [dbDepartments]);
+    const departmentNames = useMemo(() => Array.from(new Set(dbDepartments.map(c => c.name).filter(Boolean))), [dbDepartments]);
 
     // Table filters
     const [searchTerm,     setSearchTerm]    = useState('');

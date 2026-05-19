@@ -1,11 +1,13 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import { X, CheckCircle, AlertCircle, Info } from 'lucide-react';
+import { useLanguage } from './LanguageContext';
 import './Toast.css';
 
 const ToastContext = createContext();
 
 export const ToastProvider = ({ children }) => {
     const [toasts, setToasts] = useState([]);
+    const { t, dir } = useLanguage();
 
     const addToast = useCallback((message, type = 'success', duration = 3000) => {
         const id = Date.now() + Math.random();
@@ -25,7 +27,7 @@ export const ToastProvider = ({ children }) => {
     return (
         <ToastContext.Provider value={{ addToast }}>
             {children}
-            <div className="toast-container">
+            <div className="toast-container" dir={dir}>
                 {toasts.map(toast => (
                     <div key={toast.id} className={`toast toast-${toast.type} slide-in`}>
                         <div className="toast-icon">
@@ -33,7 +35,7 @@ export const ToastProvider = ({ children }) => {
                             {toast.type === 'error' && <AlertCircle size={20} />}
                             {toast.type === 'info' && <Info size={20} />}
                         </div>
-                        <div className="toast-message">{toast.message}</div>
+                        <div className="toast-message">{t(toast.message)}</div>
                         <button className="toast-close" onClick={() => removeToast(toast.id)}>
                             <X size={16} />
                         </button>
@@ -51,3 +53,4 @@ export const useToast = () => {
     }
     return context;
 };
+

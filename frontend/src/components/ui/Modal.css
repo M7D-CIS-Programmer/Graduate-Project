@@ -34,6 +34,10 @@
     border-top: 4px solid #f59e0b;
 }
 
+.modal-content.success {
+    border-top: 4px solid #10b981;
+}
+
 .modal-header {
     padding: 1.25rem 1.5rem;
     border-bottom: 1px solid var(--border-color);

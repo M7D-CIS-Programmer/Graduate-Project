@@ -16,6 +16,7 @@ import { useToast } from '../context/ToastContext';
 import { useLocation, useNavigate } from 'react-router-dom';
 import '../pages/Jobs/Jobs.css';
 import { useApplications, useUpdateApplicationStatus } from '../hooks/useApplications';
+import { useDepartments } from '../hooks/useDepartments';
 import { getImageUrl } from '../api/api';
 import CandidateActionModal from '../components/ui/CandidateActionModal';
 
@@ -30,11 +31,27 @@ const Candidates = () => {
 
     const [searchQuery, setSearchQuery] = useState(initialSearch);
     const { data: applications = [], isLoading, error } = useApplications();
+    const { data: departments = [] } = useDepartments();
+
+    const uniqueDepartmentNames = useMemo(() => {
+        return Array.from(new Set(departments.map(d => d.name).filter(Boolean))).sort();
+    }, [departments]);
+
     const { mutate: updateApplicationStatus } = useUpdateApplicationStatus();
     const [selectedFilters, setSelectedFilters] = useState({
         type: [],
         experience: []
     });
+    const [selectedDepartment, setSelectedDepartment] = useState('');
+
+    const handleResetFilters = () => {
+        setSearchQuery('');
+        setSelectedFilters({
+            type: [],
+            experience: []
+        });
+        setSelectedDepartment('');
+    };
 
     /* ── Modal state ── */
     const [modal, setModal] = useState({
@@ -147,7 +164,13 @@ const Candidates = () => {
             matchesType = selectedFilters.type.includes(app.job?.type);
         }
 
-        return matchesSearch && matchesType;
+        let matchesDepartment = true;
+        if (selectedDepartment) {
+            const deptObj = departments.find(d => String(d.id) === String(app.job?.departmentId));
+            matchesDepartment = deptObj?.name === selectedDepartment;
+        }
+
+        return matchesSearch && matchesType && matchesDepartment;
     });
 
     const handleSearch = (e) => {
@@ -168,9 +191,31 @@ const Candidates = () => {
 
                 <div className="jobs-layout">
                     <aside className="filters-sidebar">
-                        <div className="filter-header" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '2rem' }}>
-                            <Filter size={20} className="text-primary" />
-                            <h2 style={{ fontSize: '1.25rem' }}>{t('filters')}</h2>
+                        <div className="filter-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2rem' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                <Filter size={20} className="text-primary" />
+                                <h2 style={{ fontSize: '1.25rem' }}>{t('filters')}</h2>
+                            </div>
+                            {(searchQuery || selectedFilters.type.length > 0 || selectedFilters.experience.length > 0 || selectedDepartment) && (
+                                <button type="button" className="btn-outline" onClick={handleResetFilters} style={{ padding: '0.25rem 0.5rem', fontSize: '0.85rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'transparent', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.25rem', color: 'var(--text-main)' }}>
+                                    {t('reset') || 'Reset'}
+                                </button>
+                            )}
+                        </div>
+
+                        <div className="filter-section">
+                            <h3 className="filter-title">{t('department') || 'Department'}</h3>
+                            <select
+                                className="filter-select"
+                                value={selectedDepartment}
+                                onChange={(e) => setSelectedDepartment(e.target.value)}
+                                style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', background: 'var(--bg-card)', border: '1px solid var(--border-color)', color: 'var(--text-main)', marginBottom: '1rem' }}
+                            >
+                                <option value="">{t('allDepartments') || 'All Departments'}</option>
+                                {uniqueDepartmentNames.map(name => (
+                                    <option key={name} value={name}>{name}</option>
+                                ))}
+                            </select>
                         </div>
 
                         {filterSections.map(cat => (
