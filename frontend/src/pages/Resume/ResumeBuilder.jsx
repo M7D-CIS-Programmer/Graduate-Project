@@ -22,8 +22,8 @@ import './ResumeBuilder.css';
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 const months = [
-    'January','February','March','April','May','June',
-    'July','August','September','October','November','December'
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
 ];
 const years = Array.from({ length: 60 }, (_, i) => new Date().getFullYear() - i);
 
@@ -173,14 +173,14 @@ const ResumeBuilder = () => {
                 setResumeId(data.id);
                 setFormData({
                     personal: {
-                        name:     data.name      || '',
-                        email:    data.email     || '',
-                        phone:    data.phone     || '',
-                        location: data.location  || '',
-                        linkedin: data.linkedin  || '',
-                        github:   data.github    || '',
-                        website:  data.website   || '',
-                        about:    data.bio        || '',
+                        name: data.name || '',
+                        email: data.email || '',
+                        phone: data.phone || '',
+                        location: data.location || '',
+                        linkedin: data.linkedin || '',
+                        github: data.github || '',
+                        website: data.website || '',
+                        about: data.bio || '',
                     },
                     experience: data.experiences?.length
                         ? data.experiences.map(e => ({
@@ -197,7 +197,7 @@ const ResumeBuilder = () => {
                     skills: data.skills?.map(s => s.name) || [],
                 });
             })
-            .catch(() => {});
+            .catch(() => { });
     }, [user?.id]);
 
     // ── Validation ────────────────────────────────────────────────────────────
@@ -302,29 +302,29 @@ const ResumeBuilder = () => {
     // ── Save ─────────────────────────────────────────────────────────────────
 
     const buildPayload = useCallback(() => ({
-        userId:   user.id,
-        name:     formData.personal.name,
-        email:    formData.personal.email,
-        phone:    formData.personal.phone,
+        userId: user.id,
+        name: formData.personal.name,
+        email: formData.personal.email,
+        phone: formData.personal.phone,
         location: formData.personal.location,
         linkedin: formData.personal.linkedin,
-        github:   formData.personal.github,
-        website:  formData.personal.website,
-        bio:      formData.personal.about,
+        github: formData.personal.github,
+        website: formData.personal.website,
+        bio: formData.personal.about,
         experiences: formData.experience
             .filter(e => !expIsEmpty(e))
             .map(e => ({
-                jobName:     e.title,
+                jobName: e.title,
                 companyName: e.company,
-                startDate:   e.start,
-                endDate:     e.end || null,
+                startDate: e.start,
+                endDate: e.end || null,
                 description: e.description || null,
             })),
         educations: formData.education
             .filter(e => !eduIsEmpty(e))
             .map(e => ({
                 educationLevel: e.degree,
-                institution:    e.school,
+                institution: e.school,
                 graduationYear: parseInt(e.year) || 0,
             })),
         skills: formData.skills.map(s => ({ name: s })),
@@ -354,7 +354,7 @@ const ResumeBuilder = () => {
         } finally {
             if (!silent) setIsSaving(false);
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [buildPayload, resumeId, user?.id, addToast, formData]);
 
     // ── Auto-save (debounced, 3 s — silent, no validation block) ─────────────
@@ -381,7 +381,7 @@ const ResumeBuilder = () => {
                 setTimeout(() => setAutoSaveStatus(''), 4000);
             }
         })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [debouncedForm]);
 
     // ── Experience helpers ────────────────────────────────────────────────────
@@ -465,14 +465,14 @@ const ResumeBuilder = () => {
         }
 
         const doc = new jsPDF();
-        const pw  = doc.internal.pageSize.getWidth();
-        const ph  = doc.internal.pageSize.getHeight();
-        const ml  = 18, mr = 18;
+        const pw = doc.internal.pageSize.getWidth();
+        const ph = doc.internal.pageSize.getHeight();
+        const ml = 18, mr = 18;
         let y = 22;
 
         const primary = [99, 102, 241];
-        const dark    = [30,  41,  59];
-        const muted   = [100, 116, 139];
+        const dark = [30, 41, 59];
+        const muted = [100, 116, 139];
 
         const checkPage = (needed = 10) => {
             if (y + needed > ph - 15) { doc.addPage(); y = 20; }
@@ -512,8 +512,8 @@ const ResumeBuilder = () => {
 
         const socialParts = [
             formData.personal.linkedin && `LinkedIn: ${formData.personal.linkedin}`,
-            formData.personal.github   && `GitHub: ${formData.personal.github}`,
-            formData.personal.website  && formData.personal.website,
+            formData.personal.github && `GitHub: ${formData.personal.github}`,
+            formData.personal.website && formData.personal.website,
         ].filter(Boolean);
         if (socialParts.length) {
             doc.setFontSize(9);
@@ -613,10 +613,10 @@ const ResumeBuilder = () => {
     // ── Tabs ──────────────────────────────────────────────────────────────────
 
     const steps = [
-        { title: 'Personal',   icon: <User size={18} /> },
+        { title: 'Personal', icon: <User size={18} /> },
         { title: 'Experience', icon: <Briefcase size={18} /> },
-        { title: 'Education',  icon: <GraduationCap size={18} /> },
-        { title: 'Skills',     icon: <LangIcon size={18} /> },
+        { title: 'Education', icon: <GraduationCap size={18} /> },
+        { title: 'Skills', icon: <LangIcon size={18} /> },
     ];
 
     const p = formData.personal;
@@ -639,7 +639,7 @@ const ResumeBuilder = () => {
                     </h1>
                     <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', marginTop: '0.2rem' }}>
                         {autoSaveStatus === 'saving' && '● Auto-saving…'}
-                        {autoSaveStatus === 'saved'  && '✓ Auto-saved'}
+                        {autoSaveStatus === 'saved' && '✓ Auto-saved'}
                     </p>
                 </div>
                 <div style={{ display: 'flex', gap: '0.75rem' }}>
@@ -693,24 +693,68 @@ const ResumeBuilder = () => {
                                     onBlur={() => setErr('personal.name', validateName(p.name, lang))} />
 
                                 <Input label={lang === 'ar' ? 'البريد الإلكتروني *' : 'Email *'}
-                                    placeholder="jane@example.com"
+                                    placeholder="Name@example.com"
                                     value={p.email} icon={Mail}
                                     error={getErr('personal.email')}
                                     onChange={e => setFormData(f => ({ ...f, personal: { ...f.personal, email: e.target.value } }))}
                                     onBlur={() => setErr('personal.email', validateEmail(p.email, lang))} />
 
                                 <Input label={lang === 'ar' ? 'رقم الهاتف' : 'Phone'}
-                                    placeholder="+1 555 000 0000"
+                                    placeholder="962799999999"
                                     value={p.phone} icon={Phone}
                                     error={getErr('personal.phone')}
                                     onChange={e => setFormData(f => ({ ...f, personal: { ...f.personal, phone: e.target.value } }))}
                                     onBlur={() => setErr('personal.phone', validatePhone(p.phone, lang))} />
 
-                                <Input label={lang === 'ar' ? 'الموقع' : 'Location'}
-                                    placeholder="Dubai, UAE"
+                                {/* <Input label={lang === 'ar' ? 'الموقع' : 'Location'}
+                                    placeholder="Amman"
                                     value={p.location} icon={MapPin}
-                                    onChange={e => setFormData(f => ({ ...f, personal: { ...f.personal, location: e.target.value } }))} />
+                                    onChange={e => setFormData(f => ({ ...f, personal: { ...f.personal, location: e.target.value } }))} /> */}
+                                <div className="input-group">
+                                    <label className="input-label">
+                                        <MapPin size={16} style={{ marginInlineEnd: '6px' }} />
+                                        {lang === 'ar' ? 'الموقع' : 'Location'}
+                                    </label>
 
+                                    <select
+                                        className="resume-input custom-select"
+                                        value={p.location}
+                                        onChange={(e) =>
+                                            setFormData(f => ({
+                                                ...f,
+                                                personal: {
+                                                    ...f.personal,
+                                                    location: e.target.value
+                                                }
+                                            }))
+                                        }
+                                    >
+                                        <option value="">
+                                            {lang === 'ar' ? 'اختر الموقع' : 'Select Location'}
+                                        </option>
+
+                                        {['Amman', 'Irbid', 'Zarqa', 'Balqa', 'Madaba', 'Karak', 'Tafilah', "Ma'an", 'Aqaba', 'Mafraq', 'Jerash', 'Ajloun'].map(city => (
+                                            <option key={city} value={city}>
+                                                {lang === 'ar'
+                                                    ? {
+                                                        Amman: 'عمّان',
+                                                        Irbid: 'إربد',
+                                                        Zarqa: 'الزرقاء',
+                                                        Balqa: 'البلقاء',
+                                                        Madaba: 'مادبا',
+                                                        Karak: 'الكرك',
+                                                        Tafilah: 'الطفيلة',
+                                                        "Ma'an": 'معان',
+                                                        Aqaba: 'العقبة',
+                                                        Mafraq: 'المفرق',
+                                                        Jerash: 'جرش',
+                                                        Ajloun: 'عجلون'
+                                                    }[city]
+                                                    : city}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
                                 <Input label="LinkedIn"
                                     placeholder="https://linkedin.com/in/yourname"
                                     value={p.linkedin} icon={Linkedin}

@@ -1,7 +1,6 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useLanguage } from '../../context/LanguageContext';
-import { useTheme } from '../../context/ThemeContext';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '../../api/api';
 import { useAuth } from '../../context/AuthContext';
@@ -18,7 +17,6 @@ import {
     User,
     Calendar,
     FileText,
-    ExternalLink,
     MessageSquare
 } from 'lucide-react';
 import './User.css';
@@ -26,7 +24,6 @@ import './User.css';
 const CandidateProfile = () => {
     const { id } = useParams();
     const { t, dir } = useLanguage();
-    const { theme } = useTheme();
     const navigate = useNavigate();
     const { user: currentUser } = useAuth();
 
@@ -88,8 +85,8 @@ const CandidateProfile = () => {
                 <aside className="profile-card-left glass">
                     <div className="profile-avatar-wrapper">
                         <div className="profile-avatar-large">
-                            {candidate.photo ? (
-                                <img src={candidate.photo} alt={candidate.name} />
+                            {candidate.profilePicture ? (
+                                <img src={candidate.profilePicture} alt={candidate.name} />
                             ) : (
                                 candidate.name?.charAt(0)
                             )}
@@ -101,11 +98,11 @@ const CandidateProfile = () => {
 
                     <div className="candidate-stats">
                         <div className="stat-item">
-                            <span className="stat-val">{candidate.appliedJobs?.length || 0}</span>
+                            <span className="stat-val">{(candidate.appliedJobs ?? candidate.AppliedJobs)?.length || 0}</span>
                             <span className="stat-lbl">{t('applications') || 'Applications'}</span>
                         </div>
                         <div className="stat-item">
-                            <span className="stat-val">{candidate.resumes?.length || 0}</span>
+                            <span className="stat-val">{(candidate.resumes ?? candidate.Resumes)?.length || 0}</span>
                             <span className="stat-lbl">{t('resumes') || 'Resumes'}</span>
                         </div>
                     </div>
@@ -134,13 +131,13 @@ const CandidateProfile = () => {
                     </div>
 
                     <div className="social-links-grid">
-                        {candidate.linkedIn && (
-                            <a href={candidate.linkedIn} target="_blank" rel="noreferrer" className="social-btn">
+                        {(candidate.linkedIn || candidate.LinkedIn) && (
+                            <a href={candidate.linkedIn || candidate.LinkedIn} target="_blank" rel="noreferrer" className="social-btn">
                                 <Linkedin size={20} />
                             </a>
                         )}
-                        {candidate.github && (
-                            <a href={candidate.github} target="_blank" rel="noreferrer" className="social-btn">
+                        {(candidate.github || candidate.Github) && (
+                            <a href={candidate.github || candidate.Github} target="_blank" rel="noreferrer" className="social-btn">
                                 <Github size={20} />
                             </a>
                         )}
@@ -175,8 +172,26 @@ const CandidateProfile = () => {
                             <div className="info-summary-card">
                                 <p className="text-muted">
                                     {t('experienceLevel') || 'Experience Level'}:
-                                    <span className="text-main"> {candidate.experienceLevel || t('notSpecified') || 'Not specified'}</span>
+                                    <span className="text-main"> {candidate.experienceLevel || candidate.ExperienceLevel || t('notSpecified') || 'Not specified'}</span>
                                 </p>
+                                {/* Real experiences from resume */}
+                                {(() => {
+                                    const resumes = candidate.resumes ?? candidate.Resumes ?? [];
+                                    const experiences = resumes[0]?.experiences ?? resumes[0]?.Experiences ?? [];
+                                    return experiences.length > 0 ? (
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '1rem' }}>
+                                            {experiences.map((exp, idx) => (
+                                                <div key={idx} style={{ paddingLeft: '0.75rem', borderLeft: '2px solid var(--primary)' }}>
+                                                    <h4 style={{ margin: '0 0 0.2rem 0', fontSize: '0.95rem' }}>{exp.jobName}</h4>
+                                                    <p className="text-muted" style={{ margin: 0, fontSize: '0.85rem' }}>
+                                                        {exp.companyName}
+                                                        {exp.startDate ? ` · ${new Date(exp.startDate).getFullYear()} – ${exp.endDate ? new Date(exp.endDate).getFullYear() : 'Present'}` : ''}
+                                                    </p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ) : null;
+                                })()}
                             </div>
                         </section>
 
@@ -186,11 +201,15 @@ const CandidateProfile = () => {
                                 {t('skills') || 'Top Skills'}
                             </h3>
                             <div className="skills-tag-cloud">
-                                {candidate.resumes?.[0]?.skills?.map((skill, index) => (
-                                    <span key={index} className="skill-tag">{skill.name}</span>
-                                )) || (
-                                        <p className="text-muted">{t('noSkills') || 'No skills listed.'}</p>
-                                    )}
+                                {(() => {
+                                    const resumes = candidate.resumes ?? candidate.Resumes ?? [];
+                                    const skills = resumes[0]?.skills ?? resumes[0]?.Skills ?? [];
+                                    return skills.length > 0
+                                        ? skills.map((skill, index) => (
+                                            <span key={index} className="skill-tag">{skill.name ?? skill.Name}</span>
+                                        ))
+                                        : <p className="text-muted">{t('noSkills') || 'No skills listed.'}</p>;
+                                })()}
                             </div>
                         </section>
                     </div>
