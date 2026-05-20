@@ -125,9 +125,9 @@ const EditProfile = () => {
         try {
             const result = await api.uploadProfilePicture(currentUser.id, file);
             updateUser({ profilePicture: result.imagePath });
-            addToast(t('profileUpdated'), 'success');
+            addToast('profileUpdated', 'success');
         } catch (error) {
-            addToast(t('actionFailed'), 'error');
+            addToast('actionFailed', 'error');
         }
     };
 
@@ -155,10 +155,10 @@ const EditProfile = () => {
             };
 
             await updateUser(payload);
-            addToast(t('profileUpdated'), 'success');
+            addToast('profileUpdated', 'success');
             navigate('/profile');
         } catch (error) {
-            addToast(t('actionFailed'), 'error');
+            addToast('actionFailed', 'error');
         } finally {
             setIsSaving(false);
         }

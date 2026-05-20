@@ -72,9 +72,9 @@ const Profile = () => {
                     const fetchedUser = await api.getUser(id, currentUser?.id);
                     setUserData(fetchedUser);
                 }
-            } catch (error) {
-                console.error("Error fetching user profile:", error);
-                addToast(t('actionFailed'), 'error');
+            } catch (err) {
+                console.error("Error toggling follow status:", err);
+                addToast('actionFailed', 'error');
             } finally {
                 setIsLoading(false);
             }

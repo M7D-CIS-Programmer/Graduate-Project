@@ -36,9 +36,9 @@ const ManageJobs = () => {
     const handleApprove = (job) => {
         updateJobStatus({ id: job.id, status: 'Active' }, {
             onSuccess: () =>
-                addToast(t('jobApproved') || `"${job.title}" has been approved`, 'success'),
+                addToast(t('jobApprovedMsg', { title: job.title }), 'success'),
             onError: (err) =>
-                addToast(err.message || t('actionFailed') || 'Action failed', 'error'),
+                addToast(err.message || 'actionFailed', 'error'),
         });
     };
 
@@ -48,12 +48,12 @@ const ManageJobs = () => {
             onSuccess: () =>
                 addToast(
                     newStatus === 'Suspended'
-                        ? (t('jobSuspended') || `"${job.title}" has been suspended`)
-                        : (t('jobActivated') || `"${job.title}" has been activated`),
+                        ? t('jobRejectedMsg', { title: job.title })
+                        : t('jobApprovedMsg', { title: job.title }),
                     newStatus === 'Suspended' ? 'warning' : 'success'
                 ),
             onError: (err) =>
-                addToast(err.message || t('actionFailed') || 'Action failed', 'error'),
+                addToast(err.message || 'actionFailed', 'error'),
         });
     };
 
@@ -66,12 +66,12 @@ const ManageJobs = () => {
         if (jobToDelete) {
             deleteJob(jobToDelete.id, {
                 onSuccess: () => {
-                    addToast(t('jobDeletedSuccess') || 'Job deleted successfully', 'success');
+                    addToast('jobDeletedSuccess', 'success');
                     setIsDeleteModalOpen(false);
                     setJobToDelete(null);
                 },
                 onError: (err) => {
-                    addToast(err.message || 'Failed to delete job', 'error');
+                    addToast(err.message || 'jobDeleteFailed', 'error');
                 }
             });
         }

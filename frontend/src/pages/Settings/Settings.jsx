@@ -44,17 +44,17 @@ const Settings = () => {
         
         // Validation
         if (!passwordData.current || !passwordData.new || !passwordData.confirm) {
-            addToast(t('allFieldsRequired') || 'All fields are required', 'error');
+            addToast('allFieldsRequired', 'error');
             return;
         }
 
         if (passwordData.new !== passwordData.confirm) {
-            addToast(t('passwordsDontMatch') || 'Passwords do not match', 'error');
+            addToast('passwordsDontMatch', 'error');
             return;
         }
 
         if (passwordData.new.length < 6) {
-            addToast(t('passwordTooShort') || 'Password must be at least 6 characters', 'error');
+            addToast('passwordTooShort', 'error');
             return;
         }
 
@@ -64,11 +64,11 @@ const Settings = () => {
                 currentPassword: passwordData.current,
                 newPassword: passwordData.new
             });
-            addToast(t('passwordUpdatedSuccess') || 'Password updated successfully', 'success');
+            addToast('passwordUpdatedSuccess', 'success');
             setPasswordData({ current: '', new: '', confirm: '' });
         } catch (error) {
             console.error('Failed to update password', error);
-            addToast(error.message || t('actionFailed'), 'error');
+            addToast(error.message || 'actionFailed', 'error');
         } finally {
             setIsSavingSecurity(false);
         }
@@ -79,12 +79,12 @@ const Settings = () => {
         setIsDeleting(true);
         try {
             await api.deleteUser(user.id);
-            addToast(t('accountDeletedSuccess') || 'Account deleted successfully', 'success');
+            addToast('accountDeletedSuccess', 'success');
             logout();
             navigate('/');
         } catch (error) {
             console.error('Failed to delete account', error);
-            addToast(error.message || t('actionFailed'), 'error');
+            addToast(error.message || 'actionFailed', 'error');
         } finally {
             setIsDeleting(false);
             setIsDeleteModalOpen(false);

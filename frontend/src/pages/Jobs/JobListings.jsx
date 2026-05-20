@@ -120,17 +120,17 @@ const JobListings = () => {
     const handleSaveToggle = (e, job) => {
         e.stopPropagation();
         if (!user) {
-            addToast(t('signInToApply') || 'Please sign in to save jobs', 'error');
+            addToast('signInToApply', 'error');
             return;
         }
 
         if (isSaved(job.id)) {
             unsaveJob(getSavedId(job.id), {
-                onSuccess: () => addToast(t('removedFromSaved') || 'Job removed from saved', 'info')
+                onSuccess: () => addToast('removedFromSaved', 'info')
             });
         } else {
             saveJob(job.id, {
-                onSuccess: () => addToast(t('jobSaved') || 'Job saved successfully', 'success')
+                onSuccess: () => addToast('jobSaved', 'success')
             });
         }
     };

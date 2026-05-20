@@ -135,16 +135,10 @@ const ResumeBuilder = () => {
         const url = `${window.location.origin}/resume/${user?.id}`;
         navigator.clipboard.writeText(url).then(() => {
             setCopied(true);
-            addToast(
-                lang === 'ar' ? 'تم نسخ رابط السيرة الذاتية!' : 'Resume link copied to clipboard!',
-                'success'
-            );
+            addToast('linkCopied', 'success');
             setTimeout(() => setCopied(false), 2500);
         }).catch(() => {
-            addToast(
-                lang === 'ar' ? 'تعذّر نسخ الرابط' : 'Failed to copy link',
-                'error'
-            );
+            addToast('actionFailed', 'error');
         });
     };
 
@@ -340,12 +334,7 @@ const ResumeBuilder = () => {
         if (!user?.id) return;
         // Validate before manual save
         if (!silent && !validateAll()) {
-            addToast(
-                lang === 'ar'
-                    ? 'يرجى تصحيح الأخطاء قبل الحفظ'
-                    : 'Please fix the errors before saving',
-                'error'
-            );
+            addToast('fillRequiredFieldsMsg', 'error');
             return false;
         }
         if (!silent) setIsSaving(true);
@@ -357,16 +346,10 @@ const ResumeBuilder = () => {
                 const res = await api.createResume(payload);
                 setResumeId(res.id);
             }
-            if (!silent) addToast(
-                lang === 'ar' ? 'تم حفظ السيرة الذاتية!' : 'Resume saved!',
-                'success'
-            );
+            if (!silent) addToast('resumeSaved', 'success');
             return true;
         } catch {
-            if (!silent) addToast(
-                lang === 'ar' ? 'فشل الحفظ. حاول مرة أخرى.' : 'Failed to save resume.',
-                'error'
-            );
+            if (!silent) addToast('actionFailed', 'error');
             return false;
         } finally {
             if (!silent) setIsSaving(false);
@@ -477,10 +460,7 @@ const ResumeBuilder = () => {
         if (nameErr) {
             setErrors(e => ({ ...e, 'personal.name': nameErr }));
             setActiveStep(0);
-            addToast(
-                lang === 'ar' ? 'يرجى إدخال اسمك أولاً' : 'Please enter your name first',
-                'error'
-            );
+            addToast('fillRequiredFieldsMsg', 'error');
             return;
         }
 

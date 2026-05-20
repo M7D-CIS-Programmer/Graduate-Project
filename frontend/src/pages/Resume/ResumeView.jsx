@@ -35,7 +35,7 @@ const ResumeView = () => {
                 setResume(data);
             } catch (err) {
                 console.error('Error fetching resume:', err);
-                addToast('Could not load candidate resume.', 'error');
+                addToast('actionFailed', 'error');
             } finally {
                 setIsLoading(false);
             }

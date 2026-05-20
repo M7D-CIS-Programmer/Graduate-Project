@@ -26,10 +26,10 @@ export const useFollowCompany = () => {
             queryClient.invalidateQueries({ queryKey: ['followedCompanies', user?.id] });
             // Refresh the company profile so its follower count updates immediately
             queryClient.invalidateQueries({ queryKey: ['company', String(companyId)] });
-            addToast(t('companyFollowed') || 'Company followed successfully', 'success');
+            addToast('companyFollowed', 'success');
         },
         onError: (error) => {
-            addToast(error.message || t('actionFailed'), 'error');
+            addToast(error.message || 'actionFailed', 'error');
         }
     });
 };
@@ -46,10 +46,10 @@ export const useUnfollowCompany = () => {
             queryClient.invalidateQueries({ queryKey: ['followedCompanies', user?.id] });
             // Refresh the company profile so its follower count updates immediately
             queryClient.invalidateQueries({ queryKey: ['company', String(companyId)] });
-            addToast(t('companyUnfollowed') || 'Company unfollowed successfully', 'success');
+            addToast('companyUnfollowed', 'success');
         },
         onError: (error) => {
-            addToast(error.message || t('actionFailed'), 'error');
+            addToast(error.message || 'actionFailed', 'error');
         }
     });
 };

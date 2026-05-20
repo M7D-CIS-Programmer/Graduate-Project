@@ -45,11 +45,11 @@ const Departments = () => {
 
     const handleCreate = () => {
         const name = newName.trim();
-        if (!name) { addToast(t('deptEmpty'), 'error'); return; }
+        if (!name) { addToast('deptEmpty', 'error'); return; }
 
         create(name, {
-            onSuccess: () => { setNewName(''); addToast(t('deptCreated'), 'success'); },
-            onError:   (err) => addToast(err.message || t('deptCreateFailed'), 'error'),
+            onSuccess: () => { setNewName(''); addToast('deptCreated', 'success'); },
+            onError:   (err) => addToast(err.message || 'deptCreateFailed', 'error'),
         });
     };
 
@@ -64,11 +64,11 @@ const Departments = () => {
 
     const handleUpdate = () => {
         const name = editingName.trim();
-        if (!name) { addToast(t('deptEmpty'), 'error'); return; }
+        if (!name) { addToast('deptEmpty', 'error'); return; }
 
         update({ id: editingId, name }, {
-            onSuccess: () => { cancelEdit(); addToast(t('deptUpdated'), 'success'); },
-            onError:   (err) => addToast(err.message || t('deptUpdateFailed'), 'error'),
+            onSuccess: () => { cancelEdit(); addToast('deptUpdated', 'success'); },
+            onError:   (err) => addToast(err.message || 'deptUpdateFailed', 'error'),
         });
     };
 
@@ -79,8 +79,8 @@ const Departments = () => {
 
     const handleDelete = () => {
         remove(deletingId, {
-            onSuccess: () => { setDeletingId(null); addToast(t('deptDeleted'), 'success'); },
-            onError:   (err) => { setDeletingId(null); addToast(err.message || t('deptDeleteFailed'), 'error'); },
+            onSuccess: () => { setDeletingId(null); addToast('deptDeleted', 'success'); },
+            onError:   (err) => { setDeletingId(null); addToast(err.message || 'deptDeleteFailed', 'error'); },
         });
     };
 

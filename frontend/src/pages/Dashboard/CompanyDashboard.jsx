@@ -88,12 +88,11 @@ const CompanyDashboard = () => {
         try {
             await updateStatusMutation.mutateAsync({ id: applicant.id, status: newStatus });
             addToast(
-                t(actionType === 'accept' ? 'candidateAccepted' : 'candidateRejected') ||
-                `Applicant ${actionType === 'accept' ? 'Accepted' : 'Rejected'}`,
+                actionType === 'accept' ? 'candidateAccepted' : 'candidateRejected',
                 'success'
             );
         } catch (error) {
-            addToast(t('actionFailed') || 'Failed to update status', 'error');
+            addToast('actionFailed', 'error');
         }
     };
 

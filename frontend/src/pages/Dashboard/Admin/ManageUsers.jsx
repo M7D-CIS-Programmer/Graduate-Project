@@ -60,12 +60,12 @@ const ManageUsers = () => {
             onSuccess: () =>
                 addToast(
                     newStatus === 'Suspended'
-                        ? (t('userSuspended') || `${user.name} has been suspended`)
-                        : (t('userActivated') || `${user.name} has been activated`),
+                        ? t('userSuspendedMsg', { name: user.name })
+                        : t('userActivatedMsg', { name: user.name }),
                     newStatus === 'Suspended' ? 'warning' : 'success'
                 ),
             onError: (err) =>
-                addToast(err.message || t('actionFailed') || 'Action failed', 'error'),
+                addToast(err.message || 'actionFailed', 'error'),
         });
     };
 
@@ -93,12 +93,12 @@ const ManageUsers = () => {
         if (!userToDelete) return;
         deleteUser(userToDelete.id, {
             onSuccess: () => {
-                addToast(t('userDeletedSuccess') || 'User deleted successfully', 'success');
+                addToast('userDeletedSuccess', 'success');
                 setIsDeleteModalOpen(false);
                 setUserToDelete(null);
             },
             onError: (err) =>
-                addToast(err.message || t('actionFailed') || 'Failed to delete user', 'error'),
+                addToast(err.message || 'actionFailed', 'error'),
         });
     };
 

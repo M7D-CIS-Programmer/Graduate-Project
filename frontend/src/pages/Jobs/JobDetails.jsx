@@ -79,7 +79,7 @@ const JobDetails = () => {
 
     const handleSave = () => {
         if (!user) {
-            addToast(t('signInToApply') || 'Please sign in to save jobs', 'error');
+            addToast('signInToApply', 'error');
             return;
         }
 
@@ -90,7 +90,7 @@ const JobDetails = () => {
             unsaveJob(savedJobId, {
                 onError: () => {
                     setIsSaved(true);
-                    addToast('Failed to remove saved job.', 'error');
+                    addToast('removeSavedFailed', 'error');
                 },
             });
         } else {
@@ -98,7 +98,7 @@ const JobDetails = () => {
             saveJob(job.id, {
                 onError: () => {
                     setIsSaved(false);
-                    addToast('Failed to save job.', 'error');
+                    addToast('saveFailed', 'error');
                 },
             });
         }
@@ -106,7 +106,7 @@ const JobDetails = () => {
 
     const handleApplyClick = () => {
         if (!user) {
-            addToast(t('signInToApply') || 'Please sign in to apply', 'error');
+            addToast('signInToApply', 'error');
             return;
         }
         if (isApplied) return;
@@ -122,7 +122,7 @@ const JobDetails = () => {
         e.preventDefault();
 
         if (!user) {
-            addToast(t('signInToApply') || 'Please sign in to apply', 'error');
+            addToast('signInToApply', 'error');
             return;
         }
 
@@ -130,14 +130,14 @@ const JobDetails = () => {
 
         const appliedDate = new Date().toISOString();
         if (!formData.cvFile) {
-            addToast('Please upload your CV as a PDF file.', 'error');
+            addToast('cvFormatPdf', 'error');
             return;
         }
 
         const isPdf = formData.cvFile.type === 'application/pdf'
             || formData.cvFile.name.toLowerCase().endsWith('.pdf');
         if (!isPdf) {
-            addToast('Only PDF CV files are allowed.', 'error');
+            addToast('cvFormatPdf', 'error');
             return;
         }
 
@@ -172,17 +172,17 @@ const JobDetails = () => {
 
                 setIsApplied(true);
                 setIsModalOpen(false);
-                addToast(t('appliedSuccess') || 'Application submitted successfully!', 'success');
+                addToast('appliedSuccess', 'success');
             },
             onError: () => {
-                addToast('Failed to submit application', 'error');
+                addToast('applyFailed', 'error');
             }
         });
     };
 
     const handleShare = () => {
         navigator.clipboard.writeText(window.location.href);
-        addToast('Job link copied to clipboard!', 'info');
+        addToast('linkCopied', 'info');
     };
 
     return (

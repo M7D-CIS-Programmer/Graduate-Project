@@ -47,7 +47,7 @@ const PlatformSettings = () => {
 
     const handleClearCache = () => {
         if (window.confirm(t('clearCache') + '?')) {
-            addToast('Cache cleared successfully.', 'success');
+            addToast('cacheClearedSuccess', 'success');
         }
     };
 

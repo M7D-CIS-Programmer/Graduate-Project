@@ -187,9 +187,9 @@ const ContactMessages = () => {
             // Update the cached detail too
             setDetailMsg(d => d?.id === id ? { ...d, status } : d);
             queryClient.invalidateQueries({ queryKey: ['contact-messages'] });
-            addToast(ar ? 'تم تحديث الحالة' : 'Status updated', 'success');
+            addToast('statusUpdated', 'success');
         },
-        onError: () => addToast(ar ? 'فشل تحديث الحالة' : 'Failed to update status', 'error'),
+        onError: () => addToast('statusUpdateFailed', 'error'),
     });
 
     const { mutate: deleteMsg, isPending: isDeleting } = useMutation({
@@ -198,9 +198,9 @@ const ContactMessages = () => {
             queryClient.invalidateQueries({ queryKey: ['contact-messages'] });
             setDeleteTarget(null);
             if (detailMsg?.id === deleteTarget) setDetailMsg(null);
-            addToast(ar ? 'تم حذف الرسالة' : 'Message deleted', 'success');
+            addToast('messageDeleted', 'success');
         },
-        onError: () => addToast(ar ? 'فشل الحذف' : 'Failed to delete', 'error'),
+        onError: () => addToast('deleteFailed', 'error'),
     });
 
     // ── Helpers ───────────────────────────────────────────────────────────────

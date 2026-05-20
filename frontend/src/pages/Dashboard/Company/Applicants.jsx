@@ -225,7 +225,7 @@ const Applicants = () => {
                     if (res.ok) {
                         window.open(cvUrl, '_blank', 'noopener,noreferrer');
                     } else {
-                        addToast(t('cvNotAvailable') || 'CV file is missing from the server', 'error');
+                        addToast('cvNotAvailable', 'error');
                     }
                 } catch {
                     window.open(cvUrl, '_blank', 'noopener,noreferrer');
@@ -233,7 +233,7 @@ const Applicants = () => {
             } else if ((app.hasResume || app.resumeUrl) && app.userId) {
                 navigate(`/resume/${app.userId}`);
             } else {
-                addToast(t('cvNotAvailable') || 'CV not available for this candidate', 'error');
+                addToast('cvNotAvailable', 'error');
             }
         } else if (action === 'viewProfile') navigate(`/candidate/${app.userId}`);
     };
@@ -243,15 +243,15 @@ const Applicants = () => {
         closeModal();
         const newStatus = actionType === 'accept' ? 'Shortlisted' : actionType === 'review' ? 'Reviewing' : 'Rejected';
         updateStatus({ id: app.id, status: newStatus }, {
-            onSuccess: () => addToast(t(actionType === 'accept' ? 'candidateAccepted' : actionType === 'reject' ? 'candidateRejected' : 'candidateReviewing'), 'success'),
-            onError:   () => addToast(t('actionFailed'), 'error'),
+            onSuccess: () => addToast(actionType === 'accept' ? 'candidateAccepted' : actionType === 'reject' ? 'candidateRejected' : 'candidateReviewing', 'success'),
+            onError:   () => addToast('actionFailed', 'error'),
         });
     };
 
     const handleGenerateReport = async () => {
-        if (!reportDepartment)                  { addToast('Please select a department.', 'error'); return; }
-        if (!reportJobTitle.trim())           { addToast('Please enter a job title.', 'error'); return; }
-        if (reportJobDesc.trim().length < 20) { addToast('Job description is too short (min 20 chars).', 'error'); return; }
+        if (!reportDepartment)                  { addToast('selectDepartmentMsg', 'error'); return; }
+        if (!reportJobTitle.trim())           { addToast('enterJobTitleMsg', 'error'); return; }
+        if (reportJobDesc.trim().length < 20) { addToast('jobDescTooShortMsg', 'error'); return; }
 
         setIsGenerating(true);
         setReportResults(null);

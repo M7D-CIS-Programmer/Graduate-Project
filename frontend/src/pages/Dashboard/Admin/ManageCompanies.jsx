@@ -59,12 +59,12 @@ const ManageCompanies = () => {
             onSuccess: () =>
                 addToast(
                     newStatus === 'Suspended'
-                        ? (t('companySuspended') || `${company.name} has been suspended`)
-                        : (t('companyActivated') || `${company.name} has been activated`),
+                        ? t('companySuspendedMsg', { name: company.name })
+                        : t('companyActivatedMsg', { name: company.name }),
                     newStatus === 'Suspended' ? 'warning' : 'success'
                 ),
             onError: (err) =>
-                addToast(err.message || t('actionFailed') || 'Action failed', 'error'),
+                addToast(err.message || 'actionFailed', 'error'),
         });
     };
 
@@ -86,9 +86,9 @@ const ManageCompanies = () => {
     const handleApprove = (company) => {
         updateUserStatus({ id: company.id, status: 'Active' }, {
             onSuccess: () =>
-                addToast(t('companyApproved') || `${company.name} has been approved`, 'success'),
+                addToast(t('companyApprovedMsg', { name: company.name }), 'success'),
             onError: (err) =>
-                addToast(err.message || t('actionFailed') || 'Action failed', 'error'),
+                addToast(err.message || 'actionFailed', 'error'),
         });
     };
 
@@ -102,12 +102,12 @@ const ManageCompanies = () => {
         if (!companyToDelete) return;
         deleteUser(companyToDelete.id, {
             onSuccess: () => {
-                addToast(t('companyDeletedSuccess') || 'Company deleted successfully', 'success');
+                addToast('companyDeletedSuccess', 'success');
                 setIsDeleteModalOpen(false);
                 setCompanyToDelete(null);
             },
             onError: (err) =>
-                addToast(err.message || t('actionFailed') || 'Failed to delete company', 'error'),
+                addToast(err.message || 'actionFailed', 'error'),
         });
     };
 
