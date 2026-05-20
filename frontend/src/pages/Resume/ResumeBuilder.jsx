@@ -3,7 +3,7 @@ import jsPDF from 'jspdf';
 import {
     User, MapPin, Briefcase, GraduationCap, Plus, Trash2,
     Phone, Mail, Globe, Github, Linkedin,
-    Languages as LangIcon, Download, Eye, X, Save
+    Languages as LangIcon, Download, Eye, X, Save, Link2, Check
 } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { useTheme } from '../../context/ThemeContext';
@@ -128,7 +128,25 @@ const ResumeBuilder = () => {
     const [resumeId, setResumeId] = useState(null);
     const [isSaving, setIsSaving] = useState(false);
     const [autoSaveStatus, setAutoSaveStatus] = useState('');
+    const [copied, setCopied] = useState(false);
     const isFirstLoad = useRef(true);
+
+    const handleCopyLink = () => {
+        const url = `${window.location.origin}/resume/${user?.id}`;
+        navigator.clipboard.writeText(url).then(() => {
+            setCopied(true);
+            addToast(
+                lang === 'ar' ? 'تم نسخ رابط السيرة الذاتية!' : 'Resume link copied to clipboard!',
+                'success'
+            );
+            setTimeout(() => setCopied(false), 2500);
+        }).catch(() => {
+            addToast(
+                lang === 'ar' ? 'تعذّر نسخ الرابط' : 'Failed to copy link',
+                'error'
+            );
+        });
+    };
 
     // ── Field-level errors ─────────────────────────────────────────────────────
     // Keys: 'personal.name', 'personal.email', 'personal.phone', 'personal.about',
@@ -650,6 +668,14 @@ const ResumeBuilder = () => {
                         {isSaving
                             ? (lang === 'ar' ? 'جارٍ الحفظ…' : 'Saving…')
                             : (lang === 'ar' ? 'حفظ' : 'Save')}
+                    </Button>
+                    <Button variant="outline" onClick={handleCopyLink}
+                        style={copied ? { borderColor: '#22c55e', color: '#22c55e' } : {}}
+                    >
+                        {copied ? <Check size={16} /> : <Link2 size={16} />}
+                        {copied
+                            ? (lang === 'ar' ? 'تم النسخ!' : 'Copied!')
+                            : (lang === 'ar' ? 'نسخ الرابط' : 'Copy Link')}
                     </Button>
                     <Button onClick={handleDownloadPDF}>
                         <Download size={16} />
