@@ -194,7 +194,7 @@ export default function JobPost() {
                         {lang === 'ar' ? "يرجى الذهاب إلى صفحة الأقسام الخاصة بك وإنشاء قسم قبل نشر وظيفة." : "Please go to your departments page and create a department before posting a job."}
                     </p>
                     <div style={{ marginTop: '2rem' }}>
-                        <button className="btn-primary" onClick={() => navigate('/dashboard/company')}>
+                        <button className="btn-primary" onClick={() => navigate('/departments')}>
                             <Plus size={20} />
                             {lang === 'ar' ? "إنشاء قسم" : "Create a Department"}
                         </button>

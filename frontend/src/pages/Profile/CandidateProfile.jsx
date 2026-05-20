@@ -195,31 +195,7 @@ const CandidateProfile = () => {
                         </section>
                     </div>
 
-                    {/* Applications History (Optional visibility for Company) */}
-                    <section className="dashboard-section glass">
-                        <h3 className="section-title">
-                            <FileText size={20} />
-                            {t('resumeOverview') || 'Resume Overview'}
-                        </h3>
-                        {candidate.resumes?.length > 0 ? (
-                            candidate.resumes.map(resume => (
-                                <div key={resume.id} className="resume-preview-card">
-                                    <div className="resume-icon">
-                                        <FileText size={24} />
-                                    </div>
-                                    <div className="resume-info">
-                                        <h4>{resume.title}</h4>
-                                        <p>{resume.summary?.substring(0, 100)}...</p>
-                                    </div>
-                                    <Button variant="outline" size="sm" onClick={() => navigate(`/resume/${candidate.id}`)}>
-                                        {t('view')}
-                                    </Button>
-                                </div>
-                            ))
-                        ) : (
-                            <p className="text-muted">{t('noResumes') || 'No resumes uploaded.'}</p>
-                        )}
-                    </section>
+
                 </div>
             </div>
 

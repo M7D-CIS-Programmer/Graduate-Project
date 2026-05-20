@@ -273,8 +273,8 @@ const Navbar = ({ toggleSidebar }) => {
                                                     className={`dropdown-item ${!notif.isRead ? 'unread' : ''}`}
                                                     onClick={() => {
                                                         if (!notif.isRead) markAsRead(notif.id);
-                                                        if (notif.link) navigate(notif.link);
                                                         setShowNotifications(false);
+                                                        navigate('/notifications');
                                                     }}
                                                 >
                                                     <div className="item-content">

@@ -643,12 +643,6 @@ const ResumeBuilder = () => {
                     </p>
                 </div>
                 <div style={{ display: 'flex', gap: '0.75rem' }}>
-                    <Button variant="outline" onClick={() => save(false)} disabled={isSaving}>
-                        <Save size={16} />
-                        {isSaving
-                            ? (lang === 'ar' ? 'جارٍ الحفظ…' : 'Saving…')
-                            : (lang === 'ar' ? 'حفظ' : 'Save')}
-                    </Button>
                     <Button variant="outline" onClick={handleCopyLink}
                         style={copied ? { borderColor: '#22c55e', color: '#22c55e' } : {}}
                     >
