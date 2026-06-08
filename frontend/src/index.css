@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap');
 
 :root {
-  --primary: #6366f1;
+  --primary: #0f0f14;
   --primary-hover: #4f46e5;
   --bg-dark: #0f172a;
   --bg-card: rgba(30, 41, 59, 0.7);
@@ -19,7 +19,7 @@
 }
 
 [data-theme='light'] {
-  --primary: #3D52A0;
+  --primary: #58114a;
   --primary-hover: #7091E6;
   --bg-dark: #EDE8F5;
   /* Page Background */
